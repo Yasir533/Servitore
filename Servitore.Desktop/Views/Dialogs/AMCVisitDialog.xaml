@@ -1,0 +1,65 @@
+<Window x:Class="Servitore.Desktop.Views.Dialogs.AMCVisitDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="AMC Visit Details" Height="480" Width="420"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        Loaded="Window_Loaded">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="AMC Visit Details" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,20" x:Name="TitleText"/>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="0,0,8,0">
+
+                <DatePicker x:Name="ScheduledDatePicker"
+                            materialDesign:HintAssist.Hint="Scheduled Date *"
+                            Style="{StaticResource MaterialDesignOutlinedDatePicker}"
+                            Margin="0,0,0,12" />
+
+                <DatePicker x:Name="ActualVisitDatePicker"
+                            materialDesign:HintAssist.Hint="Actual Visit Date"
+                            Style="{StaticResource MaterialDesignOutlinedDatePicker}"
+                            Margin="0,0,0,12" />
+
+                <ComboBox x:Name="StatusCombo"
+                          materialDesign:HintAssist.Hint="Visit Status *"
+                          Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                          Margin="0,0,0,12">
+                    <ComboBoxItem Content="Scheduled" Tag="Scheduled" IsSelected="True" />
+                    <ComboBoxItem Content="Completed" Tag="Completed" />
+                    <ComboBoxItem Content="Cancelled" Tag="Cancelled" />
+                </ComboBox>
+
+                <ComboBox x:Name="EngineerCombo"
+                          materialDesign:HintAssist.Hint="Assign Engineer"
+                          Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                          DisplayMemberPath="FullName"
+                          SelectedValuePath="Id"
+                          Margin="0,0,0,12" />
+
+                <TextBox x:Name="RemarksBox"
+                         materialDesign:HintAssist.Hint="Remarks / Visit Notes"
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         Height="80" TextWrapping="Wrap" AcceptsReturn="True"
+                         VerticalScrollBarVisibility="Auto" />
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <Button Content="Cancel" Style="{StaticResource MaterialDesignFlatButton}" Click="Cancel_Click" Margin="0,0,8,0" />
+            <Button Content="Save" Style="{StaticResource MaterialDesignRaisedButton}" Click="Save_Click" Width="90" />
+        </StackPanel>
+    </Grid>
+</Window>

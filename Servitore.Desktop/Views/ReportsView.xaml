@@ -1,0 +1,101 @@
+<UserControl x:Class="Servitore.Desktop.Views.ReportsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,24">
+            <TextBlock Text="Reports" FontSize="26" FontWeight="SemiBold" />
+            <TextBlock Text="Generate and export business reports" Opacity="0.55" FontSize="13" />
+        </StackPanel>
+
+        <UniformGrid Grid.Row="1" Rows="2" Columns="3">
+
+            <!-- Customer Report -->
+            <Border Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="6"
+                    Margin="0,0,12,12" Padding="24">
+                <StackPanel>
+                    <materialDesign:PackIcon Kind="AccountGroup" Width="36" Height="36" Foreground="#5C6BC0" Margin="0,0,0,12" />
+                    <TextBlock Text="Customer Report" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,4" />
+                    <TextBlock Text="All customers with contact details" Opacity="0.55" FontSize="12" Margin="0,0,0,16" TextWrapping="Wrap" />
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="Excel" Style="{StaticResource MaterialDesignOutlinedButton}"
+                                Command="{Binding ExportCustomersExcelCommand}" Margin="0,0,8,0" />
+                        <Button Content="PDF"   Style="{StaticResource MaterialDesignFlatButton}"
+                                Command="{Binding ExportCustomersPdfCommand}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Asset Report -->
+            <Border Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="6"
+                    Margin="0,0,12,12" Padding="24">
+                <StackPanel>
+                    <materialDesign:PackIcon Kind="Devices" Width="36" Height="36" Foreground="#26A69A" Margin="0,0,0,12" />
+                    <TextBlock Text="Asset Report" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,4" />
+                    <TextBlock Text="Full asset inventory with warranty status" Opacity="0.55" FontSize="12" Margin="0,0,0,16" TextWrapping="Wrap" />
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="Excel" Style="{StaticResource MaterialDesignOutlinedButton}"
+                                Command="{Binding ExportAssetsExcelCommand}" Margin="0,0,8,0" />
+                        <Button Content="PDF"   Style="{StaticResource MaterialDesignFlatButton}"
+                                Command="{Binding ExportAssetsPdfCommand}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Ticket Report -->
+            <Border Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="6"
+                    Margin="0,0,0,12" Padding="24">
+                <StackPanel>
+                    <materialDesign:PackIcon Kind="TicketOutline" Width="36" Height="36" Foreground="#EF5350" Margin="0,0,0,12" />
+                    <TextBlock Text="Service Ticket Report" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,4" />
+                    <TextBlock Text="All tickets with status and resolution details" Opacity="0.55" FontSize="12" Margin="0,0,0,16" TextWrapping="Wrap" />
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="Excel" Style="{StaticResource MaterialDesignOutlinedButton}"
+                                Command="{Binding ExportTicketsExcelCommand}" Margin="0,0,8,0" />
+                        <Button Content="PDF"   Style="{StaticResource MaterialDesignFlatButton}"
+                                Command="{Binding ExportTicketsPdfCommand}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Warranty Report -->
+            <Border Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="6"
+                    Margin="0,0,12,0" Padding="24">
+                <StackPanel>
+                    <materialDesign:PackIcon Kind="ShieldAlert" Width="36" Height="36" Foreground="#FFA726" Margin="0,0,0,12" />
+                    <TextBlock Text="Warranty Report" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,4" />
+                    <TextBlock Text="Expired and expiring warranties" Opacity="0.55" FontSize="12" Margin="0,0,0,16" TextWrapping="Wrap" />
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="Excel" Style="{StaticResource MaterialDesignOutlinedButton}"
+                                Command="{Binding ExportWarrantyExcelCommand}" Margin="0,0,8,0" />
+                        <Button Content="PDF"   Style="{StaticResource MaterialDesignFlatButton}"
+                                Command="{Binding ExportWarrantyPdfCommand}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- AMC Report -->
+            <Border Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="6"
+                    Margin="0,0,12,0" Padding="24">
+                <StackPanel>
+                    <materialDesign:PackIcon Kind="FileSign" Width="36" Height="36" Foreground="#42A5F5" Margin="0,0,0,12" />
+                    <TextBlock Text="AMC Report" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,4" />
+                    <TextBlock Text="Active and expiring AMC contracts" Opacity="0.55" FontSize="12" Margin="0,0,0,16" TextWrapping="Wrap" />
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="Excel" Style="{StaticResource MaterialDesignOutlinedButton}"
+                                Command="{Binding ExportAmcExcelCommand}" Margin="0,0,8,0" />
+                        <Button Content="PDF"   Style="{StaticResource MaterialDesignFlatButton}"
+                                Command="{Binding ExportAmcPdfCommand}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+        </UniformGrid>
+    </Grid>
+</UserControl>

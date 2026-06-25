@@ -1,0 +1,63 @@
+<UserControl x:Class="Servitore.Desktop.Views.ActivityLogView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,16">
+            <StackPanel>
+                <TextBlock Text="Activity Logs" FontSize="26" FontWeight="SemiBold" />
+                <TextBlock Text="System audit logs and user activity trail" Opacity="0.55" FontSize="13" />
+            </StackPanel>
+        </StackPanel>
+
+        <!-- Loading Progress Bar -->
+        <ProgressBar Grid.Row="1" Style="{StaticResource MaterialDesignLinearProgressBar}"
+                     IsIndeterminate="True" Margin="0,0,0,8"
+                     Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+        <!-- Filters Row -->
+        <Grid Grid.Row="2" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="180" />
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0"
+                     materialDesign:HintAssist.Hint="Search by user, action, module, or Log ID…"
+                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                     Margin="0,0,12,0" />
+            <ComboBox Grid.Column="1"
+                      materialDesign:HintAssist.Hint="Filter by Module"
+                      Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                      ItemsSource="{Binding Modules}"
+                      SelectedItem="{Binding SelectedModule, UpdateSourceTrigger=PropertyChanged}" />
+        </Grid>
+
+        <!-- Data Grid -->
+        <Border Grid.Row="3" Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="6">
+            <DataGrid ItemsSource="{Binding LogsView}"
+                      AutoGenerateColumns="False" IsReadOnly="True" CanUserSortColumns="True"
+                      materialDesign:DataGridAssist.CellPadding="14 8 14 8"
+                      materialDesign:DataGridAssist.ColumnHeaderPadding="14 8 14 8">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Log ID"      Binding="{Binding LogId}"                       Width="95" />
+                    <DataGridTextColumn Header="Timestamp"   Binding="{Binding DateTime, StringFormat='{}{0:yyyy-MM-dd HH:mm:ss}'}" Width="160" />
+                    <DataGridTextColumn Header="User"        Binding="{Binding UserName}"                    Width="140" />
+                    <DataGridTextColumn Header="Module"      Binding="{Binding Module}"                      Width="120" />
+                    <DataGridTextColumn Header="Action"      Binding="{Binding Action}"                      Width="*" />
+                    <DataGridTextColumn Header="IP Address"  Binding="{Binding IPAddress}"                  Width="125" />
+                    <DataGridTextColumn Header="Client/OS"   Binding="{Binding SystemName}"                  Width="175" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+    </Grid>
+</UserControl>

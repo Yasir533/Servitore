@@ -1,0 +1,24 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+## Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+
+## NuGet
+*.nupkg
+**/packages/*
+
+## Rider / VS Code
+.idea/
+.vscode/
+
+## Secrets - never commit real connection strings, JWT keys, or API keys
+appsettings.Production.json
+*.pfx

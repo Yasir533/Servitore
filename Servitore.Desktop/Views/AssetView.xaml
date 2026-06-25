@@ -1,0 +1,97 @@
+<UserControl x:Class="Servitore.Desktop.Views.AssetView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,16">
+            <StackPanel>
+                <TextBlock Text="Assets" FontSize="26" FontWeight="SemiBold" />
+                <TextBlock Text="Equipment installed at customer sites" Opacity="0.55" FontSize="13" />
+            </StackPanel>
+            <Button Content="+ Add Asset"
+                    Style="{StaticResource MaterialDesignRaisedButton}"
+                    Command="{Binding AddAssetCommand}"
+                    HorizontalAlignment="Right" Margin="16,0,0,0" VerticalAlignment="Center" />
+        </StackPanel>
+
+        <ProgressBar Grid.Row="1" Style="{StaticResource MaterialDesignLinearProgressBar}"
+                     IsIndeterminate="True" Margin="0,0,0,8"
+                     Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+        <!-- Scan / search row -->
+        <Grid Grid.Row="2" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="200" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0"
+                     materialDesign:HintAssist.Hint="Search by name, serial, or asset code…"
+                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                     Margin="0,0,12,0" />
+            <TextBox Grid.Column="1"
+                     materialDesign:HintAssist.Hint="Scan barcode / QR"
+                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                     Text="{Binding ScannedCode, UpdateSourceTrigger=PropertyChanged}"
+                     Margin="0,0,8,0" />
+            <Button Grid.Column="2" Content="Lookup"
+                    Style="{StaticResource MaterialDesignOutlinedButton}"
+                    Command="{Binding LookupByBarcodeCommand}" />
+        </Grid>
+
+        <!-- Data grid -->
+        <Border Grid.Row="3" Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="6">
+            <DataGrid ItemsSource="{Binding AssetsView}"
+                      AutoGenerateColumns="False" IsReadOnly="True" CanUserSortColumns="True"
+                      MouseDoubleClick="DataGrid_MouseDoubleClick"
+                      materialDesign:DataGridAssist.CellPadding="14 8 14 8"
+                      materialDesign:DataGridAssist.ColumnHeaderPadding="14 8 14 8">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="ID"          Binding="{Binding AssetId}"     Width="60" />
+                    <DataGridTextColumn Header="Asset Code"  Binding="{Binding AssetCode}"   Width="120" />
+                    <DataGridTextColumn Header="Product"     Binding="{Binding ProductName}" Width="*" />
+                    <DataGridTextColumn Header="Serial No."  Binding="{Binding SerialNumber}" Width="150" />
+                    <DataGridTextColumn Header="Customer"    Binding="{Binding CustomerName}" Width="180" />
+                    <DataGridTextColumn Header="Warranty"    Binding="{Binding WarrantyStatus}" Width="130" />
+                    <DataGridTemplateColumn Header="Actions" Width="130">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Style="{StaticResource MaterialDesignIconButton}"
+                                            Command="{Binding DataContext.ViewProfileCommand,
+                                                      RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                            CommandParameter="{Binding}" ToolTip="View Details">
+                                        <materialDesign:PackIcon Kind="Eye" Width="16" Height="16" />
+                                    </Button>
+                                    <Button Style="{StaticResource MaterialDesignIconButton}"
+                                            Command="{Binding DataContext.EditAssetCommand,
+                                                      RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                            CommandParameter="{Binding}" ToolTip="Edit">
+                                        <materialDesign:PackIcon Kind="Pencil" Width="16" Height="16" />
+                                    </Button>
+                                    <Button Style="{StaticResource MaterialDesignIconButton}"
+                                            Command="{Binding DataContext.DeleteAssetCommand,
+                                                      RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                            CommandParameter="{Binding}" ToolTip="Delete"
+                                            Foreground="{DynamicResource MaterialDesignValidationErrorBrush}">
+                                        <materialDesign:PackIcon Kind="Delete" Width="16" Height="16" />
+                                    </Button>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+    </Grid>
+</UserControl>

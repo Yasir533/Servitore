@@ -1,0 +1,80 @@
+<UserControl x:Class="Servitore.Desktop.Views.UserManagementView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,16">
+            <StackPanel>
+                <TextBlock Text="User Management" FontSize="26" FontWeight="SemiBold" />
+                <TextBlock Text="System users and roles" Opacity="0.55" FontSize="13" />
+            </StackPanel>
+            <Button Content="+ Add User"
+                    Style="{StaticResource MaterialDesignRaisedButton}"
+                    Command="{Binding AddUserCommand}"
+                    HorizontalAlignment="Right" Margin="16,0,0,0" VerticalAlignment="Center" />
+        </StackPanel>
+
+        <ProgressBar Grid.Row="1" Style="{StaticResource MaterialDesignLinearProgressBar}"
+                     IsIndeterminate="True" Margin="0,0,0,8"
+                     Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+        <TextBox Grid.Row="2"
+                 materialDesign:HintAssist.Hint="Search by name or username…"
+                 Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                 Margin="0,0,0,12" />
+
+        <Border Grid.Row="3" Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="6">
+            <DataGrid ItemsSource="{Binding UsersView}"
+                      AutoGenerateColumns="False" IsReadOnly="True" CanUserSortColumns="True"
+                      materialDesign:DataGridAssist.CellPadding="14 8 14 8"
+                      materialDesign:DataGridAssist.ColumnHeaderPadding="14 8 14 8">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="ID"         Binding="{Binding Id}"        Width="60" />
+                    <DataGridTextColumn Header="Full Name"  Binding="{Binding FullName}"  Width="*" />
+                    <DataGridTextColumn Header="Username"   Binding="{Binding Username}"  Width="150" />
+                    <DataGridTextColumn Header="Email"      Binding="{Binding Email}"     Width="220" />
+                    <DataGridTextColumn Header="Role"       Binding="{Binding RoleName}"  Width="120" />
+                    <DataGridTextColumn Header="Phone"      Binding="{Binding PhoneNumber}" Width="130" />
+                    <DataGridTemplateColumn Header="Active" Width="80">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <materialDesign:PackIcon Kind="CheckCircle" Foreground="#4CAF50"
+                                                         Visibility="{Binding IsActive, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                         HorizontalAlignment="Center" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Actions" Width="100">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Style="{StaticResource MaterialDesignIconButton}"
+                                            Command="{Binding DataContext.EditUserCommand,
+                                                      RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                            CommandParameter="{Binding}" ToolTip="Edit">
+                                        <materialDesign:PackIcon Kind="Pencil" Width="16" Height="16" />
+                                    </Button>
+                                    <Button Style="{StaticResource MaterialDesignIconButton}"
+                                            Command="{Binding DataContext.ToggleActiveCommand,
+                                                      RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                            CommandParameter="{Binding}" ToolTip="Toggle Active">
+                                        <materialDesign:PackIcon Kind="AccountOff" Width="16" Height="16" />
+                                    </Button>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+    </Grid>
+</UserControl>
