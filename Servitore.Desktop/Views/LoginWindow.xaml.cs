@@ -49,14 +49,24 @@ public partial class LoginWindow : Window
         LoginFormPanel.Visibility = Visibility.Collapsed;
         ConnectionFailedPanel.Visibility = Visibility.Collapsed;
 
-        ConnectionStatusText.Text = "Starting Servitore...";
-        await System.Threading.Tasks.Task.Delay(500);
-        ConnectionStatusText.Text = "Connecting to server...";
-
         bool isOnline = false;
-        int maxRetries = 10;
+        int maxRetries = 60; // 60 attempts * 500ms = 30 seconds timeout
         for (int i = 0; i < maxRetries; i++)
         {
+            // Progressive status text updates based on elapsed time (5s / 15s boundaries)
+            if (i < 10)
+            {
+                ConnectionStatusText.Text = "Starting Servitore...";
+            }
+            else if (i < 30)
+            {
+                ConnectionStatusText.Text = "Connecting to server...";
+            }
+            else
+            {
+                ConnectionStatusText.Text = "Loading data...";
+            }
+
             try
             {
                 var pingResult = await App.ApiService.GetAsync<PingResponse>("api/auth/ping");
@@ -82,9 +92,22 @@ public partial class LoginWindow : Window
         }
         else
         {
-            ConnectionCheckPanel.Visibility = Visibility.Collapsed;
-            LoginFormPanel.Visibility = Visibility.Collapsed;
-            ConnectionFailedPanel.Visibility = Visibility.Visible;
+            var result = MessageBox.Show(
+                this,
+                "Unable to connect to the server. Please ensure the Servitore API is running.",
+                "Connection Failed",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning,
+                MessageBoxResult.Yes);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                await CheckConnectionAndSetupUiAsync();
+            }
+            else
+            {
+                Application.Current.Shutdown();
+            }
         }
     }
 

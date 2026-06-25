@@ -47,7 +47,7 @@ public partial class UserManagementViewModel : ViewModelBase
         IsLoading = true;
         try
         {
-            int maxRetries = 3;
+            int maxRetries = 15;
             for (int i = 0; i < maxRetries; i++)
             {
                 try

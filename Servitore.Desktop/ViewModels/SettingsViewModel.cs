@@ -33,7 +33,7 @@ public partial class SettingsViewModel : ViewModelBase
     {
         try
         {
-            int maxRetries = 3;
+            int maxRetries = 15;
             for (int i = 0; i < maxRetries; i++)
             {
                 try
@@ -74,7 +74,7 @@ public partial class SettingsViewModel : ViewModelBase
 
         try
         {
-            int maxRetries = 3;
+            int maxRetries = 15;
             for (int i = 0; i < maxRetries; i++)
             {
                 try
