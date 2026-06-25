@@ -48,21 +48,36 @@ public partial class WarrantyViewModel : ViewModelBase
         IsLoading = true;
         try
         {
-            var results = await _apiService.GetAsync<List<WarrantyRow>>("api/warranty");
-            _all.Clear();
-            if (results is not null)
+            int maxRetries = 3;
+            for (int i = 0; i < maxRetries; i++)
             {
-                foreach (var r in results) _all.Add(r);
-                ExpiredCount  = results.Count(r => r.WarrantyStatus == "Expired");
-                ExpiringCount = results.Count(r => r.WarrantyStatus == "Expiring Soon");
-                ActiveCount   = results.Count(r => r.WarrantyStatus == "Active");
+                try
+                {
+                    var results = await _apiService.GetAsync<List<WarrantyRow>>("api/warranty");
+                    _all.Clear();
+                    if (results is not null)
+                    {
+                        foreach (var r in results) _all.Add(r);
+                        ExpiredCount  = results.Count(r => r.WarrantyStatus == "Expired");
+                        ExpiringCount = results.Count(r => r.WarrantyStatus == "Expiring Soon");
+                        ActiveCount   = results.Count(r => r.WarrantyStatus == "Active");
+                    }
+                    return; // Success!
+                }
+                catch (Exception ex)
+                {
+                    Helpers.ClientLogger.Log($"Attempt {i + 1} to load warranty data failed", ex);
+                    if (i < maxRetries - 1)
+                    {
+                        await Task.Delay(2000);
+                    }
+                }
             }
         }
-        catch (Exception)
+        finally
         {
-            Helpers.DialogHelper.ShowError("Unable to load warranty data. Please try again.");
+            IsLoading = false;
         }
-        finally { IsLoading = false; }
     }
 
     [RelayCommand]

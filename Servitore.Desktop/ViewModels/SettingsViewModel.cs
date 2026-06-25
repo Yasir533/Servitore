@@ -33,42 +33,74 @@ public partial class SettingsViewModel : ViewModelBase
     {
         try
         {
-            var settings = await _apiService.GetAsync<SettingsDto>("api/settings");
-            if (settings is not null)
+            int maxRetries = 3;
+            for (int i = 0; i < maxRetries; i++)
             {
-                CompanyName    = settings.CompanyName ?? string.Empty;
-                CompanyPhone   = settings.CompanyPhone ?? string.Empty;
-                CompanyEmail   = settings.CompanyEmail ?? string.Empty;
-                CompanyWebsite = settings.CompanyWebsite ?? string.Empty;
-                CompanyAddress = settings.CompanyAddress ?? string.Empty;
+                try
+                {
+                    var settings = await _apiService.GetAsync<SettingsDto>("api/settings");
+                    if (settings is not null)
+                    {
+                        CompanyName    = settings.CompanyName ?? string.Empty;
+                        CompanyPhone   = settings.CompanyPhone ?? string.Empty;
+                        CompanyEmail   = settings.CompanyEmail ?? string.Empty;
+                        CompanyWebsite = settings.CompanyWebsite ?? string.Empty;
+                        CompanyAddress = settings.CompanyAddress ?? string.Empty;
 
-                SmtpHost        = settings.SmtpHost ?? string.Empty;
-                SmtpPort        = settings.SmtpPort?.ToString() ?? "587";
-                SmtpFromAddress = settings.SmtpFromAddress ?? string.Empty;
-                SmtpFromName    = settings.SmtpFromName ?? string.Empty;
-                SmtpUsername    = settings.SmtpUsername ?? string.Empty;
+                        SmtpHost        = settings.SmtpHost ?? string.Empty;
+                        SmtpPort        = settings.SmtpPort?.ToString() ?? "587";
+                        SmtpFromAddress = settings.SmtpFromAddress ?? string.Empty;
+                        SmtpFromName    = settings.SmtpFromName ?? string.Empty;
+                        SmtpUsername    = settings.SmtpUsername ?? string.Empty;
 
-                TicketNumberFormat = settings.TicketNumberFormat ?? "TKT-{YYYY}-{0000}";
+                        TicketNumberFormat = settings.TicketNumberFormat ?? "TKT-{YYYY}-{0000}";
+                    }
+                    break; // Success!
+                }
+                catch (Exception ex)
+                {
+                    Helpers.ClientLogger.Log($"Attempt {i + 1} to load settings failed", ex);
+                    if (i < maxRetries - 1)
+                    {
+                        await Task.Delay(2000);
+                    }
+                }
             }
         }
         catch (Exception)
         {
-            Helpers.DialogHelper.ShowError("Unable to load settings. Please try again.");
+            // Fail-safe
         }
 
         try
         {
-            var waSettings = await _apiService.GetAsync<WhatsAppSettingsDto>("api/settings/whatsapp");
-            if (waSettings is not null)
+            int maxRetries = 3;
+            for (int i = 0; i < maxRetries; i++)
             {
-                WaPhoneNumber = waSettings.PhoneNumber ?? string.Empty;
-                WaApiKey      = waSettings.ApiKey ?? string.Empty;
-                WaIsEnabled   = waSettings.IsEnabled;
+                try
+                {
+                    var waSettings = await _apiService.GetAsync<WhatsAppSettingsDto>("api/settings/whatsapp");
+                    if (waSettings is not null)
+                    {
+                        WaPhoneNumber = waSettings.PhoneNumber ?? string.Empty;
+                        WaApiKey      = waSettings.ApiKey ?? string.Empty;
+                        WaIsEnabled   = waSettings.IsEnabled;
+                    }
+                    break; // Success!
+                }
+                catch (Exception ex)
+                {
+                    Helpers.ClientLogger.Log($"Attempt {i + 1} to load WhatsApp settings failed", ex);
+                    if (i < maxRetries - 1)
+                    {
+                        await Task.Delay(2000);
+                    }
+                }
             }
         }
         catch (Exception)
         {
-            Helpers.DialogHelper.ShowError("Unable to load WhatsApp settings. Please try again.");
+            // Fail-safe
         }
     }
 

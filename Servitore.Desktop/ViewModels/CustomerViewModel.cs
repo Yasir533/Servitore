@@ -56,14 +56,26 @@ public partial class CustomerViewModel : ViewModelBase
         IsLoading = true;
         try
         {
-            var results = await _apiService.GetAsync<List<CustomerRow>>("api/customers");
-            _allCustomers.Clear();
-            if (results is not null)
-                foreach (var c in results) _allCustomers.Add(c);
-        }
-        catch (Exception)
-        {
-            Helpers.DialogHelper.ShowError("Unable to load customer data. Please try again.");
+            int maxRetries = 3;
+            for (int i = 0; i < maxRetries; i++)
+            {
+                try
+                {
+                    var results = await _apiService.GetAsync<List<CustomerRow>>("api/customers");
+                    _allCustomers.Clear();
+                    if (results is not null)
+                        foreach (var c in results) _allCustomers.Add(c);
+                    return; // Success!
+                }
+                catch (Exception ex)
+                {
+                    Helpers.ClientLogger.Log($"Attempt {i + 1} to load customer data failed", ex);
+                    if (i < maxRetries - 1)
+                    {
+                        await Task.Delay(2000);
+                    }
+                }
+            }
         }
         finally
         {

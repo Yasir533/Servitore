@@ -48,21 +48,36 @@ public partial class AMCViewModel : ViewModelBase
         IsLoading = true;
         try
         {
-            var results = await _apiService.GetAsync<List<AMCRow>>("api/amc");
-            _all.Clear();
-            if (results is not null)
+            int maxRetries = 3;
+            for (int i = 0; i < maxRetries; i++)
             {
-                foreach (var r in results) _all.Add(r);
-                ActiveCount   = results.Count(r => r.Status == "Active");
-                ExpiringCount = results.Count(r => r.Status == "Expiring Soon");
-                TotalValue    = results.Where(r => r.Status == "Active").Sum(r => r.ContractValue);
+                try
+                {
+                    var results = await _apiService.GetAsync<List<AMCRow>>("api/amc");
+                    _all.Clear();
+                    if (results is not null)
+                    {
+                        foreach (var r in results) _all.Add(r);
+                        ActiveCount   = results.Count(r => r.Status == "Active");
+                        ExpiringCount = results.Count(r => r.Status == "Expiring Soon");
+                        TotalValue    = results.Where(r => r.Status == "Active").Sum(r => r.ContractValue);
+                    }
+                    return; // Success!
+                }
+                catch (Exception ex)
+                {
+                    Helpers.ClientLogger.Log($"Attempt {i + 1} to load AMC data failed", ex);
+                    if (i < maxRetries - 1)
+                    {
+                        await Task.Delay(2000);
+                    }
+                }
             }
         }
-        catch (Exception)
+        finally
         {
-            Helpers.DialogHelper.ShowError("Unable to load AMC data. Please try again.");
+            IsLoading = false;
         }
-        finally { IsLoading = false; }
     }
 
     [RelayCommand]

@@ -41,15 +41,27 @@ public partial class AssetProfileViewModel : ViewModelBase
         IsLoading = true;
         try
         {
-            Profile = await _apiService.GetAsync<AssetDetailsDto>($"api/assets/{_assetId}/profile");
-            if (Profile != null)
+            int maxRetries = 3;
+            for (int i = 0; i < maxRetries; i++)
             {
-                await LoadBarcodeImageAsync();
+                try
+                {
+                    Profile = await _apiService.GetAsync<AssetDetailsDto>($"api/assets/{_assetId}/profile");
+                    if (Profile != null)
+                    {
+                        await LoadBarcodeImageAsync();
+                    }
+                    return; // Success!
+                }
+                catch (Exception ex)
+                {
+                    ClientLogger.Log($"Attempt {i + 1} to load asset profile data failed", ex);
+                    if (i < maxRetries - 1)
+                    {
+                        await Task.Delay(2000);
+                    }
+                }
             }
-        }
-        catch (Exception)
-        {
-            DialogHelper.ShowError("Unable to load data. Please try again.");
         }
         finally
         {

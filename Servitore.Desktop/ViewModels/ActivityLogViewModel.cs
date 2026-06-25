@@ -80,19 +80,31 @@ public partial class ActivityLogViewModel : ViewModelBase
         IsLoading = true;
         try
         {
-            var results = await _apiService.GetAsync<List<ActivityLogDto>>("api/activitylogs");
-            _all.Clear();
-            if (results is not null)
+            int maxRetries = 3;
+            for (int i = 0; i < maxRetries; i++)
             {
-                foreach (var log in results)
+                try
                 {
-                    _all.Add(log);
+                    var results = await _apiService.GetAsync<List<ActivityLogDto>>("api/activitylogs");
+                    _all.Clear();
+                    if (results is not null)
+                    {
+                        foreach (var log in results)
+                        {
+                            _all.Add(log);
+                        }
+                    }
+                    return; // Success!
+                }
+                catch (Exception ex)
+                {
+                    Helpers.ClientLogger.Log($"Attempt {i + 1} to load activity log data failed", ex);
+                    if (i < maxRetries - 1)
+                    {
+                        await Task.Delay(2000);
+                    }
                 }
             }
-        }
-        catch (Exception)
-        {
-            Helpers.DialogHelper.ShowError("Unable to load data. Please try again.");
         }
         finally 
         { 

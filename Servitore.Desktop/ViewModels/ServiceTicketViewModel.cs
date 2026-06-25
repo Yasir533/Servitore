@@ -68,14 +68,26 @@ public partial class ServiceTicketViewModel : ViewModelBase
         IsLoading = true;
         try
         {
-            var results = await _apiService.GetAsync<List<TicketRow>>("api/servicetickets");
-            _allTickets.Clear();
-            if (results is not null)
-                foreach (var t in results) _allTickets.Add(t);
-        }
-        catch (Exception)
-        {
-            Helpers.DialogHelper.ShowError("Unable to load service ticket data. Please try again.");
+            int maxRetries = 3;
+            for (int i = 0; i < maxRetries; i++)
+            {
+                try
+                {
+                    var results = await _apiService.GetAsync<List<TicketRow>>("api/servicetickets");
+                    _allTickets.Clear();
+                    if (results is not null)
+                        foreach (var t in results) _allTickets.Add(t);
+                    return; // Success!
+                }
+                catch (Exception ex)
+                {
+                    Helpers.ClientLogger.Log($"Attempt {i + 1} to load service ticket data failed", ex);
+                    if (i < maxRetries - 1)
+                    {
+                        await Task.Delay(2000);
+                    }
+                }
+            }
         }
         finally
         {

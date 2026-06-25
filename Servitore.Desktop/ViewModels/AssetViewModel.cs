@@ -61,14 +61,26 @@ public partial class AssetViewModel : ViewModelBase
         IsLoading = true;
         try
         {
-            var results = await _apiService.GetAsync<List<AssetRow>>("api/assets");
-            _allAssets.Clear();
-            if (results is not null)
-                foreach (var a in results) _allAssets.Add(a);
-        }
-        catch (Exception)
-        {
-            Helpers.DialogHelper.ShowError("Unable to load asset data. Please try again.");
+            int maxRetries = 3;
+            for (int i = 0; i < maxRetries; i++)
+            {
+                try
+                {
+                    var results = await _apiService.GetAsync<List<AssetRow>>("api/assets");
+                    _allAssets.Clear();
+                    if (results is not null)
+                        foreach (var a in results) _allAssets.Add(a);
+                    return; // Success!
+                }
+                catch (Exception ex)
+                {
+                    Helpers.ClientLogger.Log($"Attempt {i + 1} to load asset data failed", ex);
+                    if (i < maxRetries - 1)
+                    {
+                        await Task.Delay(2000);
+                    }
+                }
+            }
         }
         finally
         {
