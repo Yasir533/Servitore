@@ -24,4 +24,10 @@
     <ProjectReference Include="..\Servitore.Shared\Servitore.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="clientSettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

@@ -47,7 +47,7 @@ public partial class LoginViewModel : ViewModelBase
         }
         catch (Exception)
         {
-            ErrorMessage = "Unable to reach server. Please try again later.";
+            ErrorMessage = "Unable to connect to the server. Please ensure the server is running.";
         }
         finally
         {

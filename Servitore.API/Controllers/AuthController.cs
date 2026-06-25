@@ -20,6 +20,16 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
+    /// Lightweight ping check for client startup retry connection check.
+    /// </summary>
+    [HttpGet("ping")]
+    [AllowAnonymous]
+    public IActionResult Ping()
+    {
+        return Ok(new { Status = "Healthy" });
+    }
+
+    /// <summary>
     /// Authenticates a user and returns a JWT bearer token.
     /// </summary>
     [HttpPost("login")]

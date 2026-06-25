@@ -32,10 +32,11 @@ public class AuthenticationService
         }
         catch (HttpRequestException ex)
         {
+            Helpers.ClientLogger.Log("Authentication service failed to reach API server", ex);
             return new LoginResponse
             {
                 Success = false,
-                Message = $"Cannot reach server: {ex.Message}"
+                Message = "Unable to connect to the server. Please ensure the server is running."
             };
         }
 
