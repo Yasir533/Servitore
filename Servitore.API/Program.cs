@@ -44,6 +44,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // App services / repositories (see ServiceCollectionExtensions)
 builder.Services.AddServitoreServices();
+builder.Services.AddHostedService<StaleLockCleanupService>();
 
 // SignalR for real-time multi-desktop sync
 builder.Services.AddSignalR();

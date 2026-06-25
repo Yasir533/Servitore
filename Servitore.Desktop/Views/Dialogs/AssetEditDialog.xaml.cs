@@ -72,38 +72,24 @@ public partial class AssetEditDialog : Window
             if (!lockResult.Success)
             {
                 var lockOwner = lockResult.Lock?.Username ?? "another user";
-                var currentRole = App.AuthenticationService.CurrentUser?.Role.ToString() ?? "Operator";
-                bool isAdminOrManager = currentRole == "Admin" || currentRole == "Manager";
+                var lockTime = lockResult.Lock?.LockedAt.ToLocalTime().ToString("t") ?? "Unknown Time";
+                var computer = lockResult.Lock?.ComputerName ?? "Unknown Device";
 
-                string msg = $"This record is currently being edited by {lockOwner}.\n\nClick Yes to View Only (Read-Only).";
-                if (isAdminOrManager)
+                var conflictDialog = new LockConflictDialog(lockOwner, lockTime, computer)
                 {
-                    msg += "\nClick No to Force Take Over editing rights.\nClick Cancel to go back.";
-                }
-                else
-                {
-                    msg += "\nClick Cancel to go back.";
-                }
+                    Owner = this
+                };
 
-                MessageBoxResult action;
-                if (isAdminOrManager)
-                {
-                    action = MessageBox.Show(this, msg, "Record Locked", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
-                }
-                else
-                {
-                    action = MessageBox.Show(this, msg, "Record Locked", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
-                    if (action == MessageBoxResult.OK) action = MessageBoxResult.Yes;
-                }
+                conflictDialog.ShowDialog();
 
-                if (action == MessageBoxResult.Yes)
+                if (conflictDialog.Result == LockConflictResult.ViewOnly)
                 {
                     _isReadOnly = true;
                     TitleText.Text += " (View Only)";
                     SaveButton.Visibility = Visibility.Collapsed;
                     DisableInputs();
                 }
-                else if (action == MessageBoxResult.No && isAdminOrManager)
+                else if (conflictDialog.Result == LockConflictResult.TakeOver)
                 {
                     var takeover = await Helpers.LockHelper.TakeOverLockAsync(_recordKey);
                     if (!takeover.Success)
@@ -189,6 +175,80 @@ public partial class AssetEditDialog : Window
         Asset.Status = selectedStatusItem?.Tag?.ToString() ?? "Active";
         Asset.VendorName = VendorNameBox.Text.Trim();
         Asset.PurchaseDate = PurchaseDatePicker.SelectedDate;
+
+        if (Asset.AssetId > 0)
+        {
+            try
+            {
+                var responseJson = await _apiService.PutAsync($"api/assets/{Asset.AssetId}", Asset);
+                var updated = System.Text.Json.JsonSerializer.Deserialize<AssetViewModel.AssetRow>(responseJson, new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (updated != null)
+                {
+                    Asset.ModifiedDate = updated.ModifiedDate;
+                }
+            }
+            catch (Services.ApiService.ConcurrencyException ex)
+            {
+                var serverAsset = System.Text.Json.JsonSerializer.Deserialize<AssetViewModel.AssetRow>(ex.ServerJson, new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (serverAsset != null)
+                {
+                    var diffs = new System.Collections.Generic.List<ConflictDiff>();
+                    if (Asset.ProductName != serverAsset.ProductName)
+                        diffs.Add(new ConflictDiff { FieldName = "Product Name", LocalValue = Asset.ProductName, ServerValue = serverAsset.ProductName });
+                    if (Asset.AssetCode != serverAsset.AssetCode)
+                        diffs.Add(new ConflictDiff { FieldName = "Asset Code", LocalValue = Asset.AssetCode, ServerValue = serverAsset.AssetCode });
+                    if (Asset.SerialNumber != serverAsset.SerialNumber)
+                        diffs.Add(new ConflictDiff { FieldName = "Serial Number", LocalValue = Asset.SerialNumber ?? "", ServerValue = serverAsset.SerialNumber ?? "" });
+                    if (Asset.VendorName != serverAsset.VendorName)
+                        diffs.Add(new ConflictDiff { FieldName = "Vendor Name", LocalValue = Asset.VendorName ?? "", ServerValue = serverAsset.VendorName ?? "" });
+                    if (Asset.PurchaseDate != serverAsset.PurchaseDate)
+                        diffs.Add(new ConflictDiff { FieldName = "Purchase Date", LocalValue = Asset.PurchaseDate?.ToString("d") ?? "", ServerValue = serverAsset.PurchaseDate?.ToString("d") ?? "" });
+                    if (Asset.Status != serverAsset.Status)
+                        diffs.Add(new ConflictDiff { FieldName = "Status", LocalValue = Asset.Status, ServerValue = serverAsset.Status });
+                    if (Asset.CustomerId != serverAsset.CustomerId)
+                        diffs.Add(new ConflictDiff { FieldName = "Customer ID", LocalValue = Asset.CustomerId.ToString(), ServerValue = serverAsset.CustomerId.ToString() });
+
+                    var resDialog = new ConflictResolutionDialog(diffs) { Owner = this };
+                    resDialog.ShowDialog();
+
+                    if (resDialog.Result == ConflictResolutionResult.KeepMine)
+                    {
+                        Asset.ModifiedDate = serverAsset.ModifiedDate;
+                        Save_Click(sender, e);
+                        return;
+                    }
+                    else if (resDialog.Result == ConflictResolutionResult.Reload)
+                    {
+                        Asset.ModifiedDate = serverAsset.ModifiedDate;
+                        ProductNameBox.Text = serverAsset.ProductName;
+                        AssetCodeBox.Text = serverAsset.AssetCode;
+                        SerialNumberBox.Text = serverAsset.SerialNumber;
+                        CustomerCombo.SelectedValue = serverAsset.CustomerId;
+                        VendorNameBox.Text = serverAsset.VendorName;
+                        PurchaseDatePicker.SelectedDate = serverAsset.PurchaseDate;
+                        
+                        foreach (System.Windows.Controls.ComboBoxItem item in StatusCombo.Items)
+                        {
+                            if (item.Tag?.ToString() == serverAsset.Status)
+                            {
+                                item.IsSelected = true;
+                                break;
+                            }
+                        }
+                        return;
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, $"Unable to save changes: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+        }
 
         if (!string.IsNullOrEmpty(_recordKey))
         {

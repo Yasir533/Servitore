@@ -30,4 +30,13 @@ public static class PresenceManager
             user.LastActivity = System.DateTime.UtcNow;
         }
     }
+
+    public static void UpdateEditingRecord(string connectionId, string? recordKey)
+    {
+        if (_users.TryGetValue(connectionId, out var user))
+        {
+            user.EditingRecord = recordKey;
+            user.LastActivity = System.DateTime.UtcNow;
+        }
+    }
 }

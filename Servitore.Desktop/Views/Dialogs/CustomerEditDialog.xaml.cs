@@ -40,38 +40,24 @@ public partial class CustomerEditDialog : Window
             if (!lockResult.Success)
             {
                 var lockOwner = lockResult.Lock?.Username ?? "another user";
-                var currentRole = App.AuthenticationService.CurrentUser?.Role.ToString() ?? "Operator";
-                bool isAdminOrManager = currentRole == "Admin" || currentRole == "Manager";
+                var lockTime = lockResult.Lock?.LockedAt.ToLocalTime().ToString("t") ?? "Unknown Time";
+                var computer = lockResult.Lock?.ComputerName ?? "Unknown Device";
 
-                string msg = $"This record is currently being edited by {lockOwner}.\n\nClick Yes to View Only (Read-Only).";
-                if (isAdminOrManager)
+                var conflictDialog = new LockConflictDialog(lockOwner, lockTime, computer)
                 {
-                    msg += "\nClick No to Force Take Over editing rights.\nClick Cancel to go back.";
-                }
-                else
-                {
-                    msg += "\nClick Cancel to go back.";
-                }
+                    Owner = this
+                };
 
-                MessageBoxResult action;
-                if (isAdminOrManager)
-                {
-                    action = MessageBox.Show(this, msg, "Record Locked", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
-                }
-                else
-                {
-                    action = MessageBox.Show(this, msg, "Record Locked", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
-                    if (action == MessageBoxResult.OK) action = MessageBoxResult.Yes;
-                }
+                conflictDialog.ShowDialog();
 
-                if (action == MessageBoxResult.Yes)
+                if (conflictDialog.Result == LockConflictResult.ViewOnly)
                 {
                     _isReadOnly = true;
                     TitleText.Text += " (View Only)";
                     SaveButton.Visibility = Visibility.Collapsed;
                     DisableInputs();
                 }
-                else if (action == MessageBoxResult.No && isAdminOrManager)
+                else if (conflictDialog.Result == LockConflictResult.TakeOver)
                 {
                     var takeover = await Helpers.LockHelper.TakeOverLockAsync(_recordKey);
                     if (!takeover.Success)
@@ -140,6 +126,66 @@ public partial class CustomerEditDialog : Window
         Customer.Mobile = MobileBox.Text.Trim();
         Customer.Email = EmailBox.Text.Trim();
         Customer.Address = AddressBox.Text.Trim();
+
+        if (Customer.CustomerId > 0)
+        {
+            try
+            {
+                var responseJson = await App.ApiService.PutAsync($"api/customers/{Customer.CustomerId}", Customer);
+                var updated = System.Text.Json.JsonSerializer.Deserialize<CustomerViewModel.CustomerRow>(responseJson, new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (updated != null)
+                {
+                    Customer.ModifiedDate = updated.ModifiedDate;
+                }
+            }
+            catch (Services.ApiService.ConcurrencyException ex)
+            {
+                var serverCustomer = System.Text.Json.JsonSerializer.Deserialize<CustomerViewModel.CustomerRow>(ex.ServerJson, new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (serverCustomer != null)
+                {
+                    var diffs = new System.Collections.Generic.List<ConflictDiff>();
+                    if (Customer.CustomerName != serverCustomer.CustomerName)
+                        diffs.Add(new ConflictDiff { FieldName = "Customer Name", LocalValue = Customer.CustomerName, ServerValue = serverCustomer.CustomerName });
+                    if (Customer.ContactPerson != serverCustomer.ContactPerson)
+                        diffs.Add(new ConflictDiff { FieldName = "Contact Person", LocalValue = Customer.ContactPerson ?? "", ServerValue = serverCustomer.ContactPerson ?? "" });
+                    if (Customer.Mobile != serverCustomer.Mobile)
+                        diffs.Add(new ConflictDiff { FieldName = "Mobile", LocalValue = Customer.Mobile ?? "", ServerValue = serverCustomer.Mobile ?? "" });
+                    if (Customer.Email != serverCustomer.Email)
+                        diffs.Add(new ConflictDiff { FieldName = "Email", LocalValue = Customer.Email ?? "", ServerValue = serverCustomer.Email ?? "" });
+                    if (Customer.Address != serverCustomer.Address)
+                        diffs.Add(new ConflictDiff { FieldName = "Address", LocalValue = Customer.Address ?? "", ServerValue = serverCustomer.Address ?? "" });
+
+                    var resDialog = new ConflictResolutionDialog(diffs) { Owner = this };
+                    resDialog.ShowDialog();
+
+                    if (resDialog.Result == ConflictResolutionResult.KeepMine)
+                    {
+                        Customer.ModifiedDate = serverCustomer.ModifiedDate;
+                        Save_Click(sender, e);
+                        return;
+                    }
+                    else if (resDialog.Result == ConflictResolutionResult.Reload)
+                    {
+                        Customer.ModifiedDate = serverCustomer.ModifiedDate;
+                        NameBox.Text = serverCustomer.CustomerName;
+                        ContactBox.Text = serverCustomer.ContactPerson;
+                        MobileBox.Text = serverCustomer.Mobile;
+                        EmailBox.Text = serverCustomer.Email;
+                        AddressBox.Text = serverCustomer.Address;
+                        return;
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, $"Unable to save changes: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+        }
 
         if (!string.IsNullOrEmpty(_recordKey))
         {

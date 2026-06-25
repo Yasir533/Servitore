@@ -171,7 +171,8 @@ public partial class AssetViewModel : ViewModelBase
             CustomerId = row.CustomerId,
             Status = row.Status,
             VendorName = row.VendorName,
-            PurchaseDate = row.PurchaseDate
+            PurchaseDate = row.PurchaseDate,
+            ModifiedDate = row.ModifiedDate
         };
 
         var dialog = new Views.Dialogs.AssetEditDialog(_apiService, clone)
@@ -180,37 +181,25 @@ public partial class AssetViewModel : ViewModelBase
         };
         if (dialog.ShowDialog() == true)
         {
-            IsLoading = true;
-            try
-            {
-                await _apiService.PutAsync($"api/assets/{row.AssetId}", dialog.Asset);
-                row.ProductName = dialog.Asset.ProductName;
-                row.AssetCode = dialog.Asset.AssetCode;
-                row.SerialNumber = dialog.Asset.SerialNumber;
-                row.CustomerId = dialog.Asset.CustomerId;
-                row.CustomerName = dialog.Asset.CustomerName;
-                row.Status = dialog.Asset.Status;
-                row.VendorName = dialog.Asset.VendorName;
-                row.PurchaseDate = dialog.Asset.PurchaseDate;
-                AssetsView.Refresh();
+            row.ProductName = dialog.Asset.ProductName;
+            row.AssetCode = dialog.Asset.AssetCode;
+            row.SerialNumber = dialog.Asset.SerialNumber;
+            row.CustomerId = dialog.Asset.CustomerId;
+            row.CustomerName = dialog.Asset.CustomerName;
+            row.Status = dialog.Asset.Status;
+            row.VendorName = dialog.Asset.VendorName;
+            row.PurchaseDate = dialog.Asset.PurchaseDate;
+            row.ModifiedDate = dialog.Asset.ModifiedDate;
+            AssetsView.Refresh();
 
-                await App.SignalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
-                {
-                    EntityType = "Asset",
-                    Action = "Updated",
-                    RecordId = row.AssetId.ToString(),
-                    DisplayName = row.ProductName,
-                    Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
-                });
-            }
-            catch (Exception)
+            await App.SignalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
             {
-                Helpers.DialogHelper.ShowError("Unable to save changes. Please try again later.");
-            }
-            finally
-            {
-                IsLoading = false;
-            }
+                EntityType = "Asset",
+                Action = "Updated",
+                RecordId = row.AssetId.ToString(),
+                DisplayName = row.ProductName,
+                Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
+            });
         }
     }
 
@@ -266,5 +255,6 @@ public partial class AssetViewModel : ViewModelBase
         public string Status { get; set; } = "Active";
         public string? VendorName { get; set; }
         public DateTime? PurchaseDate { get; set; }
+        public DateTime? ModifiedDate { get; set; }
     }
 }

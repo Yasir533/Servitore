@@ -73,6 +73,12 @@ public class WarrantyController : ControllerBase
         var existing = await _context.Warranties.FindAsync(id);
         if (existing is null) return NotFound();
 
+        if (existing.ModifiedDate.HasValue && warranty.ModifiedDate.HasValue &&
+            Math.Abs((existing.ModifiedDate.Value - warranty.ModifiedDate.Value).TotalSeconds) > 1.0)
+        {
+            return Conflict(existing);
+        }
+
         existing.AssetId = warranty.AssetId;
         existing.StartDate = warranty.StartDate;
         existing.EndDate = warranty.EndDate;

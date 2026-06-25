@@ -39,7 +39,9 @@ public class RecordLockController : ControllerBase
         // Lock is either new or already held by the same user
         if (existingLock.Username == username && existingLock.ConnectionId == request.ConnectionId)
         {
+            PresenceManager.UpdateEditingRecord(request.ConnectionId, request.RecordKey);
             await _hubContext.Clients.All.SendAsync("LocksUpdated");
+            await _hubContext.Clients.All.SendAsync("UserPresenceListUpdated", PresenceManager.GetConnectedUsers());
             return Ok(new { Success = true, Lock = existingLock });
         }
 
@@ -56,11 +58,13 @@ public class RecordLockController : ControllerBase
         }
 
         var username = User.Identity?.Name ?? "Unknown";
-        var released = RecordLockManager.ReleaseLock(request.RecordKey, username);
+        var releasedLock = RecordLockManager.ReleaseLock(request.RecordKey, username);
 
-        if (released)
+        if (releasedLock != null)
         {
+            PresenceManager.UpdateEditingRecord(releasedLock.ConnectionId, null);
             await _hubContext.Clients.All.SendAsync("LocksUpdated");
+            await _hubContext.Clients.All.SendAsync("UserPresenceListUpdated", PresenceManager.GetConnectedUsers());
             return Ok(new { Success = true });
         }
 
@@ -85,13 +89,19 @@ public class RecordLockController : ControllerBase
 
         // Get the old lock to notify them
         var oldLock = RecordLockManager.GetLock(request.RecordKey);
+        if (oldLock != null)
+        {
+            PresenceManager.UpdateEditingRecord(oldLock.ConnectionId, null);
+        }
         
         RecordLockManager.ForceReleaseLock(request.RecordKey);
         var newLock = RecordLockManager.AcquireLock(request.RecordKey, username, request.ConnectionId);
 
         if (newLock != null)
         {
+            PresenceManager.UpdateEditingRecord(request.ConnectionId, request.RecordKey);
             await _hubContext.Clients.All.SendAsync("LocksUpdated");
+            await _hubContext.Clients.All.SendAsync("UserPresenceListUpdated", PresenceManager.GetConnectedUsers());
             
             // Notify the previous lock owner if they are still connected
             if (oldLock != null && !string.IsNullOrWhiteSpace(oldLock.ConnectionId))

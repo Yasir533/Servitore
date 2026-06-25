@@ -1,6 +1,7 @@
 using Servitore.API.DTOs;
 using Servitore.API.Repositories;
 using Servitore.Database.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Servitore.API.Services;
 
@@ -10,7 +11,7 @@ public interface ICustomerService
     Task<Customer?> GetByIdAsync(int id);
     Task<Servitore.Shared.Models.CustomerProfileDto?> GetProfileAsync(int id);
     Task<Customer> CreateAsync(CustomerDto dto);
-    Task UpdateAsync(CustomerDto dto);
+    Task<Customer> UpdateAsync(CustomerDto dto);
     Task DeleteAsync(int id);
 }
 
@@ -95,12 +96,18 @@ public class CustomerService : ICustomerService
         return _repository.AddAsync(customer);
     }
 
-    public async Task UpdateAsync(CustomerDto dto)
+    public async Task<Customer> UpdateAsync(CustomerDto dto)
     {
         if (dto.CustomerId is null) throw new ArgumentException("CustomerId is required for update.");
 
         var customer = await _repository.GetByIdAsync(dto.CustomerId.Value)
             ?? throw new KeyNotFoundException("Customer not found.");
+
+        if (customer.ModifiedDate.HasValue && dto.ModifiedDate.HasValue &&
+            Math.Abs((customer.ModifiedDate.Value - dto.ModifiedDate.Value).TotalSeconds) > 1.0)
+        {
+            throw new DbUpdateConcurrencyException("The customer record has been modified by another user.");
+        }
 
         customer.CustomerName = dto.CustomerName;
         customer.ContactPerson = dto.ContactPerson;
@@ -109,6 +116,7 @@ public class CustomerService : ICustomerService
         customer.Address = dto.Address;
 
         await _repository.UpdateAsync(customer);
+        return customer;
     }
 
     public Task DeleteAsync(int id) => _repository.DeleteAsync(id);

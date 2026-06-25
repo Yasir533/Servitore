@@ -82,9 +82,17 @@ public class ServiceTicketsController : ControllerBase
     public async Task<IActionResult> Update(int id, ServiceTicketDto dto)
     {
         var updatedBy = User.Identity?.Name ?? "system";
-        await _ticketService.UpdateAsync(id, dto, updatedBy);
-        await _activityLogService.LogActivityAsync($"Updated Service Ticket: {dto.TicketNumber} (ID: {id})", "Tickets", HttpContext);
-        return NoContent();
+        try
+        {
+            var updated = await _ticketService.UpdateAsync(id, dto, updatedBy);
+            await _activityLogService.LogActivityAsync($"Updated Service Ticket: {dto.TicketNumber} (ID: {id})", "Tickets", HttpContext);
+            return Ok(updated);
+        }
+        catch (Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException)
+        {
+            var current = await _ticketService.GetByIdAsync(id);
+            return Conflict(current);
+        }
     }
 
     [HttpPut("{id:int}/close")]

@@ -43,9 +43,13 @@ public partial class DashboardView : UserControl
         App.SignalRService.LockTakenOver += OnLockTakenOver;
         App.SignalRService.DataChanged += OnDataChanged;
         App.SignalRService.ActivityLogged += OnActivityLogged;
+        App.SignalRService.ForceLogoutReceived += OnForceLogout;
 
         ShowSummary();
     }
+
+    private bool _updatingStatusFromCode = false;
+    private string _manualStatus = "Online";
 
     private void DashboardView_Loaded(object sender, RoutedEventArgs e)
     {
@@ -58,10 +62,14 @@ public partial class DashboardView : UserControl
 
         _idleTimer = new System.Windows.Threading.DispatcherTimer
         {
-            Interval = TimeSpan.FromMinutes(10) // 10 minutes idle limit
+            Interval = TimeSpan.FromMinutes(App.ApiService.IdleTimeoutMinutes)
         };
         _idleTimer.Tick += IdleTimer_Tick;
         _idleTimer.Start();
+
+        _updatingStatusFromCode = true;
+        StatusSelectorCombo.SelectedIndex = 0; // Default: Online
+        _updatingStatusFromCode = false;
 
         _ = App.SignalRService.UpdatePresenceAsync(_currentTag, "Online");
     }
@@ -84,6 +92,7 @@ public partial class DashboardView : UserControl
         App.SignalRService.LockTakenOver -= OnLockTakenOver;
         App.SignalRService.DataChanged -= OnDataChanged;
         App.SignalRService.ActivityLogged -= OnActivityLogged;
+        App.SignalRService.ForceLogoutReceived -= OnForceLogout;
     }
 
     private void Window_Activity(object sender, System.Windows.Input.InputEventArgs e)
@@ -94,16 +103,36 @@ public partial class DashboardView : UserControl
         if (_isAway)
         {
             _isAway = false;
-            _ = App.SignalRService.UpdatePresenceAsync(_currentTag, "Online");
+            if (_manualStatus == "Online")
+            {
+                _updatingStatusFromCode = true;
+                StatusSelectorCombo.SelectedIndex = 0; // Online
+                _updatingStatusFromCode = false;
+                _ = App.SignalRService.UpdatePresenceAsync(_currentTag, "Online");
+            }
         }
     }
 
     private void IdleTimer_Tick(object? sender, EventArgs e)
     {
-        if (!_isAway)
+        if (!_isAway && _manualStatus == "Online")
         {
             _isAway = true;
+            _updatingStatusFromCode = true;
+            StatusSelectorCombo.SelectedIndex = 1; // Away
+            _updatingStatusFromCode = false;
             _ = App.SignalRService.UpdatePresenceAsync(_currentTag, "Away");
+        }
+    }
+
+    private void StatusSelectorCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_updatingStatusFromCode) return;
+        if (StatusSelectorCombo.SelectedItem is ComboBoxItem item && item.Tag is string status)
+        {
+            _manualStatus = status;
+            _isAway = (status == "Away");
+            _ = App.SignalRService.UpdatePresenceAsync(_currentTag, status);
         }
     }
 
@@ -204,5 +233,21 @@ public partial class DashboardView : UserControl
             }
             NavigationHelper.NavigateTo(ticketView);
         }
+    }
+
+    private void OnForceLogout()
+    {
+        Dispatcher.Invoke(async () =>
+        {
+            MessageBox.Show("An Administrator has forced your session to log out.", "Forced Logout", MessageBoxButton.OK, MessageBoxImage.Warning);
+            App.AuthenticationService.Logout();
+            await App.SignalRService.DisconnectAsync();
+
+            var loginWin = new LoginWindow();
+            loginWin.Show();
+
+            var currentWin = Window.GetWindow(this);
+            currentWin?.Close();
+        });
     }
 }

@@ -71,38 +71,24 @@ public partial class AMCEditDialog : Window
             if (!lockResult.Success)
             {
                 var lockOwner = lockResult.Lock?.Username ?? "another user";
-                var currentRole = App.AuthenticationService.CurrentUser?.Role.ToString() ?? "Operator";
-                bool isAdminOrManager = currentRole == "Admin" || currentRole == "Manager";
+                var lockTime = lockResult.Lock?.LockedAt.ToLocalTime().ToString("t") ?? "Unknown Time";
+                var computer = lockResult.Lock?.ComputerName ?? "Unknown Device";
 
-                string msg = $"This record is currently being edited by {lockOwner}.\n\nClick Yes to View Only (Read-Only).";
-                if (isAdminOrManager)
+                var conflictDialog = new LockConflictDialog(lockOwner, lockTime, computer)
                 {
-                    msg += "\nClick No to Force Take Over editing rights.\nClick Cancel to go back.";
-                }
-                else
-                {
-                    msg += "\nClick Cancel to go back.";
-                }
+                    Owner = this
+                };
 
-                MessageBoxResult action;
-                if (isAdminOrManager)
-                {
-                    action = MessageBox.Show(this, msg, "Record Locked", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
-                }
-                else
-                {
-                    action = MessageBox.Show(this, msg, "Record Locked", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
-                    if (action == MessageBoxResult.OK) action = MessageBoxResult.Yes;
-                }
+                conflictDialog.ShowDialog();
 
-                if (action == MessageBoxResult.Yes)
+                if (conflictDialog.Result == LockConflictResult.ViewOnly)
                 {
                     _isReadOnly = true;
                     TitleText.Text += " (View Only)";
                     SaveButton.Visibility = Visibility.Collapsed;
                     DisableInputs();
                 }
-                else if (action == MessageBoxResult.No && isAdminOrManager)
+                else if (conflictDialog.Result == LockConflictResult.TakeOver)
                 {
                     var takeover = await Helpers.LockHelper.TakeOverLockAsync(_recordKey);
                     if (!takeover.Success)

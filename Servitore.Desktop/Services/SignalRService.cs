@@ -19,13 +19,15 @@ public class SignalRService
     public event Action<ActivityLogDto>? ActivityLogged;
     public event Action<string, string>? LockTakenOver; // (recordKey, newOwner)
     public event Action? LocksUpdated;
+    public event Action? ForceLogoutReceived;
 
     public string? ConnectionId => _connection?.ConnectionId;
 
     public async Task ConnectAsync(string apiBaseUrl, string token)
     {
         var machineName = Uri.EscapeDataString(Environment.MachineName);
-        var hubUrl = $"{apiBaseUrl.TrimEnd('/')}{AppConstants.NotificationHubUrl}?computerName={machineName}";
+        var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.0.0-enterprise";
+        var hubUrl = $"{apiBaseUrl.TrimEnd('/')}{AppConstants.NotificationHubUrl}?computerName={machineName}&appVersion={version}";
 
         _connection = new HubConnectionBuilder()
             .WithUrl(hubUrl, options =>
@@ -76,6 +78,11 @@ public class SignalRService
             LocksUpdated?.Invoke();
         });
 
+        _connection.On("OnForceLogout", () =>
+        {
+            ForceLogoutReceived?.Invoke();
+        });
+
         await _connection.StartAsync();
     }
 
@@ -106,6 +113,30 @@ public class SignalRService
             {
                 // Suppress background trace failures
             }
+        }
+    }
+
+    public async Task ForceLogoutAsync(string connectionId)
+    {
+        if (_connection?.State == HubConnectionState.Connected)
+        {
+            try
+            {
+                await _connection.SendAsync("ForceLogout", connectionId);
+            }
+            catch (Exception) { }
+        }
+    }
+
+    public async Task SendBroadcastAsync(string message)
+    {
+        if (_connection?.State == HubConnectionState.Connected)
+        {
+            try
+            {
+                await _connection.SendAsync("SendBroadcast", message);
+            }
+            catch (Exception) { }
         }
     }
 

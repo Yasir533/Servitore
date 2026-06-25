@@ -12,6 +12,7 @@ public class CollaborationHub : Hub
     {
         var httpContext = Context.GetHttpContext();
         var computerName = httpContext?.Request.Query["computerName"].ToString() ?? "Unknown";
+        var appVersion = httpContext?.Request.Query["appVersion"].ToString() ?? "1.0.0";
         var ip = httpContext?.Connection?.RemoteIpAddress?.ToString() ?? "Unknown";
         
         var username = Context.User?.Identity?.Name ?? "Anonymous";
@@ -27,7 +28,8 @@ public class CollaborationHub : Hub
             CurrentModule = "Dashboard",
             ComputerName = computerName,
             IpAddress = ip,
-            Status = "Online"
+            Status = "Online",
+            AppVersion = appVersion
         };
 
         PresenceManager.AddUser(Context.ConnectionId, user);
@@ -88,5 +90,28 @@ public class CollaborationHub : Hub
     public async Task BroadcastDataChange(DataEventModel dataEvent)
     {
         await Clients.All.SendAsync("DataChanged", dataEvent);
+    }
+
+    public async Task ForceLogout(string connectionId)
+    {
+        if (Context.User?.IsInRole("Admin") == true || Context.User?.IsInRole("Manager") == true)
+        {
+            await Clients.Client(connectionId).SendAsync("OnForceLogout");
+        }
+    }
+
+    public async Task SendBroadcast(string message)
+    {
+        if (Context.User?.IsInRole("Admin") == true || Context.User?.IsInRole("Manager") == true)
+        {
+            var senderName = Context.User?.Identity?.Name ?? "Admin";
+            await Clients.All.SendAsync("ReceiveNotification", new NotificationModel
+            {
+                Message = $"[Broadcast] {message}",
+                Type = Servitore.Shared.Enums.NotificationType.Info,
+                CreatedBy = senderName,
+                CreatedDate = DateTime.UtcNow
+            });
+        }
     }
 }

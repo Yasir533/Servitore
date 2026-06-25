@@ -18,10 +18,12 @@ public class ApiService
 {
     private readonly HttpClient _httpClient;
     public string BaseUrl { get; }
+    public int IdleTimeoutMinutes { get; } = 10;
 
     public ApiService()
     {
         var baseUrl = AppConstants.DefaultApiBaseUrl;
+        var idleTimeout = 10;
         try
         {
             var configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "clientSettings.json");
@@ -37,10 +39,17 @@ public class ApiService
                         baseUrl = val;
                     }
                 }
+                if (doc.RootElement.TryGetProperty("IdleTimeoutMinutes", out var idleProp))
+                {
+                    if (idleProp.ValueKind == JsonValueKind.Number)
+                    {
+                        idleTimeout = idleProp.GetInt32();
+                    }
+                }
             }
             else
             {
-                var defaultJson = JsonSerializer.Serialize(new { ApiBaseUrl = AppConstants.DefaultApiBaseUrl }, new JsonSerializerOptions { WriteIndented = true });
+                var defaultJson = JsonSerializer.Serialize(new { ApiBaseUrl = AppConstants.DefaultApiBaseUrl, IdleTimeoutMinutes = 10 }, new JsonSerializerOptions { WriteIndented = true });
                 File.WriteAllText(configPath, defaultJson);
             }
         }
@@ -50,6 +59,7 @@ public class ApiService
         }
 
         BaseUrl = baseUrl;
+        IdleTimeoutMinutes = idleTimeout;
         _httpClient = new HttpClient
         {
             BaseAddress = new Uri(baseUrl),
@@ -131,17 +141,32 @@ public class ApiService
         }
     }
 
-    public async Task PutAsync<TRequest>(string endpoint, TRequest body)
+    public async Task<string> PutAsync<TRequest>(string endpoint, TRequest body)
     {
         try
         {
             var response = await _httpClient.PutAsJsonAsync(endpoint, body);
+            if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+            {
+                var contentStr = await response.Content.ReadAsStringAsync();
+                throw new ConcurrencyException(contentStr);
+            }
             response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
         }
         catch (Exception ex)
         {
             Helpers.ClientLogger.Log($"PUT request failed for endpoint: {endpoint}", ex);
             throw;
+        }
+    }
+
+    public class ConcurrencyException : Exception
+    {
+        public string ServerJson { get; }
+        public ConcurrencyException(string serverJson) : base("A concurrency conflict occurred.")
+        {
+            ServerJson = serverJson;
         }
     }
 

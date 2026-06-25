@@ -144,7 +144,8 @@ public partial class CustomerViewModel : ViewModelBase
             ContactPerson = row.ContactPerson,
             Mobile = row.Mobile,
             Email = row.Email,
-            Address = row.Address
+            Address = row.Address,
+            ModifiedDate = row.ModifiedDate
         };
 
         var dialog = new Views.Dialogs.CustomerEditDialog(clone)
@@ -153,34 +154,22 @@ public partial class CustomerViewModel : ViewModelBase
         };
         if (dialog.ShowDialog() == true)
         {
-            IsLoading = true;
-            try
-            {
-                await _apiService.PutAsync($"api/customers/{row.CustomerId}", dialog.Customer);
-                row.CustomerName = dialog.Customer.CustomerName;
-                row.ContactPerson = dialog.Customer.ContactPerson;
-                row.Mobile = dialog.Customer.Mobile;
-                row.Email = dialog.Customer.Email;
-                row.Address = dialog.Customer.Address;
-                CustomersView.Refresh();
+            row.CustomerName = dialog.Customer.CustomerName;
+            row.ContactPerson = dialog.Customer.ContactPerson;
+            row.Mobile = dialog.Customer.Mobile;
+            row.Email = dialog.Customer.Email;
+            row.Address = dialog.Customer.Address;
+            row.ModifiedDate = dialog.Customer.ModifiedDate;
+            CustomersView.Refresh();
 
-                await App.SignalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
-                {
-                    EntityType = "Customer",
-                    Action = "Updated",
-                    RecordId = row.CustomerId.ToString(),
-                    DisplayName = row.CustomerName,
-                    Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
-                });
-            }
-            catch (Exception)
+            await App.SignalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
             {
-                Helpers.DialogHelper.ShowError("Unable to save changes. Please try again later.");
-            }
-            finally
-            {
-                IsLoading = false;
-            }
+                EntityType = "Customer",
+                Action = "Updated",
+                RecordId = row.CustomerId.ToString(),
+                DisplayName = row.CustomerName,
+                Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
+            });
         }
     }
 
@@ -232,5 +221,6 @@ public partial class CustomerViewModel : ViewModelBase
         public string? Mobile { get; set; }
         public string? Email { get; set; }
         public string? Address { get; set; }
+        public DateTime? ModifiedDate { get; set; }
     }
 }
