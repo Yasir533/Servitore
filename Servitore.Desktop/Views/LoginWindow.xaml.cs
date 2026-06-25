@@ -21,10 +21,37 @@ public partial class LoginWindow : Window
 
     private async void LoginWindow_Loaded(object sender, RoutedEventArgs e)
     {
-        _viewModel.IsBusy = true;
-        ErrorText.Text = "Connecting to server...";
-        ErrorText.Foreground = System.Windows.Media.Brushes.Gray;
-        ErrorText.Visibility = Visibility.Visible;
+        await CheckConnectionAndSetupUiAsync();
+    }
+
+    private async System.Threading.Tasks.Task CheckConnectionAndSetupUiAsync()
+    {
+        // 1. Optimize for instant load: Try to ping immediately first
+        try
+        {
+            var pingResult = await App.ApiService.GetAsync<PingResponse>("api/auth/ping");
+            if (pingResult is { Status: "Healthy" })
+            {
+                ConnectionCheckPanel.Visibility = Visibility.Collapsed;
+                LoginFormPanel.Visibility = Visibility.Visible;
+                ConnectionFailedPanel.Visibility = Visibility.Collapsed;
+                UsernameBox.Focus();
+                return;
+            }
+        }
+        catch (System.Exception ex)
+        {
+            Helpers.ClientLogger.Log("Instant connection check failed, initiating retry sequence.", ex);
+        }
+
+        // 2. Slow path: Show Loading UI & attempt retries
+        ConnectionCheckPanel.Visibility = Visibility.Visible;
+        LoginFormPanel.Visibility = Visibility.Collapsed;
+        ConnectionFailedPanel.Visibility = Visibility.Collapsed;
+
+        ConnectionStatusText.Text = "Starting Servitore...";
+        await System.Threading.Tasks.Task.Delay(500);
+        ConnectionStatusText.Text = "Connecting to server...";
 
         bool isOnline = false;
         int maxRetries = 10;
@@ -43,22 +70,32 @@ public partial class LoginWindow : Window
             {
                 Helpers.ClientLogger.Log($"Startup connection attempt {i + 1} failed.", ex);
             }
-            await System.Threading.Tasks.Task.Delay(1000);
+            await System.Threading.Tasks.Task.Delay(500);
         }
 
-        _viewModel.IsBusy = false;
         if (isOnline)
         {
-            ErrorText.Visibility = Visibility.Collapsed;
-            ErrorText.Foreground = (System.Windows.Media.Brush)FindResource("MaterialDesignValidationErrorBrush");
+            ConnectionCheckPanel.Visibility = Visibility.Collapsed;
+            LoginFormPanel.Visibility = Visibility.Visible;
+            ConnectionFailedPanel.Visibility = Visibility.Collapsed;
+            UsernameBox.Focus();
         }
         else
         {
-            _viewModel.ErrorMessage = "Unable to connect to the server. Please ensure the server is running.";
-            ErrorText.Text = _viewModel.ErrorMessage;
-            ErrorText.Foreground = (System.Windows.Media.Brush)FindResource("MaterialDesignValidationErrorBrush");
-            ErrorText.Visibility = Visibility.Visible;
+            ConnectionCheckPanel.Visibility = Visibility.Collapsed;
+            LoginFormPanel.Visibility = Visibility.Collapsed;
+            ConnectionFailedPanel.Visibility = Visibility.Visible;
         }
+    }
+
+    private async void RetryButton_Click(object sender, RoutedEventArgs e)
+    {
+        await CheckConnectionAndSetupUiAsync();
+    }
+
+    private void ExitButton_Click(object sender, RoutedEventArgs e)
+    {
+        Application.Current.Shutdown();
     }
 
     private class PingResponse

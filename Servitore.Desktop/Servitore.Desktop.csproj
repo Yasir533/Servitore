@@ -24,10 +24,29 @@
     <ProjectReference Include="..\Servitore.Shared\Servitore.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="clientSettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+  <Choose>
+    <When Condition="'$(Configuration)' == 'Release'">
+      <ItemGroup>
+        <None Include="clientSettings.Production.json">
+          <Link>clientSettings.json</Link>
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="clientSettings.Development.json">
+          <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+        </None>
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <None Include="clientSettings.Development.json">
+          <Link>clientSettings.json</Link>
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="clientSettings.Production.json">
+          <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+        </None>
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
 
 </Project>
