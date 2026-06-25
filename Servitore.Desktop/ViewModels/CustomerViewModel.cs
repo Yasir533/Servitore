@@ -61,6 +61,10 @@ public partial class CustomerViewModel : ViewModelBase
             if (results is not null)
                 foreach (var c in results) _allCustomers.Add(c);
         }
+        catch (Exception)
+        {
+            Helpers.DialogHelper.ShowError("Unable to load customer data. Please try again.");
+        }
         finally
         {
             IsLoading = false;
@@ -86,9 +90,9 @@ public partial class CustomerViewModel : ViewModelBase
                     CustomersView.Refresh();
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Helpers.DialogHelper.ShowError($"Failed to save customer: {ex.Message}");
+                Helpers.DialogHelper.ShowError("Unable to save changes. Please try again later.");
             }
             finally
             {
@@ -129,9 +133,9 @@ public partial class CustomerViewModel : ViewModelBase
                 row.Address = dialog.Customer.Address;
                 CustomersView.Refresh();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Helpers.DialogHelper.ShowError($"Failed to update customer: {ex.Message}");
+                Helpers.DialogHelper.ShowError("Unable to save changes. Please try again later.");
             }
             finally
             {
@@ -152,9 +156,9 @@ public partial class CustomerViewModel : ViewModelBase
             await _apiService.DeleteAsync($"api/customers/{row.CustomerId}");
             _allCustomers.Remove(row);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Helpers.DialogHelper.ShowError($"Failed to delete customer: {ex.Message}");
+            Helpers.DialogHelper.ShowError("Unable to delete customer. Please try again later.");
         }
         finally
         {

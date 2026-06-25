@@ -27,7 +27,7 @@ public class WarrantyController : ControllerBase
         var today = DateTime.UtcNow.Date;
         var results = await _context.Warranties
             .Include(w => w.Asset)
-            .ThenInclude(a => a.Customer)
+            .ThenInclude(a => a!.Customer)
             .OrderBy(w => w.EndDate)
             .Select(w => new {
                 w.WarrantyId,

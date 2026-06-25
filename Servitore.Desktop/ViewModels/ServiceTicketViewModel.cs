@@ -73,6 +73,10 @@ public partial class ServiceTicketViewModel : ViewModelBase
             if (results is not null)
                 foreach (var t in results) _allTickets.Add(t);
         }
+        catch (Exception)
+        {
+            Helpers.DialogHelper.ShowError("Unable to load service ticket data. Please try again.");
+        }
         finally
         {
             IsLoading = false;
@@ -104,9 +108,9 @@ public partial class ServiceTicketViewModel : ViewModelBase
                 await _apiService.PostAsync<object, object>("api/servicetickets", dto);
                 await LoadAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Helpers.DialogHelper.ShowError($"Failed to save ticket: {ex.Message}");
+                Helpers.DialogHelper.ShowError("Unable to save changes. Please try again later.");
             }
             finally
             {
@@ -147,9 +151,9 @@ public partial class ServiceTicketViewModel : ViewModelBase
                 await LoadAsync();
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Helpers.DialogHelper.ShowError($"Failed to update ticket: {ex.Message}");
+            Helpers.DialogHelper.ShowError("Unable to save changes. Please try again later.");
         }
         finally
         {
@@ -161,8 +165,15 @@ public partial class ServiceTicketViewModel : ViewModelBase
     private async Task CloseTicket(TicketRow? row)
     {
         if (row is null) return;
-        await _apiService.PutAsync($"api/servicetickets/{row.TicketId}/close", new { });
-        await LoadAsync();
+        try
+        {
+            await _apiService.PutAsync($"api/servicetickets/{row.TicketId}/close", new { });
+            await LoadAsync();
+        }
+        catch (Exception)
+        {
+            Helpers.DialogHelper.ShowError("Unable to close ticket. Please try again later.");
+        }
     }
 
     public class TicketRow

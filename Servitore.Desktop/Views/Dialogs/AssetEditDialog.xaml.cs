@@ -57,9 +57,9 @@ public partial class AssetEditDialog : Window
                 }
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            MessageBox.Show($"Failed to load customer list: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show("Unable to load lookup data. Please try again.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 

@@ -68,41 +68,113 @@ public class ApiService
 
     public void ClearAuthToken() => SetAuthToken(null);
 
-    public Task<T?> GetAsync<T>(string endpoint) =>
-        _httpClient.GetFromJsonAsync<T>(endpoint);
+    private async Task<T?> ReadContentSafeAsync<T>(HttpContent content)
+    {
+        var json = await content.ReadAsStringAsync();
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            return default;
+        }
+        try
+        {
+            return JsonSerializer.Deserialize<T>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        }
+        catch (JsonException ex)
+        {
+            Helpers.ClientLogger.Log("JSON deserialization failed", ex);
+            throw new InvalidOperationException("Failed to process the server response.", ex);
+        }
+    }
 
-    public Task<byte[]> GetByteArrayAsync(string endpoint) =>
-        _httpClient.GetByteArrayAsync(endpoint);
+    public async Task<T?> GetAsync<T>(string endpoint)
+    {
+        try
+        {
+            var response = await _httpClient.GetAsync(endpoint);
+            response.EnsureSuccessStatusCode();
+            return await ReadContentSafeAsync<T>(response.Content);
+        }
+        catch (Exception ex)
+        {
+            Helpers.ClientLogger.Log($"GET request failed for endpoint: {endpoint}", ex);
+            throw;
+        }
+    }
+
+    public async Task<byte[]> GetByteArrayAsync(string endpoint)
+    {
+        try
+        {
+            return await _httpClient.GetByteArrayAsync(endpoint);
+        }
+        catch (Exception ex)
+        {
+            Helpers.ClientLogger.Log($"GET byte array request failed for endpoint: {endpoint}", ex);
+            throw;
+        }
+    }
 
     public async Task<TResponse?> PostAsync<TRequest, TResponse>(string endpoint, TRequest body)
     {
-        var response = await _httpClient.PostAsJsonAsync(endpoint, body);
-        response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<TResponse>();
+        try
+        {
+            var response = await _httpClient.PostAsJsonAsync(endpoint, body);
+            response.EnsureSuccessStatusCode();
+            return await ReadContentSafeAsync<TResponse>(response.Content);
+        }
+        catch (Exception ex)
+        {
+            Helpers.ClientLogger.Log($"POST request failed for endpoint: {endpoint}", ex);
+            throw;
+        }
     }
 
     public async Task PutAsync<TRequest>(string endpoint, TRequest body)
     {
-        var response = await _httpClient.PutAsJsonAsync(endpoint, body);
-        response.EnsureSuccessStatusCode();
+        try
+        {
+            var response = await _httpClient.PutAsJsonAsync(endpoint, body);
+            response.EnsureSuccessStatusCode();
+        }
+        catch (Exception ex)
+        {
+            Helpers.ClientLogger.Log($"PUT request failed for endpoint: {endpoint}", ex);
+            throw;
+        }
     }
 
     public async Task DeleteAsync(string endpoint)
     {
-        var response = await _httpClient.DeleteAsync(endpoint);
-        response.EnsureSuccessStatusCode();
+        try
+        {
+            var response = await _httpClient.DeleteAsync(endpoint);
+            response.EnsureSuccessStatusCode();
+        }
+        catch (Exception ex)
+        {
+            Helpers.ClientLogger.Log($"DELETE request failed for endpoint: {endpoint}", ex);
+            throw;
+        }
     }
 
     public async Task<TResponse?> UploadFileAsync<TResponse>(string endpoint, string filePath)
     {
-        using var content = new MultipartFormDataContent();
-        using var fileStream = File.OpenRead(filePath);
-        using var streamContent = new StreamContent(fileStream);
-        streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-        content.Add(streamContent, "file", Path.GetFileName(filePath));
+        try
+        {
+            using var content = new MultipartFormDataContent();
+            using var fileStream = File.OpenRead(filePath);
+            using var streamContent = new StreamContent(fileStream);
+            streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+            content.Add(streamContent, "file", Path.GetFileName(filePath));
 
-        var response = await _httpClient.PostAsync(endpoint, content);
-        response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<TResponse>();
+            var response = await _httpClient.PostAsync(endpoint, content);
+            response.EnsureSuccessStatusCode();
+            return await ReadContentSafeAsync<TResponse>(response.Content);
+        }
+        catch (Exception ex)
+        {
+            Helpers.ClientLogger.Log($"FileUpload request failed for endpoint: {endpoint}, file: {filePath}", ex);
+            throw;
+        }
     }
 }

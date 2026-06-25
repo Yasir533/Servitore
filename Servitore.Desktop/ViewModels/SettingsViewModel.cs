@@ -51,9 +51,9 @@ public partial class SettingsViewModel : ViewModelBase
                 TicketNumberFormat = settings.TicketNumberFormat ?? "TKT-{YYYY}-{0000}";
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Helpers.DialogHelper.ShowError($"Failed to load general settings: {ex.Message}");
+            Helpers.DialogHelper.ShowError("Unable to load settings. Please try again.");
         }
 
         try
@@ -66,9 +66,9 @@ public partial class SettingsViewModel : ViewModelBase
                 WaIsEnabled   = waSettings.IsEnabled;
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Helpers.DialogHelper.ShowError($"Failed to load WhatsApp settings: {ex.Message}");
+            Helpers.DialogHelper.ShowError("Unable to load WhatsApp settings. Please try again.");
         }
     }
 
@@ -103,9 +103,9 @@ public partial class SettingsViewModel : ViewModelBase
 
             Helpers.DialogHelper.ShowInfo("Settings saved successfully.");
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Helpers.DialogHelper.ShowError($"Failed to save settings: {ex.Message}");
+            Helpers.DialogHelper.ShowError("Unable to save changes. Please try again later.");
         }
     }
 

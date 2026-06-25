@@ -18,33 +18,35 @@
 
         <TextBlock Text="Edit Customer" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,20" x:Name="TitleText"/>
 
-        <StackPanel Grid.Row="1">
-            <TextBox x:Name="NameBox"
-                     materialDesign:HintAssist.Hint="Customer Name *"
-                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                     Margin="0,0,0,12" />
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="0,0,8,0">
+                <TextBox x:Name="NameBox"
+                         materialDesign:HintAssist.Hint="Customer Name *"
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         Margin="0,0,0,12" />
 
-            <TextBox x:Name="ContactBox"
-                     materialDesign:HintAssist.Hint="Contact Person"
-                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                     Margin="0,0,0,12" />
+                <TextBox x:Name="ContactBox"
+                         materialDesign:HintAssist.Hint="Contact Person"
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         Margin="0,0,0,12" />
 
-            <TextBox x:Name="MobileBox"
-                     materialDesign:HintAssist.Hint="Mobile"
-                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                     Margin="0,0,0,12" />
+                <TextBox x:Name="MobileBox"
+                         materialDesign:HintAssist.Hint="Mobile"
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         Margin="0,0,0,12" />
 
-            <TextBox x:Name="EmailBox"
-                     materialDesign:HintAssist.Hint="Email"
-                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                     Margin="0,0,0,12" />
+                <TextBox x:Name="EmailBox"
+                         materialDesign:HintAssist.Hint="Email"
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         Margin="0,0,0,12" />
 
-            <TextBox x:Name="AddressBox"
-                     materialDesign:HintAssist.Hint="Address"
-                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                     Height="80" TextWrapping="Wrap" AcceptsReturn="True"
-                     VerticalScrollBarVisibility="Auto" />
-        </StackPanel>
+                <TextBox x:Name="AddressBox"
+                         materialDesign:HintAssist.Hint="Address"
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         Height="80" TextWrapping="Wrap" AcceptsReturn="True"
+                         VerticalScrollBarVisibility="Auto" />
+            </StackPanel>
+        </ScrollViewer>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
             <Button Content="Cancel" Style="{StaticResource MaterialDesignFlatButton}" Click="Cancel_Click" Margin="0,0,8,0" />

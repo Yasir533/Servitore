@@ -40,11 +40,10 @@ public partial class App : Application
         if (ex == null) return;
         try
         {
-            var logPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "client_errors.log");
-            var logText = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] [{source}] ERROR: {ex.Message}{Environment.NewLine}{ex.StackTrace}{Environment.NewLine}{Environment.NewLine}";
-            File.AppendAllText(logPath, logText);
+            Helpers.ClientLogger.Log($"Unhandled exception from {source}", ex);
             
-            MessageBox.Show($"An unexpected error occurred: {ex.Message}. Details written to client_errors.log", "Application Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show("Something went wrong. Please contact the administrator if the problem persists.", 
+                "Application Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
         catch
         {

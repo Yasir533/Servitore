@@ -67,8 +67,8 @@ public class AssetRepository : IAssetRepository
             .Include(a => a.Customer)
             .Include(a => a.Warranty)
             .Include(a => a.AMCContract)
-                .ThenInclude(c => c.Visits)
-                    .ThenInclude(v => v.Engineer)
+                .ThenInclude(c => c!.Visits)
+                    .ThenInclude(v => v!.Engineer)
             .Include(a => a.Documents)
             .Include(a => a.ServiceTickets)
             .FirstOrDefaultAsync(a => a.AssetId == id);

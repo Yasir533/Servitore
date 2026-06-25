@@ -17,6 +17,13 @@ public partial class AssetProfileView : UserControl
 
     private async void UserControl_Loaded(object sender, RoutedEventArgs e)
     {
-        await _viewModel.LoadCommand.ExecuteAsync(null);
+        try
+        {
+            await _viewModel.LoadCommand.ExecuteAsync(null);
+        }
+        catch (System.Exception ex)
+        {
+            Helpers.ClientLogger.Log("Failed to execute LoadCommand in AssetProfileView", ex);
+        }
     }
 }

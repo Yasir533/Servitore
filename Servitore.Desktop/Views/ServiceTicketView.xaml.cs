@@ -10,6 +10,16 @@ public partial class ServiceTicketView : UserControl
         InitializeComponent();
         var vm = new ServiceTicketViewModel(App.ApiService, App.SignalRService);
         DataContext = vm;
-        _ = vm.LoadCommand.ExecuteAsync(null);
+        Loaded += async (s, e) =>
+        {
+            try
+            {
+                await vm.LoadCommand.ExecuteAsync(null);
+            }
+            catch (System.Exception ex)
+            {
+                Helpers.ClientLogger.Log("Failed to execute LoadCommand in ServiceTicketView", ex);
+            }
+        };
     }
 }

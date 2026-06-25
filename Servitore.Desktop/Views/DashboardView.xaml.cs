@@ -62,7 +62,14 @@ public partial class DashboardView : UserControl
 
     private async void ShowSummary()
     {
-        await _viewModel.LoadCommand.ExecuteAsync(null);
+        try
+        {
+            await _viewModel.LoadCommand.ExecuteAsync(null);
+        }
+        catch (System.Exception ex)
+        {
+            Helpers.ClientLogger.Log("Failed to load dashboard summary", ex);
+        }
         var homeView = new DashboardHomeView { DataContext = _viewModel };
         ContentHost.Content = homeView;
     }

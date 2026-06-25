@@ -104,9 +104,9 @@ public partial class TicketEditDialog : Window
 
             _isLoaded = true;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            MessageBox.Show($"Failed to load lookup data: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show("Unable to load lookup data. Please try again.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
@@ -132,9 +132,9 @@ public partial class TicketEditDialog : Window
                 AssetCombo.SelectedIndex = 0;
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            MessageBox.Show($"Failed to load assets: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show("Unable to load assets. Please try again.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 

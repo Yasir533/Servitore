@@ -10,6 +10,16 @@ public partial class SettingsView : UserControl
         InitializeComponent();
         var vm = new SettingsViewModel(App.ApiService);
         DataContext = vm;
-        _ = vm.LoadCommand.ExecuteAsync(null);
+        Loaded += async (s, e) =>
+        {
+            try
+            {
+                await vm.LoadCommand.ExecuteAsync(null);
+            }
+            catch (System.Exception ex)
+            {
+                Helpers.ClientLogger.Log("Failed to execute LoadCommand in SettingsView", ex);
+            }
+        };
     }
 }

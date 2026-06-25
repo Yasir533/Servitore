@@ -17,7 +17,14 @@ public partial class CustomerProfileView : UserControl
 
     private async void UserControl_Loaded(object sender, RoutedEventArgs e)
     {
-        await _viewModel.LoadCommand.ExecuteAsync(null);
+        try
+        {
+            await _viewModel.LoadCommand.ExecuteAsync(null);
+        }
+        catch (System.Exception ex)
+        {
+            Helpers.ClientLogger.Log("Failed to execute LoadCommand in CustomerProfileView", ex);
+        }
     }
 
     private void AssetsGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)

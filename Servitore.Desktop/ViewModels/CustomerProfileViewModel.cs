@@ -33,9 +33,9 @@ public partial class CustomerProfileViewModel : ViewModelBase
         {
             Profile = await _apiService.GetAsync<CustomerProfileDto>($"api/customers/{_customerId}/profile");
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            DialogHelper.ShowError($"Failed to load customer profile: {ex.Message}");
+            DialogHelper.ShowError("Unable to load data. Please try again.");
         }
         finally
         {

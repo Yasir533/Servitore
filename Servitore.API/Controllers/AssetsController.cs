@@ -156,10 +156,12 @@ public class AssetsController : ControllerBase
     [HttpPost("{id:int}/documents")]
     public async Task<IActionResult> UploadDocument(int id, IFormFile file)
     {
-        if (file == null || file.Length == 0) return BadRequest("File is empty.");
+        if (file == null || file.Length == 0) 
+            return BadRequest(new { success = false, message = "File is empty." });
 
         var asset = await _assetRepository.GetByIdAsync(id);
-        if (asset == null) return NotFound("Asset not found.");
+        if (asset == null) 
+            return NotFound(new { success = false, message = "Asset not found." });
 
         var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
         if (!Directory.Exists(uploadDir)) Directory.CreateDirectory(uploadDir);
@@ -195,9 +197,11 @@ public class AssetsController : ControllerBase
     public async Task<IActionResult> DownloadDocument(int docId)
     {
         var doc = await _assetRepository.GetDocumentByIdAsync(docId);
-        if (doc == null) return NotFound("Document not found.");
+        if (doc == null) 
+            return NotFound(new { success = false, message = "Document not found." });
 
-        if (!System.IO.File.Exists(doc.FilePath)) return NotFound("Physical file not found on disk.");
+        if (!System.IO.File.Exists(doc.FilePath)) 
+            return NotFound(new { success = false, message = "Physical file not found on disk." });
 
         var bytes = await System.IO.File.ReadAllBytesAsync(doc.FilePath);
         return File(bytes, "application/octet-stream", doc.FileName);
@@ -207,7 +211,8 @@ public class AssetsController : ControllerBase
     public async Task<IActionResult> DeleteDocument(int docId)
     {
         var doc = await _assetRepository.GetDocumentByIdAsync(docId);
-        if (doc == null) return NotFound("Document not found.");
+        if (doc == null) 
+            return NotFound(new { success = false, message = "Document not found." });
 
         if (System.IO.File.Exists(doc.FilePath))
         {

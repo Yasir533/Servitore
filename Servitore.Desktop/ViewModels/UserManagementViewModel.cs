@@ -52,6 +52,10 @@ public partial class UserManagementViewModel : ViewModelBase
             if (results is not null)
                 foreach (var u in results) _all.Add(u);
         }
+        catch (Exception)
+        {
+            Helpers.DialogHelper.ShowError("Unable to load user data. Please try again.");
+        }
         finally { IsLoading = false; }
     }
 
@@ -89,9 +93,9 @@ public partial class UserManagementViewModel : ViewModelBase
                 await _apiService.PostAsync<object, object>("api/users", dto);
                 await LoadAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Helpers.DialogHelper.ShowError($"Failed to add user: {ex.Message}");
+                Helpers.DialogHelper.ShowError("Unable to save changes. Please try again later.");
             }
             finally
             {
@@ -148,9 +152,9 @@ public partial class UserManagementViewModel : ViewModelBase
                 await _apiService.PutAsync($"api/users/{row.Id}", dto);
                 await LoadAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Helpers.DialogHelper.ShowError($"Failed to update user: {ex.Message}");
+                Helpers.DialogHelper.ShowError("Unable to save changes. Please try again later.");
             }
             finally
             {
@@ -163,9 +167,16 @@ public partial class UserManagementViewModel : ViewModelBase
     private async Task ToggleActive(UserRow? row)
     {
         if (row is null) return;
-        await _apiService.PutAsync($"api/users/{row.Id}/toggle-active", new { });
-        row.IsActive = !row.IsActive;
-        UsersView.Refresh();
+        try
+        {
+            await _apiService.PutAsync($"api/users/{row.Id}/toggle-active", new { });
+            row.IsActive = !row.IsActive;
+            UsersView.Refresh();
+        }
+        catch (Exception)
+        {
+            Helpers.DialogHelper.ShowError("Unable to toggle user active status. Please try again later.");
+        }
     }
 
     public class UserRow

@@ -57,9 +57,9 @@ public partial class DashboardViewModel : ViewModelBase
                 await _apiService.PostAsync<object, object>("api/customers", dialog.Customer);
                 await LoadAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Helpers.DialogHelper.ShowError($"Failed to save customer: {ex.Message}");
+                Helpers.DialogHelper.ShowError("Unable to save changes. Please try again later.");
             }
             finally
             {
@@ -83,9 +83,9 @@ public partial class DashboardViewModel : ViewModelBase
                 await _apiService.PostAsync<object, object>("api/assets", dialog.Asset);
                 await LoadAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Helpers.DialogHelper.ShowError($"Failed to save asset: {ex.Message}");
+                Helpers.DialogHelper.ShowError("Unable to save changes. Please try again later.");
             }
             finally
             {
@@ -119,9 +119,9 @@ public partial class DashboardViewModel : ViewModelBase
                 await _apiService.PostAsync<object, object>("api/servicetickets", dto);
                 await LoadAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Helpers.DialogHelper.ShowError($"Failed to save ticket: {ex.Message}");
+                Helpers.DialogHelper.ShowError("Unable to save changes. Please try again later.");
             }
             finally
             {
@@ -154,9 +154,9 @@ public partial class DashboardViewModel : ViewModelBase
                 await _apiService.PostAsync<object, object>("api/amc", requestBody);
                 await LoadAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Helpers.DialogHelper.ShowError($"Failed to save AMC contract: {ex.Message}");
+                Helpers.DialogHelper.ShowError("Unable to save changes. Please try again later.");
             }
             finally
             {

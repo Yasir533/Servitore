@@ -47,9 +47,9 @@ public partial class AssetProfileViewModel : ViewModelBase
                 await LoadBarcodeImageAsync();
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            DialogHelper.ShowError($"Failed to load asset details: {ex.Message}");
+            DialogHelper.ShowError("Unable to load data. Please try again.");
         }
         finally
         {
@@ -111,9 +111,9 @@ public partial class AssetProfileViewModel : ViewModelBase
                     OnPropertyChanged(nameof(Profile));
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                DialogHelper.ShowError($"Failed to upload document: {ex.Message}");
+                DialogHelper.ShowError("Unable to save changes. Please try again later.");
             }
             finally
             {
@@ -140,9 +140,9 @@ public partial class AssetProfileViewModel : ViewModelBase
                 await File.WriteAllBytesAsync(sfd.FileName, bytes);
                 DialogHelper.ShowInfo("Document downloaded successfully.");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                DialogHelper.ShowError($"Failed to download document: {ex.Message}");
+                DialogHelper.ShowError("Unable to download document. Please try again later.");
             }
             finally
             {
@@ -164,9 +164,9 @@ public partial class AssetProfileViewModel : ViewModelBase
             Profile?.Documents.Remove(doc);
             OnPropertyChanged(nameof(Profile));
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            DialogHelper.ShowError($"Failed to delete document: {ex.Message}");
+            DialogHelper.ShowError("Unable to save changes. Please try again later.");
         }
         finally
         {
@@ -208,9 +208,9 @@ public partial class AssetProfileViewModel : ViewModelBase
                     OnPropertyChanged(nameof(Profile));
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                DialogHelper.ShowError($"Failed to schedule visit: {ex.Message}");
+                DialogHelper.ShowError("Unable to save changes. Please try again later.");
             }
             finally
             {
@@ -251,9 +251,9 @@ public partial class AssetProfileViewModel : ViewModelBase
                 
                 OnPropertyChanged(nameof(Profile));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                DialogHelper.ShowError($"Failed to update visit: {ex.Message}");
+                DialogHelper.ShowError("Unable to save changes. Please try again later.");
             }
             finally
             {
@@ -275,9 +275,9 @@ public partial class AssetProfileViewModel : ViewModelBase
             Profile?.AMCContract?.Visits.Remove(row);
             OnPropertyChanged(nameof(Profile));
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            DialogHelper.ShowError($"Failed to delete visit: {ex.Message}");
+            DialogHelper.ShowError("Unable to save changes. Please try again later.");
         }
         finally
         {

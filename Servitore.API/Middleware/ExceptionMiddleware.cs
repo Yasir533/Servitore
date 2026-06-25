@@ -25,12 +25,27 @@ public class ExceptionMiddleware
             _logger.LogError(ex, "Unhandled exception processing {Path}", context.Request.Path);
 
             context.Response.ContentType = "application/json";
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            
+            var statusCode = HttpStatusCode.InternalServerError;
+            var message = "Something went wrong. Please contact the administrator if the problem persists.";
+
+            if (ex is KeyNotFoundException)
+            {
+                statusCode = HttpStatusCode.NotFound;
+                message = ex.Message;
+            }
+            else if (ex is ArgumentException || ex is InvalidOperationException)
+            {
+                statusCode = HttpStatusCode.BadRequest;
+                message = ex.Message;
+            }
+
+            context.Response.StatusCode = (int)statusCode;
 
             var payload = JsonSerializer.Serialize(new
             {
-                error = "An unexpected error occurred.",
-                detail = ex.Message
+                success = false,
+                message = message
             });
 
             await context.Response.WriteAsync(payload);

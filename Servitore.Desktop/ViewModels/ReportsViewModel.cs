@@ -85,9 +85,9 @@ public partial class ReportsViewModel : ViewModelBase
             await File.WriteAllBytesAsync(dialog.FileName, bytes);
             Helpers.DialogHelper.ShowInfo("Report exported successfully.");
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Helpers.DialogHelper.ShowError($"Failed to download report: {ex.Message}");
+            Helpers.DialogHelper.ShowError("Unable to download report. Please try again.");
         }
     }
 }

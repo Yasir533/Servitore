@@ -29,7 +29,7 @@ public class AMCController : ControllerBase
         var today = DateTime.UtcNow.Date;
         var results = await _context.AMCContracts
             .Include(c => c.Asset)
-            .ThenInclude(a => a.Customer)
+            .ThenInclude(a => a!.Customer)
             .OrderBy(c => c.EndDate)
             .Select(c => new {
                 c.AMCContractId,

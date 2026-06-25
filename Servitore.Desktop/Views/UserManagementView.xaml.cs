@@ -10,6 +10,16 @@ public partial class UserManagementView : UserControl
         InitializeComponent();
         var vm = new UserManagementViewModel(App.ApiService);
         DataContext = vm;
-        _ = vm.LoadCommand.ExecuteAsync(null);
+        Loaded += async (s, e) =>
+        {
+            try
+            {
+                await vm.LoadCommand.ExecuteAsync(null);
+            }
+            catch (System.Exception ex)
+            {
+                Helpers.ClientLogger.Log("Failed to execute LoadCommand in UserManagementView", ex);
+            }
+        };
     }
 }

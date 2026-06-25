@@ -74,7 +74,7 @@ public class DashboardController : ControllerBase
         // 2. AMC Alerts
         var amcAlerts = await _context.AMCContracts
             .Include(a => a.Asset)
-            .ThenInclude(ast => ast.Customer)
+            .ThenInclude(ast => ast!.Customer)
             .Where(a => a.EndDate >= today && a.EndDate <= in30Days)
             .Select(a => new Servitore.Shared.Models.DashboardAmcAlertDto
             {
@@ -90,7 +90,7 @@ public class DashboardController : ControllerBase
         // 3. Warranty Alerts
         var warrantyAlerts = await _context.Warranties
             .Include(w => w.Asset)
-            .ThenInclude(ast => ast.Customer)
+            .ThenInclude(ast => ast!.Customer)
             .Where(w => w.EndDate >= today && w.EndDate <= in30Days)
             .Select(w => new Servitore.Shared.Models.DashboardWarrantyAlertDto
             {

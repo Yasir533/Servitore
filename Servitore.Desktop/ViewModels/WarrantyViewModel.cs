@@ -58,6 +58,10 @@ public partial class WarrantyViewModel : ViewModelBase
                 ActiveCount   = results.Count(r => r.WarrantyStatus == "Active");
             }
         }
+        catch (Exception)
+        {
+            Helpers.DialogHelper.ShowError("Unable to load warranty data. Please try again.");
+        }
         finally { IsLoading = false; }
     }
 
@@ -84,9 +88,9 @@ public partial class WarrantyViewModel : ViewModelBase
                 await _apiService.PostAsync<object, object>("api/warranty", requestBody);
                 await LoadAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Helpers.DialogHelper.ShowError($"Failed to save warranty: {ex.Message}");
+                Helpers.DialogHelper.ShowError("Unable to save changes. Please try again later.");
             }
             finally
             {
@@ -137,9 +141,9 @@ public partial class WarrantyViewModel : ViewModelBase
                 await _apiService.PutAsync($"api/warranty/{row.WarrantyId}", requestBody);
                 await LoadAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Helpers.DialogHelper.ShowError($"Failed to update warranty: {ex.Message}");
+                Helpers.DialogHelper.ShowError("Unable to save changes. Please try again later.");
             }
             finally
             {
@@ -160,9 +164,9 @@ public partial class WarrantyViewModel : ViewModelBase
             await _apiService.DeleteAsync($"api/warranty/{row.WarrantyId}");
             await LoadAsync();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Helpers.DialogHelper.ShowError($"Failed to delete warranty: {ex.Message}");
+            Helpers.DialogHelper.ShowError("Unable to delete warranty. Please try again later.");
         }
         finally
         {

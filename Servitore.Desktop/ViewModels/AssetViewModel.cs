@@ -66,6 +66,10 @@ public partial class AssetViewModel : ViewModelBase
             if (results is not null)
                 foreach (var a in results) _allAssets.Add(a);
         }
+        catch (Exception)
+        {
+            Helpers.DialogHelper.ShowError("Unable to load asset data. Please try again.");
+        }
         finally
         {
             IsLoading = false;
@@ -76,11 +80,18 @@ public partial class AssetViewModel : ViewModelBase
     private async Task LookupByBarcodeAsync()
     {
         if (string.IsNullOrWhiteSpace(ScannedCode)) return;
-        var asset = await _apiService.GetAsync<AssetRow>($"api/assets/by-barcode/{ScannedCode}");
-        if (asset is not null)
+        try
         {
-            _allAssets.Clear();
-            _allAssets.Add(asset);
+            var asset = await _apiService.GetAsync<AssetRow>($"api/assets/by-barcode/{ScannedCode}");
+            if (asset is not null)
+            {
+                _allAssets.Clear();
+                _allAssets.Add(asset);
+            }
+        }
+        catch (Exception)
+        {
+            Helpers.DialogHelper.ShowError("Unable to find asset by barcode.");
         }
     }
 
@@ -103,9 +114,9 @@ public partial class AssetViewModel : ViewModelBase
                     AssetsView.Refresh();
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Helpers.DialogHelper.ShowError($"Failed to save asset: {ex.Message}");
+                Helpers.DialogHelper.ShowError("Unable to save changes. Please try again later.");
             }
             finally
             {
@@ -153,9 +164,9 @@ public partial class AssetViewModel : ViewModelBase
                 row.PurchaseDate = dialog.Asset.PurchaseDate;
                 AssetsView.Refresh();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Helpers.DialogHelper.ShowError($"Failed to update asset: {ex.Message}");
+                Helpers.DialogHelper.ShowError("Unable to save changes. Please try again later.");
             }
             finally
             {
@@ -176,9 +187,9 @@ public partial class AssetViewModel : ViewModelBase
             await _apiService.DeleteAsync($"api/assets/{row.AssetId}");
             _allAssets.Remove(row);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Helpers.DialogHelper.ShowError($"Failed to delete asset: {ex.Message}");
+            Helpers.DialogHelper.ShowError("Unable to delete asset. Please try again later.");
         }
         finally
         {

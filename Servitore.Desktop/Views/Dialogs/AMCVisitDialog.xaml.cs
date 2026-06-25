@@ -70,9 +70,9 @@ public partial class AMCVisitDialog : Window
                 }
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            MessageBox.Show($"Failed to load lookup data: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show("Unable to load lookup data. Please try again.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 

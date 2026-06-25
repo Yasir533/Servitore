@@ -49,6 +49,7 @@ public partial class LoginWindow : Window
             Content = dashboard,
             WindowState = WindowState.Maximized
         };
+        Application.Current.MainWindow = mainWindow;
         mainWindow.Show();
 
         Close();

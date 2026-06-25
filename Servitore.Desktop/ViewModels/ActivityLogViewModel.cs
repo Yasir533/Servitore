@@ -90,9 +90,9 @@ public partial class ActivityLogViewModel : ViewModelBase
                 }
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Helpers.DialogHelper.ShowError($"Failed to load activity logs: {ex.Message}");
+            Helpers.DialogHelper.ShowError("Unable to load data. Please try again.");
         }
         finally 
         { 

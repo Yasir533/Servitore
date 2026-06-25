@@ -24,9 +24,9 @@ public class BarcodeController : ControllerBase
             var bytes = _barcodeService.GenerateBarcode(content);
             return File(bytes, "image/png");
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            return BadRequest(ex.Message);
+            return BadRequest(new { success = false, message = "Unable to generate barcode." });
         }
     }
 
@@ -38,9 +38,9 @@ public class BarcodeController : ControllerBase
             var bytes = _barcodeService.GenerateQrCode(content);
             return File(bytes, "image/png");
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            return BadRequest(ex.Message);
+            return BadRequest(new { success = false, message = "Unable to generate QR code." });
         }
     }
 }

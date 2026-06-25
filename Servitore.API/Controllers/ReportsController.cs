@@ -70,7 +70,7 @@ public class ReportsController : ControllerBase
     {
         var warranties = await _context.Warranties
             .Include(w => w.Asset)
-            .ThenInclude(a => a.Customer)
+            .ThenInclude(a => a!.Customer)
             .OrderBy(w => w.EndDate)
             .ToListAsync();
 
@@ -84,7 +84,7 @@ public class ReportsController : ControllerBase
     {
         var contracts = await _context.AMCContracts
             .Include(c => c.Asset)
-            .ThenInclude(a => a.Customer)
+            .ThenInclude(a => a!.Customer)
             .OrderBy(c => c.EndDate)
             .ToListAsync();
 

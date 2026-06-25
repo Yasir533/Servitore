@@ -58,6 +58,10 @@ public partial class AMCViewModel : ViewModelBase
                 TotalValue    = results.Where(r => r.Status == "Active").Sum(r => r.ContractValue);
             }
         }
+        catch (Exception)
+        {
+            Helpers.DialogHelper.ShowError("Unable to load AMC data. Please try again.");
+        }
         finally { IsLoading = false; }
     }
 
@@ -89,9 +93,9 @@ public partial class AMCViewModel : ViewModelBase
                     ContractsView.Refresh();
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Helpers.DialogHelper.ShowError($"Failed to save AMC contract: {ex.Message}");
+                Helpers.DialogHelper.ShowError("Unable to save changes. Please try again later.");
             }
             finally
             {
@@ -151,9 +155,9 @@ public partial class AMCViewModel : ViewModelBase
                 row.AssetId = dialog.Contract.AssetId;
                 ContractsView.Refresh();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Helpers.DialogHelper.ShowError($"Failed to update AMC contract: {ex.Message}");
+                Helpers.DialogHelper.ShowError("Unable to save changes. Please try again later.");
             }
             finally
             {
@@ -174,9 +178,9 @@ public partial class AMCViewModel : ViewModelBase
             await _apiService.DeleteAsync($"api/amc/{row.AMCContractId}");
             _all.Remove(row);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Helpers.DialogHelper.ShowError($"Failed to delete AMC contract: {ex.Message}");
+            Helpers.DialogHelper.ShowError("Unable to delete AMC contract. Please try again later.");
         }
         finally { IsLoading = false; }
     }
