@@ -1,6 +1,6 @@
 namespace Servitore.Database.Entities;
 
-public class AMCContract
+public class AMCContract : IAuditable
 {
     public int AMCContractId { get; set; }
     public int AssetId { get; set; }

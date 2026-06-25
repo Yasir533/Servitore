@@ -197,15 +197,16 @@
                 </StackPanel>
             </Grid>
 
-            <!-- Bottom: Status Counts and Notifications -->
+            <!-- Bottom: Status Counts, Notifications and Live Activity Feed -->
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*" />
-                    <ColumnDefinition Width="3*" />
+                    <ColumnDefinition Width="1.5*" />
+                    <ColumnDefinition Width="1.8*" />
+                    <ColumnDefinition Width="2.7*" />
                 </Grid.ColumnDefinitions>
 
-                <!-- Ticket Status Counts (Summary bar/canvas display) -->
-                <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                <!-- Ticket Status Summary -->
+                <StackPanel Grid.Column="0" Margin="0,0,12,0">
                     <TextBlock Text="Ticket Status Summary" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,12" />
                     <Border Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="6" Padding="20" Height="220">
                         <StackPanel VerticalAlignment="Center">
@@ -241,7 +242,7 @@
                 </StackPanel>
 
                 <!-- Recent Notifications -->
-                <StackPanel Grid.Column="1">
+                <StackPanel Grid.Column="1" Margin="0,0,12,0">
                     <TextBlock Text="Recent Notifications" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,12" />
                     <Border Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="6" Padding="4" Height="220">
                         <Grid>
@@ -255,15 +256,61 @@
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <Border BorderBrush="{DynamicResource MaterialDesignDivider}"
-                                                    BorderThickness="0,0,0,1" Padding="16,10">
+                                                    BorderThickness="0,0,0,1" Padding="12,10">
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*" />
                                                         <ColumnDefinition Width="Auto" />
                                                     </Grid.ColumnDefinitions>
-                                                    <TextBlock Text="{Binding Message}" TextWrapping="Wrap" VerticalAlignment="Center" />
-                                                    <TextBlock Grid.Column="1" Text="{Binding CreatedDate, StringFormat='{}{0:dd MMM HH:mm}'}"
-                                                               Opacity="0.5" FontSize="11" VerticalAlignment="Center" Margin="16,0,0,0" />
+                                                    <TextBlock Text="{Binding Message}" TextWrapping="Wrap" FontSize="12" VerticalAlignment="Center" />
+                                                    <TextBlock Grid.Column="1" Text="{Binding CreatedDate, StringFormat='{}{0:HH:mm}'}"
+                                                               Opacity="0.5" FontSize="11" VerticalAlignment="Center" Margin="12,0,0,0" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+
+                <!-- Live Activity Feed -->
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="Live Activity Feed" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,12" />
+                    <Border Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="6" Padding="4" Height="220">
+                        <Grid>
+                            <!-- Empty state when no activities -->
+                            <TextBlock Text="No recent activities."
+                                       Opacity="0.45" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       Visibility="{Binding HasNoActivities, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding HasNoActivities, Converter={StaticResource InverseBooleanConverter}}">
+                                <ItemsControl ItemsSource="{Binding Summary.RecentActivities}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border BorderBrush="{DynamicResource MaterialDesignDivider}"
+                                                    BorderThickness="0,0,0,1" Padding="12,8">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <materialDesign:PackIcon Kind="FlashOutline" Foreground="#FFB300" Width="16" Height="16" VerticalAlignment="Center" Margin="0,0,8,0" />
+
+                                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                        <TextBlock FontSize="12" TextWrapping="Wrap">
+                                                            <Run Text="{Binding UserName, Mode=OneWay}" FontWeight="SemiBold" />
+                                                            <Run Text=" " />
+                                                            <Run Text="{Binding Action, Mode=OneWay}" />
+                                                        </TextBlock>
+                                                        <TextBlock Text="{Binding Module}" FontSize="10" Opacity="0.55" Margin="0,2,0,0" />
+                                                    </StackPanel>
+
+                                                    <TextBlock Grid.Column="2" Text="{Binding DateTime, StringFormat='{}{0:HH:mm:ss}'}"
+                                                               Opacity="0.5" FontSize="10" VerticalAlignment="Center" Margin="8,0,0,0" />
                                                 </Grid>
                                             </Border>
                                         </DataTemplate>

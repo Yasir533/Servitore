@@ -49,7 +49,7 @@ public class ServiceTicketsController : ControllerBase
             ResolutionNotes = ticket.ResolutionNotes,
             SlaDueDate = ticket.SlaDueDate,
             SlaBreached = ticket.SlaBreached,
-            CreatedBy = ticket.CreatedBy,
+            CreatedBy = ticket.CreatedByUserId,
             CreatedByUserName = ticket.CreatedByUser?.FullName ?? string.Empty,
             CreatedDate = ticket.CreatedDate,
             History = ticket.History.OrderByDescending(h => h.UpdatedDate).Select(h => new TicketHistoryDto

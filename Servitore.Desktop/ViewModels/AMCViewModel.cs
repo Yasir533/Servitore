@@ -31,6 +31,15 @@ public partial class AMCViewModel : ViewModelBase
         _apiService = apiService;
         ContractsView = CollectionViewSource.GetDefaultView(_all);
         ContractsView.Filter = Filter;
+        App.SignalRService.DataChanged += OnDataChanged;
+    }
+
+    private async void OnDataChanged(Servitore.Shared.Models.DataEventModel dataEvent)
+    {
+        if (dataEvent.EntityType == "AMCContract")
+        {
+            await LoadAsync();
+        }
     }
 
     private bool Filter(object obj)
@@ -106,6 +115,15 @@ public partial class AMCViewModel : ViewModelBase
                 {
                     _all.Add(response);
                     ContractsView.Refresh();
+
+                    await App.SignalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
+                    {
+                        EntityType = "AMCContract",
+                        Action = "Created",
+                        RecordId = response.AMCContractId.ToString(),
+                        DisplayName = $"AMC Contract - {response.AssetName}",
+                        Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
+                    });
                 }
             }
             catch (Exception)
@@ -169,6 +187,15 @@ public partial class AMCViewModel : ViewModelBase
                 row.CustomerId = dialog.Contract.CustomerId;
                 row.AssetId = dialog.Contract.AssetId;
                 ContractsView.Refresh();
+
+                await App.SignalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
+                {
+                    EntityType = "AMCContract",
+                    Action = "Updated",
+                    RecordId = row.AMCContractId.ToString(),
+                    DisplayName = $"AMC Contract - {row.AssetName}",
+                    Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
+                });
             }
             catch (Exception)
             {
@@ -190,8 +217,19 @@ public partial class AMCViewModel : ViewModelBase
         IsLoading = true;
         try
         {
+            var id = row.AMCContractId;
+            var assetName = row.AssetName;
             await _apiService.DeleteAsync($"api/amc/{row.AMCContractId}");
             _all.Remove(row);
+
+            await App.SignalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
+            {
+                EntityType = "AMCContract",
+                Action = "Deleted",
+                RecordId = id.ToString(),
+                DisplayName = $"AMC Contract - {assetName}",
+                Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
+            });
         }
         catch (Exception)
         {

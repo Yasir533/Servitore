@@ -124,6 +124,24 @@ public class DashboardController : ControllerBase
             .Where(a => a.EndDate >= today)
             .SumAsync(a => a.ContractValue);
 
+        // 6. Recent Activities
+        var recentActivities = await _context.ActivityLogs
+            .OrderByDescending(a => a.DateTime)
+            .Take(10)
+            .Select(a => new Servitore.Shared.Models.ActivityLogDto
+            {
+                Id = a.Id,
+                LogId = a.LogId,
+                Action = a.Action,
+                Module = a.Module,
+                UserId = a.UserId,
+                UserName = a.UserName,
+                SystemName = a.SystemName,
+                IPAddress = a.IPAddress,
+                DateTime = a.DateTime
+            })
+            .ToListAsync();
+
         var summary = new Servitore.Shared.Models.DashboardSummary
         {
             TotalCustomers = totalCustomers,
@@ -137,7 +155,8 @@ public class DashboardController : ControllerBase
             AmcAlerts = amcAlerts,
             WarrantyAlerts = warrantyAlerts,
             TicketStatusCounts = ticketStatusCounts,
-            TotalAmcRevenue = totalAmcRevenue
+            TotalAmcRevenue = totalAmcRevenue,
+            RecentActivities = recentActivities
         };
 
         return Ok(summary);

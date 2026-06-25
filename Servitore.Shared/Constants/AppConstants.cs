@@ -11,7 +11,7 @@ public static class AppConstants
 #endif
 
     // SignalR
-    public const string NotificationHubUrl = "/hubs/notifications";
+    public const string NotificationHubUrl = "/hubs/collaboration";
 
     // Auth
     public const string JwtTokenStorageKey = "Servitore_AuthToken";

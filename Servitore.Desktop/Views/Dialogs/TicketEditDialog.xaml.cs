@@ -60,6 +60,9 @@ public partial class TicketEditDialog : Window
         }
     }
 
+    private string _recordKey = string.Empty;
+    private bool _isReadOnly = false;
+
     private async void Window_Loaded(object sender, RoutedEventArgs e)
     {
         try
@@ -108,6 +111,98 @@ public partial class TicketEditDialog : Window
         {
             MessageBox.Show("Unable to load lookup data. Please try again.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
+
+        if (Ticket.TicketId > 0)
+        {
+            _recordKey = $"Ticket-{Ticket.TicketId}";
+            var lockResult = await Helpers.LockHelper.AcquireLockAsync(_recordKey);
+            if (!lockResult.Success)
+            {
+                var lockOwner = lockResult.Lock?.Username ?? "another user";
+                var currentRole = App.AuthenticationService.CurrentUser?.Role.ToString() ?? "Operator";
+                bool isAdminOrManager = currentRole == "Admin" || currentRole == "Manager";
+
+                string msg = $"This record is currently being edited by {lockOwner}.\n\nClick Yes to View Only (Read-Only).";
+                if (isAdminOrManager)
+                {
+                    msg += "\nClick No to Force Take Over editing rights.\nClick Cancel to go back.";
+                }
+                else
+                {
+                    msg += "\nClick Cancel to go back.";
+                }
+
+                MessageBoxResult action;
+                if (isAdminOrManager)
+                {
+                    action = MessageBox.Show(this, msg, "Record Locked", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
+                }
+                else
+                {
+                    action = MessageBox.Show(this, msg, "Record Locked", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+                    if (action == MessageBoxResult.OK) action = MessageBoxResult.Yes;
+                }
+
+                if (action == MessageBoxResult.Yes)
+                {
+                    _isReadOnly = true;
+                    TitleText.Text += " (View Only)";
+                    SaveButton.Visibility = Visibility.Collapsed;
+                    DisableInputs();
+                }
+                else if (action == MessageBoxResult.No && isAdminOrManager)
+                {
+                    var takeover = await Helpers.LockHelper.TakeOverLockAsync(_recordKey);
+                    if (!takeover.Success)
+                    {
+                        MessageBox.Show(this, "Failed to take over editing lock. Switching to View Only.", "Lock Conflict", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        _isReadOnly = true;
+                        TitleText.Text += " (View Only)";
+                        SaveButton.Visibility = Visibility.Collapsed;
+                        DisableInputs();
+                    }
+                    else
+                    {
+                        App.SignalRService.LockTakenOver += OnLockTakenOver;
+                    }
+                }
+                else
+                {
+                    DialogResult = false;
+                    Close();
+                }
+            }
+            else
+            {
+                App.SignalRService.LockTakenOver += OnLockTakenOver;
+            }
+        }
+    }
+
+    private void OnLockTakenOver(string recordKey, string newOwner)
+    {
+        if (recordKey == _recordKey)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                MessageBox.Show(this, $"Your editing session was taken over by {newOwner}. This window will now switch to View Only.", "Session Taken Over", MessageBoxButton.OK, MessageBoxImage.Warning);
+                _isReadOnly = true;
+                TitleText.Text = TitleText.Text.Replace("Details", "Details (View Only)");
+                SaveButton.Visibility = Visibility.Collapsed;
+                DisableInputs();
+            });
+        }
+    }
+
+    private void DisableInputs()
+    {
+        CustomerCombo.IsEnabled = false;
+        AssetCombo.IsEnabled = false;
+        ProblemBox.IsEnabled = false;
+        PriorityCombo.IsEnabled = false;
+        StatusCombo.IsEnabled = false;
+        EngineerCombo.IsEnabled = false;
+        ResolutionBox.IsEnabled = false;
     }
 
     private async void CustomerCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -138,8 +233,10 @@ public partial class TicketEditDialog : Window
         }
     }
 
-    private void Save_Click(object sender, RoutedEventArgs e)
+    private async void Save_Click(object sender, RoutedEventArgs e)
     {
+        if (_isReadOnly) return;
+
         var problem = ProblemBox.Text.Trim();
         if (string.IsNullOrWhiteSpace(problem))
         {
@@ -181,14 +278,29 @@ public partial class TicketEditDialog : Window
 
         Ticket.ResolutionNotes = ResolutionBox.Text.Trim();
 
+        if (!string.IsNullOrEmpty(_recordKey))
+        {
+            await Helpers.LockHelper.ReleaseLockAsync(_recordKey);
+        }
+
         DialogResult = true;
         Close();
     }
 
-    private void Cancel_Click(object sender, RoutedEventArgs e)
+    private async void Cancel_Click(object sender, RoutedEventArgs e)
     {
+        if (!string.IsNullOrEmpty(_recordKey) && !_isReadOnly)
+        {
+            await Helpers.LockHelper.ReleaseLockAsync(_recordKey);
+        }
         DialogResult = false;
         Close();
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        App.SignalRService.LockTakenOver -= OnLockTakenOver;
+        base.OnClosed(e);
     }
 
     public class CustomerLookupItem

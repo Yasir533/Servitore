@@ -2,7 +2,7 @@ using Servitore.Shared.Enums;
 
 namespace Servitore.Database.Entities;
 
-public class ServiceTicket
+public class ServiceTicket : IAuditable
 {
     public int TicketId { get; set; }
     public string TicketNumber { get; set; } = string.Empty;
@@ -15,14 +15,19 @@ public class ServiceTicket
     public string? ResolutionNotes { get; set; }
     public DateTime? SlaDueDate { get; set; }
     public bool SlaBreached { get; set; }
-    public int CreatedBy { get; set; }
+    
+    // Relationship properties
+    public int CreatedByUserId { get; set; }
+    public User? CreatedByUser { get; set; }
+    public User? AssignedToUser { get; set; }
+
+    // Audit fields
+    public string? CreatedBy { get; set; }
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
     public string? ModifiedBy { get; set; }
     public DateTime? ModifiedDate { get; set; }
 
     public Customer? Customer { get; set; }
     public Asset? Asset { get; set; }
-    public User? CreatedByUser { get; set; }
-    public User? AssignedToUser { get; set; }
     public ICollection<TicketHistory> History { get; set; } = new List<TicketHistory>();
 }

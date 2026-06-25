@@ -31,6 +31,15 @@ public partial class WarrantyViewModel : ViewModelBase
         _apiService = apiService;
         WarrantiesView = CollectionViewSource.GetDefaultView(_all);
         WarrantiesView.Filter = Filter;
+        App.SignalRService.DataChanged += OnDataChanged;
+    }
+
+    private async void OnDataChanged(Servitore.Shared.Models.DataEventModel dataEvent)
+    {
+        if (dataEvent.EntityType == "Warranty")
+        {
+            await LoadAsync();
+        }
     }
 
     private bool Filter(object obj)
@@ -102,6 +111,15 @@ public partial class WarrantyViewModel : ViewModelBase
                 };
                 await _apiService.PostAsync<object, object>("api/warranty", requestBody);
                 await LoadAsync();
+
+                await App.SignalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
+                {
+                    EntityType = "Warranty",
+                    Action = "Created",
+                    RecordId = "New",
+                    DisplayName = $"Warranty - {dialog.Warranty.AssetName}",
+                    Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
+                });
             }
             catch (Exception)
             {
@@ -155,6 +173,15 @@ public partial class WarrantyViewModel : ViewModelBase
                 };
                 await _apiService.PutAsync($"api/warranty/{row.WarrantyId}", requestBody);
                 await LoadAsync();
+
+                await App.SignalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
+                {
+                    EntityType = "Warranty",
+                    Action = "Updated",
+                    RecordId = row.WarrantyId.ToString(),
+                    DisplayName = $"Warranty - {row.AssetName}",
+                    Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
+                });
             }
             catch (Exception)
             {
@@ -176,8 +203,19 @@ public partial class WarrantyViewModel : ViewModelBase
         IsLoading = true;
         try
         {
+            var id = row.WarrantyId;
+            var assetName = row.AssetName;
             await _apiService.DeleteAsync($"api/warranty/{row.WarrantyId}");
             await LoadAsync();
+
+            await App.SignalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
+            {
+                EntityType = "Warranty",
+                Action = "Deleted",
+                RecordId = id.ToString(),
+                DisplayName = $"Warranty - {assetName}",
+                Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
+            });
         }
         catch (Exception)
         {

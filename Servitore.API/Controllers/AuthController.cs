@@ -53,4 +53,14 @@ public class AuthController : ControllerBase
 
         return Ok(result);
     }
+
+    /// <summary>
+    /// Returns the current list of active connected user sessions.
+    /// </summary>
+    [HttpGet("presence")]
+    [Authorize]
+    public IActionResult GetPresence()
+    {
+        return Ok(Servitore.API.SignalR.PresenceManager.GetConnectedUsers());
+    }
 }

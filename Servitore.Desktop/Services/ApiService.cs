@@ -17,6 +17,7 @@ namespace Servitore.Desktop.Services;
 public class ApiService
 {
     private readonly HttpClient _httpClient;
+    public string BaseUrl { get; }
 
     public ApiService()
     {
@@ -48,6 +49,7 @@ public class ApiService
             // Fallback to default
         }
 
+        BaseUrl = baseUrl;
         _httpClient = new HttpClient
         {
             BaseAddress = new Uri(baseUrl),

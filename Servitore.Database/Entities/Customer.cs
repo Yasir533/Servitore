@@ -1,6 +1,6 @@
 namespace Servitore.Database.Entities;
 
-public class Customer
+public class Customer : IAuditable
 {
     public int CustomerId { get; set; }
     public string CustomerName { get; set; } = string.Empty;
@@ -8,6 +8,9 @@ public class Customer
     public string? Mobile { get; set; }
     public string? Email { get; set; }
     public string? Address { get; set; }
+    
+    // Audit fields
+    public string? CreatedBy { get; set; }
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
     public string? ModifiedBy { get; set; }
     public DateTime? ModifiedDate { get; set; }

@@ -8,6 +8,9 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
+using Microsoft.AspNetCore.SignalR;
+using Servitore.API.SignalR;
+
 namespace Servitore.API.Services;
 
 public interface IActivityLogService
@@ -20,10 +23,12 @@ public interface IActivityLogService
 public class ActivityLogService : IActivityLogService
 {
     private readonly IActivityLogRepository _repository;
+    private readonly IHubContext<CollaborationHub> _hubContext;
 
-    public ActivityLogService(IActivityLogRepository repository)
+    public ActivityLogService(IActivityLogRepository repository, IHubContext<CollaborationHub> hubContext)
     {
         _repository = repository;
+        _hubContext = hubContext;
     }
 
     public async Task<List<ActivityLogDto>> GetAllLogsAsync()
@@ -71,5 +76,19 @@ public class ActivityLogService : IActivityLogService
         };
 
         await _repository.AddAsync(log);
+
+        var dto = new ActivityLogDto
+        {
+            Id = log.Id,
+            LogId = log.LogId,
+            Action = log.Action,
+            Module = log.Module,
+            UserId = log.UserId,
+            UserName = log.UserName,
+            SystemName = log.SystemName,
+            IPAddress = log.IPAddress,
+            DateTime = log.DateTime
+        };
+        await _hubContext.Clients.All.SendAsync("ActivityLogged", dto);
     }
 }

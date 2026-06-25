@@ -60,7 +60,7 @@ public class ServiceTicketService : IServiceTicketService
             AssignedToUserId = dto.AssignedToUserId,
             SlaDueDate = DateTime.UtcNow.AddHours(slaHours),
             SlaBreached = false,
-            CreatedBy = createdByUserId,
+            CreatedByUserId = createdByUserId,
             CreatedDate = DateTime.UtcNow
         };
 

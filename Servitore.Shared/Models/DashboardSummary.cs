@@ -19,6 +19,7 @@ public class DashboardSummary
     public List<DashboardWarrantyAlertDto> WarrantyAlerts { get; set; } = new();
     public Dictionary<string, int> TicketStatusCounts { get; set; } = new();
     public decimal TotalAmcRevenue { get; set; }
+    public List<ActivityLogDto> RecentActivities { get; set; } = new();
 }
 
 public class DashboardTicketDto

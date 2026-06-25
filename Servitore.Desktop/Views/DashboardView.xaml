@@ -122,6 +122,15 @@
                         </StackPanel>
                     </Button>
 
+                    <Button x:Name="LiveUsersBtn" Style="{StaticResource SidebarNavButton}"
+                            Click="NavButton_Click" Tag="LiveUsers">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="AccountMultiple" Width="18" Height="18"
+                                                     VerticalAlignment="Center" Margin="0,0,14,0" />
+                            <TextBlock Text="Live Users" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+
                     <Button x:Name="SettingsBtn" Style="{StaticResource SidebarNavButton}"
                             Click="NavButton_Click" Tag="Settings">
                         <StackPanel Orientation="Horizontal">
@@ -234,6 +243,12 @@
 
             <!-- Main Content Area Host -->
             <ContentControl x:Name="ContentHost" Grid.Row="1" />
+
+            <!-- Toast Notification Area -->
+            <materialDesign:Snackbar x:Name="MainSnackbar" Grid.Row="1"
+                                     MessageQueue="{materialDesign:MessageQueue}"
+                                     HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                                     Margin="24,0,0,24" />
         </Grid>
     </Grid>
 </UserControl>

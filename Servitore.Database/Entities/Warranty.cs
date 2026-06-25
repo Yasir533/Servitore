@@ -1,6 +1,6 @@
 namespace Servitore.Database.Entities;
 
-public class Warranty
+public class Warranty : IAuditable
 {
     public int WarrantyId { get; set; }
     public int AssetId { get; set; }

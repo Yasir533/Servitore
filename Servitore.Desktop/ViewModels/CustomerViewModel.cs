@@ -37,6 +37,16 @@ public partial class CustomerViewModel : ViewModelBase
         _apiService = apiService;
         CustomersView = CollectionViewSource.GetDefaultView(_allCustomers);
         CustomersView.Filter = FilterCustomer;
+        App.SignalRService.DataChanged += OnDataChanged;
+    }
+
+    private async void OnDataChanged(Servitore.Shared.Models.DataEventModel dataEvent)
+    {
+        if (dataEvent.EntityType == "Customer")
+        {
+            // Silently reload the data in the background
+            await LoadAsync();
+        }
     }
 
     private bool FilterCustomer(object obj)
@@ -100,6 +110,15 @@ public partial class CustomerViewModel : ViewModelBase
                 {
                     _allCustomers.Add(response);
                     CustomersView.Refresh();
+                    
+                    await App.SignalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
+                    {
+                        EntityType = "Customer",
+                        Action = "Created",
+                        RecordId = response.CustomerId.ToString(),
+                        DisplayName = response.CustomerName,
+                        Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
+                    });
                 }
             }
             catch (Exception)
@@ -144,6 +163,15 @@ public partial class CustomerViewModel : ViewModelBase
                 row.Email = dialog.Customer.Email;
                 row.Address = dialog.Customer.Address;
                 CustomersView.Refresh();
+
+                await App.SignalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
+                {
+                    EntityType = "Customer",
+                    Action = "Updated",
+                    RecordId = row.CustomerId.ToString(),
+                    DisplayName = row.CustomerName,
+                    Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
+                });
             }
             catch (Exception)
             {
@@ -165,8 +193,19 @@ public partial class CustomerViewModel : ViewModelBase
         IsLoading = true;
         try
         {
+            var name = row.CustomerName;
+            var id = row.CustomerId;
             await _apiService.DeleteAsync($"api/customers/{row.CustomerId}");
             _allCustomers.Remove(row);
+
+            await App.SignalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
+            {
+                EntityType = "Customer",
+                Action = "Deleted",
+                RecordId = id.ToString(),
+                DisplayName = name,
+                Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
+            });
         }
         catch (Exception)
         {
