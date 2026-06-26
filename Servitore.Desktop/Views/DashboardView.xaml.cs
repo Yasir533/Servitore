@@ -188,20 +188,28 @@ public partial class DashboardView : UserControl
             return;
         }
 
-        UserControl view = tag switch
+        try
         {
-            "Customers"      => new CustomerView(),
-            "Products"       => new ProductView(),
-            "ServiceEntries" => new ServiceEntryView(),
-            "Reports"        => new ReportsView(),
-            "Users"          => new UserManagementView(),
-            "ActivityLogs"   => new ActivityLogView(),
-            "Settings"       => new SettingsView(),
-            "LiveUsers"      => new LiveUsersView(),
-            _                => new CustomerView()
-        };
+            UserControl view = tag switch
+            {
+                "Customers"      => new CustomerView(),
+                "Products"       => new ProductView(),
+                "ServiceEntries" => new ServiceEntryView(),
+                "Reports"        => new ReportsView(),
+                "Users"          => new UserManagementView(),
+                "ActivityLogs"   => new ActivityLogView(),
+                "Settings"       => new SettingsView(),
+                "LiveUsers"      => new LiveUsersView(),
+                _                => new CustomerView()
+            };
 
-        NavigationHelper.NavigateTo(ContentHost, view);
+            NavigationHelper.NavigateTo(ContentHost, view);
+        }
+        catch (Exception ex)
+        {
+            ClientLogger.Log($"Navigation to {tag} failed", ex);
+            DialogHelper.ShowError($"Failed to load page '{tag}': {ex.Message}", "Navigation Error");
+        }
     }
 
     private async void ShowSummary()

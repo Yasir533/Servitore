@@ -62,7 +62,7 @@
                                                       RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                             CommandParameter="{Binding}"
                                             ToolTip="View Profile">
-                                        <materialDesign:PackIcon Kind="AccountCardDetails" Width="16" Height="16" />
+                                        <materialDesign:PackIcon Kind="CardAccountDetails" Width="16" Height="16" />
                                     </Button>
                                     <Button Style="{StaticResource MaterialDesignIconButton}"
                                             Command="{Binding DataContext.EditCustomerCommand,
