@@ -46,7 +46,7 @@
             <!-- Active Users -->
             <Border Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="6" Margin="0,0,12,0" Padding="16,12">
                 <StackPanel>
-                    <TextBlock Text="Active Users (Online/Busy)" Opacity="0.6" FontSize="11" />
+                    <TextBlock Text="Online Users" Opacity="0.6" FontSize="11" />
                     <TextBlock x:Name="ActiveUsersText" Text="0" FontSize="24" FontWeight="Bold" Margin="0,4,0,0" Foreground="#4CAF50" />
                 </StackPanel>
             </Border>
@@ -54,8 +54,8 @@
             <!-- Idle Users -->
             <Border Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="6" Padding="16,12">
                 <StackPanel>
-                    <TextBlock Text="Idle Users (Away)" Opacity="0.6" FontSize="11" />
-                    <TextBlock x:Name="IdleUsersText" Text="0" FontSize="24" FontWeight="Bold" Margin="0,4,0,0" Foreground="#FF9800" />
+                    <TextBlock Text="Busy Users" Opacity="0.6" FontSize="11" />
+                    <TextBlock x:Name="IdleUsersText" Text="0" FontSize="24" FontWeight="Bold" Margin="0,4,0,0" Foreground="#F44336" />
                 </StackPanel>
             </Border>
         </UniformGrid>
@@ -78,9 +78,7 @@
                                                     <DataTrigger Binding="{Binding Status}" Value="Online">
                                                         <Setter Property="Fill" Value="#4CAF50" />
                                                     </DataTrigger>
-                                                    <DataTrigger Binding="{Binding Status}" Value="Away">
-                                                        <Setter Property="Fill" Value="#FF9800" />
-                                                    </DataTrigger>
+
                                                     <DataTrigger Binding="{Binding Status}" Value="Busy">
                                                         <Setter Property="Fill" Value="#F44336" />
                                                     </DataTrigger>

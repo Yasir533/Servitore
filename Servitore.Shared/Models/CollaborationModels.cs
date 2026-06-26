@@ -12,7 +12,7 @@ public class ConnectedUserDto
     public string CurrentModule { get; set; } = string.Empty;
     public string ComputerName { get; set; } = string.Empty;
     public string IpAddress { get; set; } = string.Empty;
-    public string Status { get; set; } = "Online"; // Online, Away, Busy, Offline
+    public string Status { get; set; } = "Online"; // Online, Busy, Offline
     public string AppVersion { get; set; } = "1.0.0";
     public string? EditingRecord { get; set; }
 }

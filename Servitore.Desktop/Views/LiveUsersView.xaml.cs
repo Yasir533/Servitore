@@ -65,8 +65,8 @@ public partial class LiveUsersView : UserControl
 
             // Update KPI metric counts
             TotalUsersText.Text = list.Count.ToString();
-            ActiveUsersText.Text = list.Count(u => u.Status == "Online" || u.Status == "Busy").ToString();
-            IdleUsersText.Text = list.Count(u => u.Status == "Away").ToString();
+            ActiveUsersText.Text = list.Count(u => u.Status == "Online").ToString();
+            IdleUsersText.Text = list.Count(u => u.Status == "Busy").ToString();
         });
     }
 

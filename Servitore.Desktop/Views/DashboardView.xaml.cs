@@ -9,9 +9,7 @@ namespace Servitore.Desktop.Views;
 public partial class DashboardView : UserControl
 {
     private readonly DashboardViewModel _viewModel;
-    private System.Windows.Threading.DispatcherTimer? _idleTimer;
     private System.Windows.Threading.DispatcherTimer? _searchDebounceTimer;
-    private bool _isAway = false;
     private string _currentTag = "Dashboard";
 
     public DashboardView()
@@ -60,20 +58,6 @@ public partial class DashboardView : UserControl
 
     private void DashboardView_Loaded(object sender, RoutedEventArgs e)
     {
-        var window = Window.GetWindow(this);
-        if (window != null)
-        {
-            window.PreviewMouseMove += Window_Activity;
-            window.PreviewKeyDown += Window_Activity;
-        }
-
-        _idleTimer = new System.Windows.Threading.DispatcherTimer
-        {
-            Interval = TimeSpan.FromMinutes(App.ApiService.IdleTimeoutMinutes)
-        };
-        _idleTimer.Tick += IdleTimer_Tick;
-        _idleTimer.Start();
-
         _updatingStatusFromCode = true;
         StatusSelectorCombo.SelectedIndex = 0; // Default: Online
         _updatingStatusFromCode = false;
@@ -83,53 +67,10 @@ public partial class DashboardView : UserControl
 
     private void DashboardView_Unloaded(object sender, RoutedEventArgs e)
     {
-        var window = Window.GetWindow(this);
-        if (window != null)
-        {
-            window.PreviewMouseMove -= Window_Activity;
-            window.PreviewKeyDown -= Window_Activity;
-        }
-
-        if (_idleTimer != null)
-        {
-            _idleTimer.Stop();
-            _idleTimer = null;
-        }
-
         App.SignalRService.LockTakenOver -= OnLockTakenOver;
         App.SignalRService.DataChanged -= OnDataChanged;
         App.SignalRService.ActivityLogged -= OnActivityLogged;
         App.SignalRService.ForceLogoutReceived -= OnForceLogout;
-    }
-
-    private void Window_Activity(object sender, System.Windows.Input.InputEventArgs e)
-    {
-        _idleTimer?.Stop();
-        _idleTimer?.Start();
-
-        if (_isAway)
-        {
-            _isAway = false;
-            if (_manualStatus == "Online")
-            {
-                _updatingStatusFromCode = true;
-                StatusSelectorCombo.SelectedIndex = 0; // Online
-                _updatingStatusFromCode = false;
-                _ = App.SignalRService.UpdatePresenceAsync(_currentTag, "Online");
-            }
-        }
-    }
-
-    private void IdleTimer_Tick(object? sender, EventArgs e)
-    {
-        if (!_isAway && _manualStatus == "Online")
-        {
-            _isAway = true;
-            _updatingStatusFromCode = true;
-            StatusSelectorCombo.SelectedIndex = 1; // Away
-            _updatingStatusFromCode = false;
-            _ = App.SignalRService.UpdatePresenceAsync(_currentTag, "Away");
-        }
     }
 
     private void StatusSelectorCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -138,7 +79,6 @@ public partial class DashboardView : UserControl
         if (StatusSelectorCombo.SelectedItem is ComboBoxItem item && item.Tag is string status)
         {
             _manualStatus = status;
-            _isAway = (status == "Away");
             _ = App.SignalRService.UpdatePresenceAsync(_currentTag, status);
         }
     }
@@ -180,7 +120,7 @@ public partial class DashboardView : UserControl
         if (sender is not Button { Tag: string tag }) return;
 
         _currentTag = tag;
-        _ = App.SignalRService.UpdatePresenceAsync(tag, _isAway ? "Away" : "Online");
+        _ = App.SignalRService.UpdatePresenceAsync(tag, _manualStatus);
 
         if (tag == "Dashboard")
         {

@@ -276,22 +276,10 @@
                                     <TextBlock Text="Online" FontSize="12"/>
                                 </StackPanel>
                             </ComboBoxItem>
-                            <ComboBoxItem Tag="Away">
-                                <StackPanel Orientation="Horizontal">
-                                    <Ellipse Width="8" Height="8" Fill="#FF9800" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Away" FontSize="12"/>
-                                </StackPanel>
-                            </ComboBoxItem>
                             <ComboBoxItem Tag="Busy">
                                 <StackPanel Orientation="Horizontal">
                                     <Ellipse Width="8" Height="8" Fill="#F44336" Margin="0,0,6,0" VerticalAlignment="Center"/>
                                     <TextBlock Text="Busy" FontSize="12"/>
-                                </StackPanel>
-                            </ComboBoxItem>
-                            <ComboBoxItem Tag="Offline">
-                                <StackPanel Orientation="Horizontal">
-                                    <Ellipse Width="8" Height="8" Fill="#9E9E9E" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Offline" FontSize="12"/>
                                 </StackPanel>
                             </ComboBoxItem>
                         </ComboBox>
