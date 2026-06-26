@@ -122,6 +122,15 @@
                         </StackPanel>
                     </Button>
 
+                    <Button x:Name="LiveUsersBtn" Style="{StaticResource SidebarNavButton}"
+                            Click="NavButton_Click" Tag="LiveUsers">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="AccountMultiple" Width="18" Height="18"
+                                                     VerticalAlignment="Center" Margin="0,0,14,0" />
+                            <TextBlock Text="Live Users" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+
                     <Button x:Name="SettingsBtn" Style="{StaticResource SidebarNavButton}"
                             Click="NavButton_Click" Tag="Settings">
                         <StackPanel Orientation="Horizontal">
@@ -228,12 +237,51 @@
                         
                         <!-- Avatar Icon -->
                         <materialDesign:PackIcon Kind="AccountCircle" Width="32" Height="32" VerticalAlignment="Center" Opacity="0.75" />
+
+                        <!-- Status Selector Combo -->
+                        <ComboBox x:Name="StatusSelectorCombo"
+                                  Width="105"
+                                  Margin="12,0,0,0"
+                                  VerticalAlignment="Center"
+                                  materialDesign:TextFieldAssist.HasClearButton="False"
+                                  SelectionChanged="StatusSelectorCombo_SelectionChanged">
+                            <ComboBoxItem Tag="Online">
+                                <StackPanel Orientation="Horizontal">
+                                    <Ellipse Width="8" Height="8" Fill="#4CAF50" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Online" FontSize="12"/>
+                                </StackPanel>
+                            </ComboBoxItem>
+                            <ComboBoxItem Tag="Away">
+                                <StackPanel Orientation="Horizontal">
+                                    <Ellipse Width="8" Height="8" Fill="#FF9800" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Away" FontSize="12"/>
+                                </StackPanel>
+                            </ComboBoxItem>
+                            <ComboBoxItem Tag="Busy">
+                                <StackPanel Orientation="Horizontal">
+                                    <Ellipse Width="8" Height="8" Fill="#F44336" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Busy" FontSize="12"/>
+                                </StackPanel>
+                            </ComboBoxItem>
+                            <ComboBoxItem Tag="Offline">
+                                <StackPanel Orientation="Horizontal">
+                                    <Ellipse Width="8" Height="8" Fill="#9E9E9E" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Offline" FontSize="12"/>
+                                </StackPanel>
+                            </ComboBoxItem>
+                        </ComboBox>
                     </StackPanel>
                 </Grid>
             </Border>
 
             <!-- Main Content Area Host -->
             <ContentControl x:Name="ContentHost" Grid.Row="1" />
+
+            <!-- Toast Notification Area -->
+            <materialDesign:Snackbar x:Name="MainSnackbar" Grid.Row="1"
+                                     MessageQueue="{materialDesign:MessageQueue}"
+                                     HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                                     Margin="24,0,0,24" />
         </Grid>
     </Grid>
 </UserControl>

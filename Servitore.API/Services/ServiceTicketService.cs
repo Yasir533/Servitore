@@ -3,6 +3,7 @@ using Servitore.API.Repositories;
 using Servitore.Database.Entities;
 using Servitore.Shared.Constants;
 using Servitore.Shared.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace Servitore.API.Services;
 
@@ -13,7 +14,7 @@ public interface IServiceTicketService
     Task<ServiceTicket?> GetByIdAsync(int id);
     Task<ServiceTicket> CreateAsync(ServiceTicketDto dto, int createdByUserId);
     Task UpdateStatusAsync(int ticketId, TicketStatus newStatus, string updatedBy, string? remarks);
-    Task UpdateAsync(int ticketId, ServiceTicketDto dto, string updatedBy);
+    Task<ServiceTicket> UpdateAsync(int ticketId, ServiceTicketDto dto, string updatedBy);
 }
 
 public class ServiceTicketService : IServiceTicketService
@@ -60,7 +61,7 @@ public class ServiceTicketService : IServiceTicketService
             AssignedToUserId = dto.AssignedToUserId,
             SlaDueDate = DateTime.UtcNow.AddHours(slaHours),
             SlaBreached = false,
-            CreatedBy = createdByUserId,
+            CreatedByUserId = createdByUserId,
             CreatedDate = DateTime.UtcNow
         };
 
@@ -119,10 +120,16 @@ public class ServiceTicketService : IServiceTicketService
         }
     }
 
-    public async Task UpdateAsync(int ticketId, ServiceTicketDto dto, string updatedBy)
+    public async Task<ServiceTicket> UpdateAsync(int ticketId, ServiceTicketDto dto, string updatedBy)
     {
         var ticket = await _repository.GetByIdAsync(ticketId)
             ?? throw new KeyNotFoundException("Ticket not found.");
+
+        if (ticket.ModifiedDate.HasValue && dto.ModifiedDate.HasValue &&
+            Math.Abs((ticket.ModifiedDate.Value - dto.ModifiedDate.Value).TotalSeconds) > 1.0)
+        {
+            throw new DbUpdateConcurrencyException("The ticket record has been modified by another user.");
+        }
 
         var oldStatus = ticket.Status;
         var oldEngineer = ticket.AssignedToUserId;
@@ -166,6 +173,7 @@ public class ServiceTicketService : IServiceTicketService
             : NotificationType.TicketUpdated;
 
         await _notificationService.BroadcastAsync(type, $"Ticket {ticket.TicketNumber} updated: {remarks}.", updatedBy);
+        return ticket;
     }
 
     private static string GenerateTicketNumber() =>

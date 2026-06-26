@@ -46,6 +46,15 @@ public partial class ServiceTicketViewModel : ViewModelBase
         TicketsView = CollectionViewSource.GetDefaultView(_allTickets);
         TicketsView.Filter = FilterTicket;
         _signalRService.NotificationReceived += async _ => await LoadAsync();
+        _signalRService.DataChanged += OnDataChanged;
+    }
+
+    private async void OnDataChanged(Servitore.Shared.Models.DataEventModel dataEvent)
+    {
+        if (dataEvent.EntityType == "ServiceTicket")
+        {
+            await LoadAsync();
+        }
     }
 
     private bool FilterTicket(object obj)
@@ -119,6 +128,15 @@ public partial class ServiceTicketViewModel : ViewModelBase
                 };
                 await _apiService.PostAsync<object, object>("api/servicetickets", dto);
                 await LoadAsync();
+
+                await _signalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
+                {
+                    EntityType = "ServiceTicket",
+                    Action = "Created",
+                    RecordId = "New",
+                    DisplayName = $"Ticket for {dialog.Ticket.CustomerName}",
+                    Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
+                });
             }
             catch (Exception)
             {
@@ -161,6 +179,15 @@ public partial class ServiceTicketViewModel : ViewModelBase
                 };
                 await _apiService.PutAsync($"api/servicetickets/{row.TicketId}", dto);
                 await LoadAsync();
+
+                await _signalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
+                {
+                    EntityType = "ServiceTicket",
+                    Action = "Updated",
+                    RecordId = row.TicketId.ToString(),
+                    DisplayName = row.TicketNumber,
+                    Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
+                });
             }
         }
         catch (Exception)
@@ -181,6 +208,15 @@ public partial class ServiceTicketViewModel : ViewModelBase
         {
             await _apiService.PutAsync($"api/servicetickets/{row.TicketId}/close", new { });
             await LoadAsync();
+
+            await _signalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
+            {
+                EntityType = "ServiceTicket",
+                Action = "Closed",
+                RecordId = row.TicketId.ToString(),
+                DisplayName = row.TicketNumber,
+                Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
+            });
         }
         catch (Exception)
         {

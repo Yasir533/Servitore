@@ -2,7 +2,7 @@ using Servitore.Shared.Enums;
 
 namespace Servitore.Database.Entities;
 
-public class Asset
+public class Asset : IAuditable
 {
     public int AssetId { get; set; }
     public string AssetCode { get; set; } = string.Empty;

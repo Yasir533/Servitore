@@ -17,12 +17,12 @@ public interface INotificationService
 public class NotificationService : INotificationService
 {
     private readonly AppDbContext _context;
-    private readonly IHubContext<NotificationHub> _hubContext;
+    private readonly IHubContext<CollaborationHub> _hubContext;
 
-    public NotificationService(AppDbContext context, IHubContext<NotificationHub> hubContext)
+    public NotificationService(AppDbContext context, IHubContext<CollaborationHub> _hubContextVal)
     {
         _context = context;
-        _hubContext = hubContext;
+        _hubContext = _hubContextVal;
     }
 
     public async Task BroadcastAsync(NotificationType type, string message, string createdBy)

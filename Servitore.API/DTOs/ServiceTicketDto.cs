@@ -13,4 +13,5 @@ public class ServiceTicketDto
     public TicketPriority Priority { get; set; } = TicketPriority.Medium;
     public int? AssignedToUserId { get; set; }
     public string? ResolutionNotes { get; set; }
+    public DateTime? ModifiedDate { get; set; }
 }

@@ -1,0 +1,58 @@
+<Window x:Class="Servitore.Desktop.Views.Dialogs.LockConflictDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="Record Locked" Height="280" Width="420"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,16">
+            <materialDesign:PackIcon Kind="LockAlertOutline" Foreground="#FFA726" Width="28" Height="28" Margin="0,0,10,0" VerticalAlignment="Center" />
+            <TextBlock Text="Record Editing Conflict" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" />
+        </StackPanel>
+
+        <!-- Body Details -->
+        <StackPanel Grid.Row="1">
+            <TextBlock Text="This record is currently being edited by another user:" Opacity="0.8" Margin="0,0,0,12" />
+            
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="130" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Currently Edited By:" FontWeight="SemiBold" Margin="0,0,0,6" />
+                <TextBlock Grid.Row="0" Grid.Column="1" x:Name="UserText" Text="Yasir" Margin="0,0,0,6" />
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Lock Started At:" FontWeight="SemiBold" Margin="0,0,0,6" />
+                <TextBlock Grid.Row="1" Grid.Column="1" x:Name="TimeText" Text="10:15 AM" Margin="0,0,0,6" />
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Computer / Device:" FontWeight="SemiBold" />
+                <TextBlock Grid.Row="2" Grid.Column="1" x:Name="ComputerText" Text="Reception-PC" />
+            </Grid>
+        </StackPanel>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <Button Content="Cancel" Style="{StaticResource MaterialDesignFlatButton}" Click="Cancel_Click" Margin="0,0,8,0" />
+            <Button x:Name="ViewOnlyBtn" Content="View Only" Style="{StaticResource MaterialDesignRaisedButton}" Click="ViewOnly_Click" Margin="0,0,8,0" />
+            <Button x:Name="TakeOverBtn" Content="Take Over" Style="{StaticResource MaterialDesignRaisedButton}" Foreground="White" Background="#EF5350" BorderBrush="#EF5350" Click="TakeOver_Click" />
+        </StackPanel>
+    </Grid>
+</Window>

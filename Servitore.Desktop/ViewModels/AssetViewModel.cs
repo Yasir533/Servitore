@@ -42,6 +42,15 @@ public partial class AssetViewModel : ViewModelBase
         _barcodeService = barcodeService;
         AssetsView = CollectionViewSource.GetDefaultView(_allAssets);
         AssetsView.Filter = FilterAsset;
+        App.SignalRService.DataChanged += OnDataChanged;
+    }
+
+    private async void OnDataChanged(Servitore.Shared.Models.DataEventModel dataEvent)
+    {
+        if (dataEvent.EntityType == "Asset")
+        {
+            await LoadAsync();
+        }
     }
 
     private bool FilterAsset(object obj)
@@ -124,6 +133,15 @@ public partial class AssetViewModel : ViewModelBase
                 {
                     _allAssets.Add(response);
                     AssetsView.Refresh();
+
+                    await App.SignalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
+                    {
+                        EntityType = "Asset",
+                        Action = "Created",
+                        RecordId = response.AssetId.ToString(),
+                        DisplayName = response.ProductName,
+                        Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
+                    });
                 }
             }
             catch (Exception)
@@ -153,7 +171,8 @@ public partial class AssetViewModel : ViewModelBase
             CustomerId = row.CustomerId,
             Status = row.Status,
             VendorName = row.VendorName,
-            PurchaseDate = row.PurchaseDate
+            PurchaseDate = row.PurchaseDate,
+            ModifiedDate = row.ModifiedDate
         };
 
         var dialog = new Views.Dialogs.AssetEditDialog(_apiService, clone)
@@ -162,28 +181,25 @@ public partial class AssetViewModel : ViewModelBase
         };
         if (dialog.ShowDialog() == true)
         {
-            IsLoading = true;
-            try
+            row.ProductName = dialog.Asset.ProductName;
+            row.AssetCode = dialog.Asset.AssetCode;
+            row.SerialNumber = dialog.Asset.SerialNumber;
+            row.CustomerId = dialog.Asset.CustomerId;
+            row.CustomerName = dialog.Asset.CustomerName;
+            row.Status = dialog.Asset.Status;
+            row.VendorName = dialog.Asset.VendorName;
+            row.PurchaseDate = dialog.Asset.PurchaseDate;
+            row.ModifiedDate = dialog.Asset.ModifiedDate;
+            AssetsView.Refresh();
+
+            await App.SignalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
             {
-                await _apiService.PutAsync($"api/assets/{row.AssetId}", dialog.Asset);
-                row.ProductName = dialog.Asset.ProductName;
-                row.AssetCode = dialog.Asset.AssetCode;
-                row.SerialNumber = dialog.Asset.SerialNumber;
-                row.CustomerId = dialog.Asset.CustomerId;
-                row.CustomerName = dialog.Asset.CustomerName;
-                row.Status = dialog.Asset.Status;
-                row.VendorName = dialog.Asset.VendorName;
-                row.PurchaseDate = dialog.Asset.PurchaseDate;
-                AssetsView.Refresh();
-            }
-            catch (Exception)
-            {
-                Helpers.DialogHelper.ShowError("Unable to save changes. Please try again later.");
-            }
-            finally
-            {
-                IsLoading = false;
-            }
+                EntityType = "Asset",
+                Action = "Updated",
+                RecordId = row.AssetId.ToString(),
+                DisplayName = row.ProductName,
+                Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
+            });
         }
     }
 
@@ -196,8 +212,19 @@ public partial class AssetViewModel : ViewModelBase
         IsLoading = true;
         try
         {
+            var id = row.AssetId;
+            var code = row.AssetCode;
             await _apiService.DeleteAsync($"api/assets/{row.AssetId}");
             _allAssets.Remove(row);
+
+            await App.SignalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
+            {
+                EntityType = "Asset",
+                Action = "Deleted",
+                RecordId = id.ToString(),
+                DisplayName = code,
+                Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
+            });
         }
         catch (Exception)
         {
@@ -228,5 +255,6 @@ public partial class AssetViewModel : ViewModelBase
         public string Status { get; set; } = "Active";
         public string? VendorName { get; set; }
         public DateTime? PurchaseDate { get; set; }
+        public DateTime? ModifiedDate { get; set; }
     }
 }

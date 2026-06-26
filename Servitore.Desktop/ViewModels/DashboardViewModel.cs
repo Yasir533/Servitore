@@ -14,6 +14,7 @@ public partial class DashboardViewModel : ViewModelBase
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasNoNotifications))]
+    [NotifyPropertyChangedFor(nameof(HasNoActivities))]
     private DashboardSummary? summary;
 
     [ObservableProperty]
@@ -21,6 +22,15 @@ public partial class DashboardViewModel : ViewModelBase
 
     public bool HasNoNotifications =>
         Summary == null || Summary.RecentNotifications.Count == 0;
+
+    public bool HasNoActivities =>
+        Summary == null || Summary.RecentActivities.Count == 0;
+
+    public void NotifyActivityAdded()
+    {
+        OnPropertyChanged(nameof(Summary));
+        OnPropertyChanged(nameof(HasNoActivities));
+    }
 
     public DashboardViewModel(ApiService apiService) => _apiService = apiService;
 

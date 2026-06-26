@@ -1,0 +1,47 @@
+<Window x:Class="Servitore.Desktop.Views.Dialogs.ConflictResolutionDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="Concurrency Conflict" Height="400" Width="600"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
+            <materialDesign:PackIcon Kind="AlertDecagramOutline" Foreground="#EF5350" Width="28" Height="28" Margin="0,0,10,0" VerticalAlignment="Center" />
+            <TextBlock Text="Concurrency Conflict Detected" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" />
+        </StackPanel>
+
+        <!-- Warning Subtext -->
+        <TextBlock Grid.Row="1" Text="Another user has updated this record while you were editing. Review the differences below:" 
+                   TextWrapping="Wrap" Opacity="0.8" Margin="0,0,0,16" />
+
+        <!-- Differences Grid -->
+        <DataGrid Grid.Row="2" x:Name="DiffsGrid" AutoGenerateColumns="False" CanUserAddRows="False" 
+                  IsReadOnly="True" HeadersVisibility="Column" Background="Transparent" BorderThickness="0">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Field" Binding="{Binding FieldName}" Width="150" FontWeight="SemiBold" />
+                <DataGridTextColumn Header="Your Value" Binding="{Binding LocalValue}" Width="*" Foreground="#EF5350" />
+                <DataGridTextColumn Header="Server Value" Binding="{Binding ServerValue}" Width="*" Foreground="#4CAF50" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Action Buttons -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <Button Content="Cancel" Style="{StaticResource MaterialDesignFlatButton}" Click="Cancel_Click" Margin="0,0,8,0" />
+            <Button x:Name="KeepMineBtn" Content="Keep Mine (Overwrite)" Style="{StaticResource MaterialDesignRaisedButton}" Background="#EF5350" BorderBrush="#EF5350" Foreground="White" Click="KeepMine_Click" Margin="0,0,8,0" />
+            <Button Content="Reload Server Version" Style="{StaticResource MaterialDesignRaisedButton}" Click="Reload_Click" />
+        </StackPanel>
+    </Grid>
+</Window>

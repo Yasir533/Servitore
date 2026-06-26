@@ -5,7 +5,13 @@ namespace Servitore.Database.Context;
 
 public class AppDbContext : DbContext
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+    private readonly ICurrentUserService? _currentUserService;
+
+    public AppDbContext(DbContextOptions<AppDbContext> options, ICurrentUserService? currentUserService = null) 
+        : base(options) 
+    {
+        _currentUserService = currentUserService;
+    }
 
     public DbSet<User> Users => Set<User>();
     public DbSet<Role> Roles => Set<Role>();
@@ -60,5 +66,30 @@ public class AppDbContext : DbContext
         );
 
         base.OnModelCreating(modelBuilder);
+    }
+
+    public override System.Threading.Tasks.Task<int> SaveChangesAsync(System.Threading.CancellationToken cancellationToken = default)
+    {
+        var entries = ChangeTracker
+            .Entries()
+            .Where(e => e.Entity is IAuditable && (e.State == EntityState.Added || e.State == EntityState.Modified));
+
+        var username = _currentUserService?.GetCurrentUsername() ?? "System";
+        var now = DateTime.UtcNow;
+
+        foreach (var entityEntry in entries)
+        {
+            var auditable = (IAuditable)entityEntry.Entity;
+            if (entityEntry.State == EntityState.Added)
+            {
+                auditable.CreatedBy = username;
+                auditable.CreatedDate = now;
+            }
+
+            auditable.ModifiedBy = username;
+            auditable.ModifiedDate = now;
+        }
+
+        return base.SaveChangesAsync(cancellationToken);
     }
 }

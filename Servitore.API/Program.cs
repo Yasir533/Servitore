@@ -7,6 +7,7 @@ using Servitore.API.Middleware;
 using Servitore.API.SignalR;
 using Servitore.Database;
 using Servitore.Database.Context;
+using Servitore.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,11 +37,14 @@ if (!builder.Environment.IsDevelopment())
 }
 
 // Database
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 // App services / repositories (see ServiceCollectionExtensions)
 builder.Services.AddServitoreServices();
+builder.Services.AddHostedService<StaleLockCleanupService>();
 
 // SignalR for real-time multi-desktop sync
 builder.Services.AddSignalR();
@@ -124,6 +128,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapHub<NotificationHub>("/hubs/notifications");
+app.MapHub<CollaborationHub>("/hubs/collaboration");
 
 app.Run();

@@ -66,8 +66,26 @@ public class AssetsController : ControllerBase
     public async Task<IActionResult> Update(int id, Asset asset)
     {
         asset.AssetId = id;
-        await _assetRepository.UpdateAsync(asset);
-        await _activityLogService.LogActivityAsync($"Updated Asset: {asset.ProductName} ({asset.AssetCode}, ID: {id})", "Assets", HttpContext);
+        var existing = await _assetRepository.GetByIdAsync(id);
+        if (existing is null) return NotFound();
+
+        if (existing.ModifiedDate.HasValue && asset.ModifiedDate.HasValue &&
+            Math.Abs((existing.ModifiedDate.Value - asset.ModifiedDate.Value).TotalSeconds) > 1.0)
+        {
+            return Conflict(existing);
+        }
+
+        existing.ProductName = asset.ProductName;
+        existing.SerialNumber = asset.SerialNumber;
+        existing.CustomerId = asset.CustomerId;
+        existing.Status = asset.Status;
+        existing.VendorName = asset.VendorName;
+        existing.PurchaseDate = asset.PurchaseDate;
+        existing.AssetCode = asset.AssetCode;
+        existing.Barcode = asset.Barcode;
+
+        await _assetRepository.UpdateAsync(existing);
+        await _activityLogService.LogActivityAsync($"Updated Asset: {existing.ProductName} ({existing.AssetCode}, ID: {id})", "Assets", HttpContext);
         return NoContent();
     }
 

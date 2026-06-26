@@ -130,6 +130,12 @@ public class AMCController : ControllerBase
         var existing = await _context.AMCContracts.FindAsync(id);
         if (existing is null) return NotFound();
 
+        if (existing.ModifiedDate.HasValue && contract.ModifiedDate.HasValue &&
+            Math.Abs((existing.ModifiedDate.Value - contract.ModifiedDate.Value).TotalSeconds) > 1.0)
+        {
+            return Conflict(existing);
+        }
+
         existing.AssetId = contract.AssetId;
         existing.StartDate = contract.StartDate;
         existing.EndDate = contract.EndDate;

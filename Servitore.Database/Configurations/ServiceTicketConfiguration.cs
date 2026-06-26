@@ -25,7 +25,7 @@ public class ServiceTicketConfiguration : IEntityTypeConfiguration<ServiceTicket
 
         builder.HasOne(t => t.CreatedByUser)
             .WithMany(u => u.CreatedTickets)
-            .HasForeignKey(t => t.CreatedBy)
+            .HasForeignKey(t => t.CreatedByUserId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

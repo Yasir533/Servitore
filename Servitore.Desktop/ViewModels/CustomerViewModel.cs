@@ -37,6 +37,16 @@ public partial class CustomerViewModel : ViewModelBase
         _apiService = apiService;
         CustomersView = CollectionViewSource.GetDefaultView(_allCustomers);
         CustomersView.Filter = FilterCustomer;
+        App.SignalRService.DataChanged += OnDataChanged;
+    }
+
+    private async void OnDataChanged(Servitore.Shared.Models.DataEventModel dataEvent)
+    {
+        if (dataEvent.EntityType == "Customer")
+        {
+            // Silently reload the data in the background
+            await LoadAsync();
+        }
     }
 
     private bool FilterCustomer(object obj)
@@ -100,6 +110,15 @@ public partial class CustomerViewModel : ViewModelBase
                 {
                     _allCustomers.Add(response);
                     CustomersView.Refresh();
+                    
+                    await App.SignalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
+                    {
+                        EntityType = "Customer",
+                        Action = "Created",
+                        RecordId = response.CustomerId.ToString(),
+                        DisplayName = response.CustomerName,
+                        Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
+                    });
                 }
             }
             catch (Exception)
@@ -125,7 +144,8 @@ public partial class CustomerViewModel : ViewModelBase
             ContactPerson = row.ContactPerson,
             Mobile = row.Mobile,
             Email = row.Email,
-            Address = row.Address
+            Address = row.Address,
+            ModifiedDate = row.ModifiedDate
         };
 
         var dialog = new Views.Dialogs.CustomerEditDialog(clone)
@@ -134,25 +154,22 @@ public partial class CustomerViewModel : ViewModelBase
         };
         if (dialog.ShowDialog() == true)
         {
-            IsLoading = true;
-            try
+            row.CustomerName = dialog.Customer.CustomerName;
+            row.ContactPerson = dialog.Customer.ContactPerson;
+            row.Mobile = dialog.Customer.Mobile;
+            row.Email = dialog.Customer.Email;
+            row.Address = dialog.Customer.Address;
+            row.ModifiedDate = dialog.Customer.ModifiedDate;
+            CustomersView.Refresh();
+
+            await App.SignalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
             {
-                await _apiService.PutAsync($"api/customers/{row.CustomerId}", dialog.Customer);
-                row.CustomerName = dialog.Customer.CustomerName;
-                row.ContactPerson = dialog.Customer.ContactPerson;
-                row.Mobile = dialog.Customer.Mobile;
-                row.Email = dialog.Customer.Email;
-                row.Address = dialog.Customer.Address;
-                CustomersView.Refresh();
-            }
-            catch (Exception)
-            {
-                Helpers.DialogHelper.ShowError("Unable to save changes. Please try again later.");
-            }
-            finally
-            {
-                IsLoading = false;
-            }
+                EntityType = "Customer",
+                Action = "Updated",
+                RecordId = row.CustomerId.ToString(),
+                DisplayName = row.CustomerName,
+                Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
+            });
         }
     }
 
@@ -165,8 +182,19 @@ public partial class CustomerViewModel : ViewModelBase
         IsLoading = true;
         try
         {
+            var name = row.CustomerName;
+            var id = row.CustomerId;
             await _apiService.DeleteAsync($"api/customers/{row.CustomerId}");
             _allCustomers.Remove(row);
+
+            await App.SignalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
+            {
+                EntityType = "Customer",
+                Action = "Deleted",
+                RecordId = id.ToString(),
+                DisplayName = name,
+                Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
+            });
         }
         catch (Exception)
         {
@@ -193,5 +221,6 @@ public partial class CustomerViewModel : ViewModelBase
         public string? Mobile { get; set; }
         public string? Email { get; set; }
         public string? Address { get; set; }
+        public DateTime? ModifiedDate { get; set; }
     }
 }

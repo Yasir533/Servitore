@@ -48,9 +48,17 @@ public class CustomersController : ControllerBase
     public async Task<IActionResult> Update(int id, CustomerDto dto)
     {
         dto.CustomerId = id;
-        await _customerService.UpdateAsync(dto);
-        await _activityLogService.LogActivityAsync($"Updated Customer: {dto.CustomerName} (ID: {id})", "Customers", HttpContext);
-        return NoContent();
+        try
+        {
+            var updated = await _customerService.UpdateAsync(dto);
+            await _activityLogService.LogActivityAsync($"Updated Customer: {dto.CustomerName} (ID: {id})", "Customers", HttpContext);
+            return Ok(updated);
+        }
+        catch (Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException)
+        {
+            var current = await _customerService.GetByIdAsync(id);
+            return Conflict(current);
+        }
     }
 
     [HttpDelete("{id:int}")]
