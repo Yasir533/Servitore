@@ -282,6 +282,12 @@
                                     <TextBlock Text="Busy" FontSize="12"/>
                                 </StackPanel>
                             </ComboBoxItem>
+                            <ComboBoxItem Tag="Offline">
+                                <StackPanel Orientation="Horizontal">
+                                    <Ellipse Width="8" Height="8" Fill="#9E9E9E" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Offline" FontSize="12"/>
+                                </StackPanel>
+                            </ComboBoxItem>
                         </ComboBox>
                     </StackPanel>
                 </Grid>
