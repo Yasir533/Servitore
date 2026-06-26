@@ -27,13 +27,13 @@ public partial class CustomerProfileView : UserControl
         }
     }
 
-    private void AssetsGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    private void ProductsGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
-        if (sender is DataGrid dg && dg.SelectedItem is Servitore.Shared.Models.CustomerAssetDto asset)
+        if (sender is DataGrid dg && dg.SelectedItem is Servitore.Shared.Models.CustomerProductDto product)
         {
             if (DataContext is CustomerProfileViewModel vm)
             {
-                vm.ViewAssetDetailsCommand.Execute(asset);
+                vm.ViewProductDetailsCommand.Execute(product);
             }
         }
     }

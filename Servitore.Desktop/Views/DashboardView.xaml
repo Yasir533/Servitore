@@ -57,40 +57,24 @@
                     </Button>
 
                     <Button Style="{StaticResource SidebarNavButton}"
-                            Click="NavButton_Click" Tag="Assets">
+                            Click="NavButton_Click" Tag="Products">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="Devices" Width="18" Height="18"
                                                      VerticalAlignment="Center" Margin="0,0,14,0" />
-                            <TextBlock Text="Assets" VerticalAlignment="Center" />
+                            <TextBlock Text="Products" VerticalAlignment="Center" />
                         </StackPanel>
                     </Button>
 
                     <Button Style="{StaticResource SidebarNavButton}"
-                            Click="NavButton_Click" Tag="ServiceTickets">
+                            Click="NavButton_Click" Tag="ServiceEntries">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="TicketOutline" Width="18" Height="18"
                                                      VerticalAlignment="Center" Margin="0,0,14,0" />
-                            <TextBlock Text="Service Tickets" VerticalAlignment="Center" />
+                            <TextBlock Text="Service Entries" VerticalAlignment="Center" />
                         </StackPanel>
                     </Button>
 
-                    <Button Style="{StaticResource SidebarNavButton}"
-                            Click="NavButton_Click" Tag="Warranty">
-                        <StackPanel Orientation="Horizontal">
-                            <materialDesign:PackIcon Kind="ShieldCheck" Width="18" Height="18"
-                                                     VerticalAlignment="Center" Margin="0,0,14,0" />
-                            <TextBlock Text="Warranty" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </Button>
 
-                    <Button Style="{StaticResource SidebarNavButton}"
-                            Click="NavButton_Click" Tag="AMC">
-                        <StackPanel Orientation="Horizontal">
-                            <materialDesign:PackIcon Kind="FileSign" Width="18" Height="18"
-                                                     VerticalAlignment="Center" Margin="0,0,14,0" />
-                            <TextBlock Text="AMC" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </Button>
 
                     <!-- Separator -->
                     <Separator Background="#2C3E50" Margin="20,8" />
@@ -165,13 +149,54 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <!-- Global Search (styled input) -->
-                    <TextBox Grid.Column="0"
-                             materialDesign:HintAssist.Hint="Global search..."
-                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                             VerticalAlignment="Center"
-                             x:Name="GlobalSearchBox"
-                             KeyDown="GlobalSearchBox_KeyDown" />
+                    <!-- Global Search (styled input with autocomplete) -->
+                    <Grid Grid.Column="0" VerticalAlignment="Center">
+                        <TextBox materialDesign:HintAssist.Hint="Global search..."
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                 x:Name="GlobalSearchBox"
+                                 TextChanged="GlobalSearchBox_TextChanged"
+                                 KeyDown="GlobalSearchBox_KeyDown" />
+                        <Popup x:Name="SearchAutocompletePopup"
+                               StaysOpen="False"
+                               PlacementTarget="{Binding ElementName=GlobalSearchBox}"
+                               Placement="Bottom"
+                               Width="300"
+                               AllowsTransparency="True"
+                               PopupAnimation="Fade">
+                            <Border Background="{DynamicResource MaterialDesignPaper}"
+                                    BorderBrush="{DynamicResource MaterialDesignDivider}"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    MaxHeight="350"
+                                    Padding="8">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                    <ItemsControl x:Name="SearchResultsList">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                                        HorizontalContentAlignment="Left"
+                                                        Click="SearchResult_Click"
+                                                        Margin="0,2"
+                                                        Padding="8,4">
+                                                    <Grid HorizontalAlignment="Stretch" Width="260">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <StackPanel Grid.Column="0">
+                                                            <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" FontWeight="SemiBold" FontSize="12" />
+                                                            <TextBlock Text="{Binding Subtitle}" TextTrimming="CharacterEllipsis" Opacity="0.6" FontSize="10" Margin="0,2,0,0"/>
+                                                        </StackPanel>
+                                                        <TextBlock Grid.Column="1" Text="{Binding Type}" Opacity="0.5" FontSize="10" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                                    </Grid>
+                                                </Button>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                            </Border>
+                        </Popup>
+                    </Grid>
 
                     <!-- User Profile & Notifications -->
                     <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">

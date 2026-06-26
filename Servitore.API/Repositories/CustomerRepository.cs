@@ -12,6 +12,7 @@ public interface ICustomerRepository
     Task<Customer> AddAsync(Customer customer);
     Task UpdateAsync(Customer customer);
     Task DeleteAsync(int id);
+    Task<bool> CheckDuplicateAsync(string name, string mobile);
 }
 
 public class CustomerRepository : ICustomerRepository
@@ -25,18 +26,16 @@ public class CustomerRepository : ICustomerRepository
 
     public Task<Customer?> GetProfileAsync(int id) =>
         _context.Customers
+            .AsNoTracking()
             .Include(c => c.Assets)
-                .ThenInclude(a => a.Warranty)
-            .Include(c => c.Assets)
-                .ThenInclude(a => a.AMCContract)
-            .Include(c => c.ServiceTickets)
+            .Include(c => c.ServiceEntries)
                 .ThenInclude(t => t.Asset)
-            .Include(c => c.ServiceTickets)
+            .Include(c => c.ServiceEntries)
                 .ThenInclude(t => t.AssignedToUser)
             .FirstOrDefaultAsync(c => c.CustomerId == id);
 
     public Task<List<Customer>> GetAllAsync() =>
-        _context.Customers.OrderBy(c => c.CustomerName).ToListAsync();
+        _context.Customers.AsNoTracking().OrderBy(c => c.CustomerName).ToListAsync();
 
     public async Task<Customer> AddAsync(Customer customer)
     {
@@ -57,5 +56,14 @@ public class CustomerRepository : ICustomerRepository
         if (customer is null) return;
         _context.Customers.Remove(customer);
         await _context.SaveChangesAsync();
+    }
+
+    public Task<bool> CheckDuplicateAsync(string name, string mobile)
+    {
+        var cleanedName = name.Trim().ToLower();
+        var cleanedMobile = mobile.Trim();
+        return _context.Customers.AnyAsync(c => 
+            c.CustomerName.Trim().ToLower() == cleanedName && 
+            c.Mobile != null && c.Mobile.Trim() == cleanedMobile);
     }
 }

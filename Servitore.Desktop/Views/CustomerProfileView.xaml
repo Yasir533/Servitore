@@ -24,7 +24,7 @@
             <StackPanel VerticalAlignment="Center">
                 <TextBlock Text="{Binding Profile.CustomerName, FallbackValue='Customer Profile'}"
                            Style="{StaticResource PageHeaderText}" />
-                <TextBlock Text="Comprehensive view of customer assets, tickets, and service history"
+                <TextBlock Text="Comprehensive view of customer products and service history"
                            Style="{StaticResource PageSubtitleText}" Margin="0" />
             </StackPanel>
         </DockPanel>
@@ -67,9 +67,9 @@
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
 
-                                    <!-- Contact Person -->
-                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Contact Person:" FontWeight="SemiBold" Margin="0,0,0,12" />
-                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Profile.ContactPerson, FallbackValue='N/A'}" Margin="0,0,0,12" />
+                                    <!-- Company -->
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Company:" FontWeight="SemiBold" Margin="0,0,0,12" />
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Profile.Company, FallbackValue='N/A'}" Margin="0,0,0,12" />
 
                                     <!-- Mobile -->
                                     <TextBlock Grid.Row="1" Grid.Column="0" Text="Mobile:" FontWeight="SemiBold" Margin="0,0,0,12" />
@@ -83,7 +83,7 @@
                                     <TextBlock Grid.Row="3" Grid.Column="0" Text="Address:" FontWeight="SemiBold" Margin="0,0,0,12" />
                                     <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Profile.Address, FallbackValue='N/A'}" TextWrapping="Wrap" Margin="0,0,0,12" />
 
-                                    <!-- Created Date -->
+                                    <!-- Registered Date -->
                                     <TextBlock Grid.Row="4" Grid.Column="0" Text="Registered Date:" FontWeight="SemiBold" />
                                     <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Profile.CreatedDate, StringFormat='{}{0:dd MMM yyyy}', FallbackValue='N/A'}" />
                                 </Grid>
@@ -94,22 +94,15 @@
                         <StackPanel Grid.Column="1">
                             <Border Style="{StaticResource StatCard}" Margin="0,0,0,16">
                                 <StackPanel>
-                                    <TextBlock Text="Assets Registered" Opacity="0.55" FontSize="12" />
-                                    <TextBlock Text="{Binding Profile.Assets.Count, FallbackValue='0'}" FontSize="24" FontWeight="Bold" Margin="0,4,0,0" />
-                                </StackPanel>
-                            </Border>
-
-                            <Border Style="{StaticResource StatCard}" Margin="0,0,0,16">
-                                <StackPanel>
-                                    <TextBlock Text="Total Service Tickets" Opacity="0.55" FontSize="12" />
-                                    <TextBlock Text="{Binding Profile.Tickets.Count, FallbackValue='0'}" FontSize="24" FontWeight="Bold" Margin="0,4,0,0" />
+                                    <TextBlock Text="Products Registered" Opacity="0.55" FontSize="12" />
+                                    <TextBlock Text="{Binding Profile.Products.Count, FallbackValue='0'}" FontSize="24" FontWeight="Bold" Margin="0,4,0,0" />
                                 </StackPanel>
                             </Border>
 
                             <Border Style="{StaticResource StatCard}">
                                 <StackPanel>
-                                    <TextBlock Text="Active AMC Contracts" Opacity="0.55" FontSize="12" />
-                                    <TextBlock Text="{Binding Profile.AmcContracts.Count, FallbackValue='0'}" FontSize="24" FontWeight="Bold" Margin="0,4,0,0" />
+                                    <TextBlock Text="Total Service Entries" Opacity="0.55" FontSize="12" />
+                                    <TextBlock Text="{Binding Profile.ServiceEntries.Count, FallbackValue='0'}" FontSize="24" FontWeight="Bold" Margin="0,4,0,0" />
                                 </StackPanel>
                             </Border>
                         </StackPanel>
@@ -117,25 +110,23 @@
                 </ScrollViewer>
             </TabItem>
 
-            <!-- 2. Customer Assets -->
-            <TabItem Header="Assets">
+            <!-- 2. Customer Products -->
+            <TabItem Header="Products">
                 <Border Margin="0,16,0,0" Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="6">
-                    <DataGrid ItemsSource="{Binding Profile.Assets}" AutoGenerateColumns="False" IsReadOnly="True"
-                              MouseDoubleClick="AssetsGrid_MouseDoubleClick"
+                    <DataGrid ItemsSource="{Binding Profile.Products}" AutoGenerateColumns="False" IsReadOnly="True"
+                              MouseDoubleClick="ProductsGrid_MouseDoubleClick"
                               materialDesign:DataGridAssist.CellPadding="14 8 14 8"
                               materialDesign:DataGridAssist.ColumnHeaderPadding="14 8 14 8">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Asset Code" Binding="{Binding AssetCode}" Width="120" />
+                            <DataGridTextColumn Header="Product Code" Binding="{Binding ProductCode}" Width="150" />
                             <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" Width="*" />
-                            <DataGridTextColumn Header="Serial Number" Binding="{Binding SerialNumber}" Width="160" />
-                            <DataGridTextColumn Header="Warranty Status" Binding="{Binding WarrantyStatus}" Width="140" />
-                            <DataGridTextColumn Header="Warranty End" Binding="{Binding WarrantyEndDate, StringFormat='{}{0:dd MMM yyyy}'}" Width="120" />
-                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100" />
+                            <DataGridTextColumn Header="Serial Number" Binding="{Binding SerialNumber}" Width="200" />
+                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="120" />
                             <DataGridTemplateColumn Header="Actions" Width="100">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Button Style="{StaticResource MaterialDesignIconButton}"
-                                                Command="{Binding DataContext.ViewAssetDetailsCommand,
+                                                Command="{Binding DataContext.ViewProductDetailsCommand,
                                                           RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                 CommandParameter="{Binding}" ToolTip="View Details">
                                             <materialDesign:PackIcon Kind="Eye" Width="16" Height="16" />
@@ -149,37 +140,19 @@
             </TabItem>
 
             <!-- 3. Service History -->
-            <TabItem Header="Service Tickets">
+            <TabItem Header="Service Entries">
                 <Border Margin="0,16,0,0" Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="6">
-                    <DataGrid ItemsSource="{Binding Profile.Tickets}" AutoGenerateColumns="False" IsReadOnly="True"
+                    <DataGrid ItemsSource="{Binding Profile.ServiceEntries}" AutoGenerateColumns="False" IsReadOnly="True"
                               materialDesign:DataGridAssist.CellPadding="14 8 14 8"
                               materialDesign:DataGridAssist.ColumnHeaderPadding="14 8 14 8">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Ticket #" Binding="{Binding TicketNumber}" Width="110" />
-                            <DataGridTextColumn Header="Asset Name" Binding="{Binding AssetName}" Width="180" />
+                            <DataGridTextColumn Header="Service Entry #" Binding="{Binding ServiceEntryNumber}" Width="150" />
+                            <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" Width="200" />
                             <DataGridTextColumn Header="Problem Description" Binding="{Binding ProblemDescription}" Width="*" />
-                            <DataGridTextColumn Header="Priority" Binding="{Binding Priority}" Width="90" />
-                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100" />
-                            <DataGridTextColumn Header="Created Date" Binding="{Binding CreatedDate, StringFormat='{}{0:dd MMM yyyy}'}" Width="120" />
-                            <DataGridTextColumn Header="Assigned To" Binding="{Binding AssignedEngineer, FallbackValue='Unassigned'}" Width="140" />
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </Border>
-            </TabItem>
-
-            <!-- 4. AMC Contracts -->
-            <TabItem Header="AMC Contracts">
-                <Border Margin="0,16,0,0" Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="6">
-                    <DataGrid ItemsSource="{Binding Profile.AmcContracts}" AutoGenerateColumns="False" IsReadOnly="True"
-                              materialDesign:DataGridAssist.CellPadding="14 8 14 8"
-                              materialDesign:DataGridAssist.ColumnHeaderPadding="14 8 14 8">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Asset Product" Binding="{Binding AssetName}" Width="*" />
-                            <DataGridTextColumn Header="Start Date" Binding="{Binding StartDate, StringFormat='{}{0:dd MMM yyyy}'}" Width="120" />
-                            <DataGridTextColumn Header="End Date" Binding="{Binding EndDate, StringFormat='{}{0:dd MMM yyyy}'}" Width="120" />
-                            <DataGridTextColumn Header="Contract Value" Binding="{Binding ContractValue, StringFormat='₹{0:N0}'}" Width="120" />
-                            <DataGridTextColumn Header="Visits Included" Binding="{Binding VisitsIncluded}" Width="120" />
-                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100" />
+                            <DataGridTextColumn Header="Priority" Binding="{Binding Priority}" Width="100" />
+                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="120" />
+                            <DataGridTextColumn Header="Created Date" Binding="{Binding CreatedDate, StringFormat='{}{0:dd MMM yyyy}'}" Width="130" />
+                            <DataGridTextColumn Header="Assigned To" Binding="{Binding AssignedEngineer, FallbackValue='Unassigned'}" Width="160" />
                         </DataGrid.Columns>
                     </DataGrid>
                 </Border>

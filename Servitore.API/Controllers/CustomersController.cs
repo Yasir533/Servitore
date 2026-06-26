@@ -12,11 +12,13 @@ public class CustomersController : ControllerBase
 {
     private readonly ICustomerService _customerService;
     private readonly IActivityLogService _activityLogService;
+    private readonly IWhatsAppService _whatsAppService;
 
-    public CustomersController(ICustomerService customerService, IActivityLogService activityLogService)
+    public CustomersController(ICustomerService customerService, IActivityLogService activityLogService, IWhatsAppService whatsAppService)
     {
         _customerService = customerService;
         _activityLogService = activityLogService;
+        _whatsAppService = whatsAppService;
     }
 
     [HttpGet]
@@ -36,11 +38,30 @@ public class CustomersController : ControllerBase
         return profile is null ? NotFound() : Ok(profile);
     }
 
+    [HttpGet("check-duplicate")]
+    public async Task<IActionResult> CheckDuplicate([FromQuery] string name, [FromQuery] string mobile)
+    {
+        if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(mobile))
+        {
+            return BadRequest("Name and Mobile are required.");
+        }
+        var isDuplicate = await _customerService.CheckDuplicateAsync(name, mobile);
+        return Ok(new { isDuplicate });
+    }
+
     [HttpPost]
     public async Task<IActionResult> Create(CustomerDto dto)
     {
         var created = await _customerService.CreateAsync(dto);
         await _activityLogService.LogActivityAsync($"Created Customer: {created.CustomerName} (ID: {created.CustomerId})", "Customers", HttpContext);
+        
+        var username = User.Identity?.Name ?? "system";
+        try
+        {
+            await _whatsAppService.SendNotificationAsync(username, "Created Customer", created.CustomerName);
+        }
+        catch (Exception) { /* ignore notification errors */ }
+
         return CreatedAtAction(nameof(GetById), new { id = created.CustomerId }, created);
     }
 
@@ -52,6 +73,14 @@ public class CustomersController : ControllerBase
         {
             var updated = await _customerService.UpdateAsync(dto);
             await _activityLogService.LogActivityAsync($"Updated Customer: {dto.CustomerName} (ID: {id})", "Customers", HttpContext);
+            
+            var username = User.Identity?.Name ?? "system";
+            try
+            {
+                await _whatsAppService.SendNotificationAsync(username, "Updated Customer", dto.CustomerName);
+            }
+            catch (Exception) { /* ignore notification errors */ }
+
             return Ok(updated);
         }
         catch (Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException)

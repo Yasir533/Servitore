@@ -13,6 +13,6 @@ public class User
     public bool IsActive { get; set; } = true;
 
     public Role? Role { get; set; }
-    public ICollection<ServiceTicket> CreatedTickets { get; set; } = new List<ServiceTicket>();
-    public ICollection<ServiceTicket> AssignedTickets { get; set; } = new List<ServiceTicket>();
+    public ICollection<ServiceEntry> CreatedEntries { get; set; } = new List<ServiceEntry>();
+    public ICollection<ServiceEntry> AssignedEntries { get; set; } = new List<ServiceEntry>();
 }

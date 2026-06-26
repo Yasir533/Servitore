@@ -22,88 +22,6 @@ namespace Servitore.Database.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Servitore.Database.Entities.AMCContract", b =>
-                {
-                    b.Property<int>("AMCContractId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AMCContractId"));
-
-                    b.Property<int>("AssetId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("ContractValue")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("VisitsIncluded")
-                        .HasColumnType("int");
-
-                    b.HasKey("AMCContractId");
-
-                    b.HasIndex("AssetId")
-                        .IsUnique();
-
-                    b.ToTable("AMCContracts");
-                });
-
-            modelBuilder.Entity("Servitore.Database.Entities.AMCVisit", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AMCContractId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("EngineerId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Remarks")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("ScheduledDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("VisitDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AMCContractId");
-
-                    b.HasIndex("EngineerId");
-
-                    b.ToTable("AMCVisits");
-                });
-
             modelBuilder.Entity("Servitore.Database.Entities.ActivityLog", b =>
                 {
                     b.Property<int>("Id")
@@ -159,6 +77,9 @@ namespace Servitore.Database.Migrations
                     b.Property<string>("Barcode")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Brand")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -167,6 +88,9 @@ namespace Servitore.Database.Migrations
 
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Model")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ModifiedBy")
                         .HasColumnType("nvarchar(max)");
@@ -240,8 +164,9 @@ namespace Servitore.Database.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ContactPerson")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Company")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -267,6 +192,9 @@ namespace Servitore.Database.Migrations
 
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("CustomerId");
 
@@ -339,13 +267,16 @@ namespace Servitore.Database.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Servitore.Database.Entities.ServiceTicket", b =>
+            modelBuilder.Entity("Servitore.Database.Entities.ServiceEntry", b =>
                 {
-                    b.Property<int>("TicketId")
+                    b.Property<int>("ServiceEntryId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TicketId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ServiceEntryId"));
+
+                    b.Property<string>("AccessoriesReceived")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("AssetId")
                         .HasColumnType("int");
@@ -379,24 +310,21 @@ namespace Servitore.Database.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
 
-                    b.Property<string>("ResolutionNotes")
+                    b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("SlaBreached")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("SlaDueDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TicketNumber")
+                    b.Property<string>("ServiceEntryNumber")
                         .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
-                    b.HasKey("TicketId");
+                    b.Property<string>("Solution")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("ServiceEntryId");
 
                     b.HasIndex("AssetId");
 
@@ -406,10 +334,75 @@ namespace Servitore.Database.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.HasIndex("TicketNumber")
+                    b.HasIndex("ServiceEntryNumber")
                         .IsUnique();
 
-                    b.ToTable("ServiceTickets");
+                    b.ToTable("ServiceEntries");
+                });
+
+            modelBuilder.Entity("Servitore.Database.Entities.ServiceEntryAttachment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AttachmentType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ServiceEntryId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UploadedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ServiceEntryId");
+
+                    b.ToTable("ServiceEntryAttachments");
+                });
+
+            modelBuilder.Entity("Servitore.Database.Entities.ServiceEntryHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("HistoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Remarks")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ServiceEntryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ServiceEntryId");
+
+                    b.ToTable("ServiceEntryHistories");
                 });
 
             modelBuilder.Entity("Servitore.Database.Entities.Settings", b =>
@@ -431,38 +424,6 @@ namespace Servitore.Database.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Settings");
-                });
-
-            modelBuilder.Entity("Servitore.Database.Entities.TicketHistory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("HistoryId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Remarks")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("TicketId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UpdatedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TicketId");
-
-                    b.ToTable("TicketHistories");
                 });
 
             modelBuilder.Entity("Servitore.Database.Entities.User", b =>
@@ -514,49 +475,6 @@ namespace Servitore.Database.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Servitore.Database.Entities.Warranty", b =>
-                {
-                    b.Property<int>("WarrantyId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WarrantyId"));
-
-                    b.Property<int>("AssetId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Terms")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("VendorName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("WarrantyId");
-
-                    b.HasIndex("AssetId")
-                        .IsUnique();
-
-                    b.ToTable("Warranties");
-                });
-
             modelBuilder.Entity("Servitore.Database.Entities.WhatsAppSettings", b =>
                 {
                     b.Property<int>("Id")
@@ -581,35 +499,6 @@ namespace Servitore.Database.Migrations
                     b.ToTable("WhatsAppSettings");
                 });
 
-            modelBuilder.Entity("Servitore.Database.Entities.AMCContract", b =>
-                {
-                    b.HasOne("Servitore.Database.Entities.Asset", "Asset")
-                        .WithOne("AMCContract")
-                        .HasForeignKey("Servitore.Database.Entities.AMCContract", "AssetId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Asset");
-                });
-
-            modelBuilder.Entity("Servitore.Database.Entities.AMCVisit", b =>
-                {
-                    b.HasOne("Servitore.Database.Entities.AMCContract", "AMCContract")
-                        .WithMany("Visits")
-                        .HasForeignKey("AMCContractId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Servitore.Database.Entities.User", "Engineer")
-                        .WithMany()
-                        .HasForeignKey("EngineerId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("AMCContract");
-
-                    b.Navigation("Engineer");
-                });
-
             modelBuilder.Entity("Servitore.Database.Entities.Asset", b =>
                 {
                     b.HasOne("Servitore.Database.Entities.Customer", "Customer")
@@ -632,27 +521,27 @@ namespace Servitore.Database.Migrations
                     b.Navigation("Asset");
                 });
 
-            modelBuilder.Entity("Servitore.Database.Entities.ServiceTicket", b =>
+            modelBuilder.Entity("Servitore.Database.Entities.ServiceEntry", b =>
                 {
                     b.HasOne("Servitore.Database.Entities.Asset", "Asset")
-                        .WithMany("ServiceTickets")
+                        .WithMany("ServiceEntries")
                         .HasForeignKey("AssetId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Servitore.Database.Entities.User", "AssignedToUser")
-                        .WithMany("AssignedTickets")
+                        .WithMany("AssignedEntries")
                         .HasForeignKey("AssignedToUserId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Servitore.Database.Entities.User", "CreatedByUser")
-                        .WithMany("CreatedTickets")
+                        .WithMany("CreatedEntries")
                         .HasForeignKey("CreatedByUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Servitore.Database.Entities.Customer", "Customer")
-                        .WithMany("ServiceTickets")
+                        .WithMany("ServiceEntries")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -666,15 +555,26 @@ namespace Servitore.Database.Migrations
                     b.Navigation("Customer");
                 });
 
-            modelBuilder.Entity("Servitore.Database.Entities.TicketHistory", b =>
+            modelBuilder.Entity("Servitore.Database.Entities.ServiceEntryAttachment", b =>
                 {
-                    b.HasOne("Servitore.Database.Entities.ServiceTicket", "Ticket")
-                        .WithMany("History")
-                        .HasForeignKey("TicketId")
+                    b.HasOne("Servitore.Database.Entities.ServiceEntry", "ServiceEntry")
+                        .WithMany("Attachments")
+                        .HasForeignKey("ServiceEntryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Ticket");
+                    b.Navigation("ServiceEntry");
+                });
+
+            modelBuilder.Entity("Servitore.Database.Entities.ServiceEntryHistory", b =>
+                {
+                    b.HasOne("Servitore.Database.Entities.ServiceEntry", "ServiceEntry")
+                        .WithMany("History")
+                        .HasForeignKey("ServiceEntryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ServiceEntry");
                 });
 
             modelBuilder.Entity("Servitore.Database.Entities.User", b =>
@@ -688,38 +588,18 @@ namespace Servitore.Database.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("Servitore.Database.Entities.Warranty", b =>
-                {
-                    b.HasOne("Servitore.Database.Entities.Asset", "Asset")
-                        .WithOne("Warranty")
-                        .HasForeignKey("Servitore.Database.Entities.Warranty", "AssetId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Asset");
-                });
-
-            modelBuilder.Entity("Servitore.Database.Entities.AMCContract", b =>
-                {
-                    b.Navigation("Visits");
-                });
-
             modelBuilder.Entity("Servitore.Database.Entities.Asset", b =>
                 {
-                    b.Navigation("AMCContract");
-
                     b.Navigation("Documents");
 
-                    b.Navigation("ServiceTickets");
-
-                    b.Navigation("Warranty");
+                    b.Navigation("ServiceEntries");
                 });
 
             modelBuilder.Entity("Servitore.Database.Entities.Customer", b =>
                 {
                     b.Navigation("Assets");
 
-                    b.Navigation("ServiceTickets");
+                    b.Navigation("ServiceEntries");
                 });
 
             modelBuilder.Entity("Servitore.Database.Entities.Role", b =>
@@ -727,16 +607,18 @@ namespace Servitore.Database.Migrations
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("Servitore.Database.Entities.ServiceTicket", b =>
+            modelBuilder.Entity("Servitore.Database.Entities.ServiceEntry", b =>
                 {
+                    b.Navigation("Attachments");
+
                     b.Navigation("History");
                 });
 
             modelBuilder.Entity("Servitore.Database.Entities.User", b =>
                 {
-                    b.Navigation("AssignedTickets");
+                    b.Navigation("AssignedEntries");
 
-                    b.Navigation("CreatedTickets");
+                    b.Navigation("CreatedEntries");
                 });
 #pragma warning restore 612, 618
         }

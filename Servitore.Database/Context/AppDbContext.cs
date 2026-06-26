@@ -17,26 +17,24 @@ public class AppDbContext : DbContext
     public DbSet<Role> Roles => Set<Role>();
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<Asset> Assets => Set<Asset>();
-    public DbSet<ServiceTicket> ServiceTickets => Set<ServiceTicket>();
-    public DbSet<TicketHistory> TicketHistories => Set<TicketHistory>();
+    public DbSet<ServiceEntry> ServiceEntries => Set<ServiceEntry>();
+    public DbSet<ServiceEntryHistory> ServiceEntryHistories => Set<ServiceEntryHistory>();
+    public DbSet<ServiceEntryAttachment> ServiceEntryAttachments => Set<ServiceEntryAttachment>();
     public DbSet<ActivityLog> ActivityLogs => Set<ActivityLog>();
-    public DbSet<Warranty> Warranties => Set<Warranty>();
-    public DbSet<AMCContract> AMCContracts => Set<AMCContract>();
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<Settings> Settings => Set<Settings>();
     public DbSet<WhatsAppSettings> WhatsAppSettings => Set<WhatsAppSettings>();
     public DbSet<AssetDocument> AssetDocuments => Set<AssetDocument>();
-    public DbSet<AMCVisit> AMCVisits => Set<AMCVisit>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
         // Configure relations for extended features
-        modelBuilder.Entity<ServiceTicket>()
-            .HasOne(t => t.AssignedToUser)
-            .WithMany(u => u.AssignedTickets)
-            .HasForeignKey(t => t.AssignedToUserId)
+        modelBuilder.Entity<ServiceEntry>()
+            .HasOne(e => e.AssignedToUser)
+            .WithMany(u => u.AssignedEntries)
+            .HasForeignKey(e => e.AssignedToUserId)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<AssetDocument>()
@@ -45,17 +43,11 @@ public class AppDbContext : DbContext
             .HasForeignKey(d => d.AssetId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<AMCVisit>()
-            .HasOne(v => v.AMCContract)
-            .WithMany(c => c.Visits)
-            .HasForeignKey(v => v.AMCContractId)
+        modelBuilder.Entity<ServiceEntryAttachment>()
+            .HasOne(a => a.ServiceEntry)
+            .WithMany(e => e.Attachments)
+            .HasForeignKey(a => a.ServiceEntryId)
             .OnDelete(DeleteBehavior.Cascade);
-
-        modelBuilder.Entity<AMCVisit>()
-            .HasOne(v => v.Engineer)
-            .WithMany()
-            .HasForeignKey(v => v.EngineerId)
-            .OnDelete(DeleteBehavior.Restrict);
 
         // Seed default roles
         modelBuilder.Entity<Role>().HasData(

@@ -11,9 +11,8 @@ public static class ServiceCollectionExtensions
         // Repositories
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ICustomerRepository, CustomerRepository>();
-        services.AddScoped<IServiceTicketRepository, ServiceTicketRepository>();
+        services.AddScoped<IServiceEntryRepository, ServiceEntryRepository>();
         services.AddScoped<IAssetRepository, AssetRepository>();
-        services.AddScoped<IAMCVisitRepository, AMCVisitRepository>();
         services.AddScoped<IActivityLogRepository, ActivityLogRepository>();
 
         // Auth
@@ -22,11 +21,10 @@ public static class ServiceCollectionExtensions
         // Services
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ICustomerService, CustomerService>();
-        services.AddScoped<IServiceTicketService, ServiceTicketService>();
+        services.AddScoped<IServiceEntryService, ServiceEntryService>();
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IBarcodeService, BarcodeService>();
         services.AddScoped<IEmailService, EmailService>();
-        services.AddScoped<IAMCVisitService, AMCVisitService>();
         services.AddScoped<IActivityLogService, ActivityLogService>();
         services.AddHttpClient<IWhatsAppService, WhatsAppService>();
 

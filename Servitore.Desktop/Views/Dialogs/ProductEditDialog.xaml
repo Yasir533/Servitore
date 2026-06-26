@@ -1,0 +1,101 @@
+<Window x:Class="Servitore.Desktop.Views.Dialogs.ProductEditDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="Product Details" Height="580" Width="440"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        Loaded="Window_Loaded"
+        PreviewKeyDown="Window_PreviewKeyDown"
+        Closing="Window_Closing">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,10">
+            <TextBlock Text="Edit Product" FontSize="20" FontWeight="SemiBold" x:Name="TitleText" />
+            <TextBlock Text="Fill out the details below. Required fields are marked with (*)." FontSize="12" Opacity="0.6" Margin="0,2,0,12" />
+            
+            <!-- Inline validation error banner -->
+            <Border x:Name="ErrorBanner" Background="#FFEBEE" BorderBrush="#EF5350" BorderThickness="1" CornerRadius="4" Padding="10" Visibility="Collapsed" Margin="0,0,0,8">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="AlertCircle" Foreground="#E53935" Width="18" Height="18" Margin="0,0,8,0" VerticalAlignment="Center" />
+                    <TextBlock x:Name="ErrorBannerText" Foreground="#C62828" FontSize="12.5" FontWeight="Medium" VerticalAlignment="Center" TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="0,0,8,0">
+                <TextBox x:Name="ProductNameBox"
+                         materialDesign:HintAssist.Hint="Product Name *"
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         TextChanged="Input_Changed"
+                         Margin="0,0,0,12" />
+
+                <TextBox x:Name="AssetCodeBox"
+                         materialDesign:HintAssist.Hint="Product Code *"
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         TextChanged="Input_Changed"
+                         Margin="0,0,0,12" />
+
+                <TextBox x:Name="SerialNumberBox"
+                         materialDesign:HintAssist.Hint="Serial Number"
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         TextChanged="Input_Changed"
+                         Margin="0,0,0,12" />
+
+                <ComboBox x:Name="CustomerCombo"
+                          materialDesign:HintAssist.Hint="Assign Customer *"
+                          Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                          DisplayMemberPath="CustomerName"
+                          SelectedValuePath="CustomerId"
+                          SelectionChanged="Input_Changed"
+                          Margin="0,0,0,12" />
+
+                <ComboBox x:Name="StatusCombo"
+                          materialDesign:HintAssist.Hint="Status *"
+                          Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                          SelectionChanged="Input_Changed"
+                          Margin="0,0,0,12">
+                    <ComboBoxItem Content="Active" Tag="Active" IsSelected="True" />
+                    <ComboBoxItem Content="Inactive" Tag="Inactive" />
+                    <ComboBoxItem Content="Scrapped" Tag="Scrapped" />
+                    <ComboBoxItem Content="Retired" Tag="Retired" />
+                </ComboBox>
+
+                <TextBox x:Name="VendorNameBox"
+                         materialDesign:HintAssist.Hint="Vendor Name"
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         TextChanged="Input_Changed"
+                         Margin="0,0,0,12" />
+
+                <DatePicker x:Name="PurchaseDatePicker"
+                            materialDesign:HintAssist.Hint="Purchase Date"
+                            Style="{StaticResource MaterialDesignOutlinedDatePicker}"
+                            SelectedDateChanged="Input_Changed"
+                            Margin="0,0,0,12" />
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Buttons Panel -->
+        <DockPanel Grid.Row="2" Margin="0,16,0,0">
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                <Button Content="Reset" Style="{StaticResource MaterialDesignFlatButton}" Click="Reset_Click" Margin="0,0,8,0" />
+                <Button Content="Cancel" Style="{StaticResource MaterialDesignFlatButton}" Click="Cancel_Click" />
+            </StackPanel>
+            
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right">
+                <Button x:Name="SaveNewButton" Content="Save &amp; New" Style="{StaticResource MaterialDesignOutlinedButton}" Click="SaveNew_Click" Margin="0,0,8,0" ToolTip="Ctrl+N" />
+                <Button x:Name="SaveButton" Content="Save &amp; Close" Style="{StaticResource MaterialDesignRaisedButton}" Click="SaveClose_Click" Width="120" ToolTip="Ctrl+S" />
+            </StackPanel>
+        </DockPanel>
+    </Grid>
+</Window>

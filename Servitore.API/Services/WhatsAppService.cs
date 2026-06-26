@@ -1,19 +1,21 @@
 using Microsoft.EntityFrameworkCore;
 using Servitore.Database.Context;
 using Servitore.Database.Entities;
+using System;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace Servitore.API.Services;
 
 public interface IWhatsAppService
 {
-    Task SendTicketCreatedAsync(ServiceTicket ticket);
-    Task SendTicketUpdatedAsync(ServiceTicket ticket);
-    Task SendTicketCompletedAsync(ServiceTicket ticket);
+    Task SendNotificationAsync(string username, string action, string recordName);
 }
 
-// Sends WhatsApp messages to the configured company number whenever a ticket
-// is created, updated, or completed. Wire ApiUrl/ApiKey/CompanyNumber in
-// appsettings ("WhatsApp" section) or via Settings database table.
 public class WhatsAppService : IWhatsAppService
 {
     private readonly HttpClient _httpClient;
@@ -24,23 +26,23 @@ public class WhatsAppService : IWhatsAppService
     public WhatsAppService(
         HttpClient httpClient, 
         IConfiguration configuration, 
-        ILogger<WhatsAppService> logger,
+        ILogger<WhatsAppService> _loggerVal,
         AppDbContext context)
     {
         _httpClient = httpClient;
         _configuration = configuration;
-        _logger = logger;
+        _logger = _loggerVal;
         _context = context;
     }
 
-    public Task SendTicketCreatedAsync(ServiceTicket ticket) =>
-        SendAsync($"New ticket {ticket.TicketNumber} created.");
-
-    public Task SendTicketUpdatedAsync(ServiceTicket ticket) =>
-        SendAsync($"Ticket {ticket.TicketNumber} updated. Status: {ticket.Status}.");
-
-    public Task SendTicketCompletedAsync(ServiceTicket ticket) =>
-        SendAsync($"Ticket {ticket.TicketNumber} completed.");
+    public async Task SendNotificationAsync(string username, string action, string recordName)
+    {
+        var localTime = DateTime.Now;
+        var date = localTime.ToString("yyyy-MM-dd");
+        var time = localTime.ToString("HH:mm:ss");
+        var message = $"User: {username}, Action: {action}, Record Name: {recordName}, Date: {date}, Time: {time}";
+        await SendAsync(message);
+    }
 
     private async Task SendAsync(string message)
     {
@@ -81,22 +83,28 @@ public class WhatsAppService : IWhatsAppService
             return;
         }
 
-        var payload = new
+        // Broadcast to all comma-separated numbers
+        var numbers = companyNumber.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        foreach (var number in numbers)
         {
-            to = companyNumber,
-            message
-        };
+            var payload = new
+            {
+                to = number,
+                message
+            };
 
-        try
-        {
-            using var request = new HttpRequestMessage(HttpMethod.Post, apiUrl);
-            request.Headers.Add("Authorization", $"Bearer {apiKey}");
-            request.Content = JsonContent(payload);
-            await _httpClient.SendAsync(request);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to send WhatsApp notification.");
+            try
+            {
+                using var request = new HttpRequestMessage(HttpMethod.Post, apiUrl);
+                request.Headers.Add("Authorization", $"Bearer {apiKey}");
+                request.Content = JsonContent(payload);
+                await _httpClient.SendAsync(request);
+                _logger.LogInformation("Successfully sent WhatsApp notification to {Number}", number);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send WhatsApp notification to {Number}.", number);
+            }
         }
     }
 

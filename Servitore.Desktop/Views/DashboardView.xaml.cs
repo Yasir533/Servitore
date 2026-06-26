@@ -10,6 +10,7 @@ public partial class DashboardView : UserControl
 {
     private readonly DashboardViewModel _viewModel;
     private System.Windows.Threading.DispatcherTimer? _idleTimer;
+    private System.Windows.Threading.DispatcherTimer? _searchDebounceTimer;
     private bool _isAway = false;
     private string _currentTag = "Dashboard";
 
@@ -20,6 +21,12 @@ public partial class DashboardView : UserControl
 
         _viewModel = new DashboardViewModel(App.ApiService);
         DataContext = _viewModel;
+
+        _searchDebounceTimer = new System.Windows.Threading.DispatcherTimer
+        {
+            Interval = TimeSpan.FromMilliseconds(300)
+        };
+        _searchDebounceTimer.Tick += SearchDebounceTimer_Tick;
 
         // Register Toast helper
         ToastHelper.MessageQueue = MainSnackbar.MessageQueue;
@@ -184,10 +191,8 @@ public partial class DashboardView : UserControl
         UserControl view = tag switch
         {
             "Customers"      => new CustomerView(),
-            "Assets"         => new AssetView(),
-            "ServiceTickets" => new ServiceTicketView(),
-            "Warranty"       => new WarrantyView(),
-            "AMC"            => new AMCView(),
+            "Products"       => new ProductView(),
+            "ServiceEntries" => new ServiceEntryView(),
             "Reports"        => new ReportsView(),
             "Users"          => new UserManagementView(),
             "ActivityLogs"   => new ActivityLogView(),
@@ -225,14 +230,132 @@ public partial class DashboardView : UserControl
             var text = GlobalSearchBox.Text.Trim();
             if (string.IsNullOrWhiteSpace(text)) return;
 
-            // Navigate to Service Tickets view and pre-fill search text
-            var ticketView = new ServiceTicketView();
-            if (ticketView.DataContext is ServiceTicketViewModel ticketVm)
+            SearchAutocompletePopup.IsOpen = false;
+            var view = new ServiceEntryView();
+            if (view.DataContext is ServiceEntryViewModel vm)
             {
-                ticketVm.SearchText = text;
+                vm.SearchText = text;
             }
-            NavigationHelper.NavigateTo(ticketView);
+            NavigationHelper.NavigateTo(ContentHost, view);
         }
+    }
+
+    private void GlobalSearchBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        _searchDebounceTimer?.Stop();
+        _searchDebounceTimer?.Start();
+    }
+
+    private async void SearchDebounceTimer_Tick(object? sender, EventArgs e)
+    {
+        _searchDebounceTimer?.Stop();
+        var query = GlobalSearchBox.Text.Trim();
+        if (query.Length < 2)
+        {
+            SearchAutocompletePopup.IsOpen = false;
+            return;
+        }
+
+        try
+        {
+            var results = await App.ApiService.GetAsync<Servitore.Shared.Models.SearchResultDto>($"api/search?q={Uri.EscapeDataString(query)}");
+            if (results != null)
+            {
+                var flatList = new System.Collections.Generic.List<SearchDropdownItem>();
+                foreach (var item in results.Customers)
+                {
+                    flatList.Add(new SearchDropdownItem { Id = item.Id, Title = item.Title, Subtitle = item.Subtitle, Type = "Customer" });
+                }
+                foreach (var item in results.Products)
+                {
+                    flatList.Add(new SearchDropdownItem { Id = item.Id, Title = item.Title, Subtitle = item.Subtitle, Type = "Product" });
+                }
+                foreach (var item in results.ServiceEntries)
+                {
+                    flatList.Add(new SearchDropdownItem { Id = item.Id, Title = item.Title, Subtitle = item.Subtitle, Type = "Service Entry" });
+                }
+                foreach (var item in results.Employees)
+                {
+                    flatList.Add(new SearchDropdownItem { Id = item.Id, Title = item.Title, Subtitle = item.Subtitle, Type = "Employee" });
+                }
+
+                if (flatList.Count > 0)
+                {
+                    SearchResultsList.ItemsSource = flatList;
+                    SearchAutocompletePopup.IsOpen = true;
+                }
+                else
+                {
+                    SearchAutocompletePopup.IsOpen = false;
+                }
+            }
+            else
+            {
+                SearchAutocompletePopup.IsOpen = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            Helpers.ClientLogger.Log("Failed to perform global search", ex);
+            SearchAutocompletePopup.IsOpen = false;
+        }
+    }
+
+    private async void SearchResult_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.DataContext is SearchDropdownItem item)
+        {
+            SearchAutocompletePopup.IsOpen = false;
+            GlobalSearchBox.Text = "";
+
+            try
+            {
+                if (item.Type == "Customer")
+                {
+                    NavigationHelper.NavigateTo(ContentHost, new CustomerProfileView(int.Parse(item.Id)));
+                }
+                else if (item.Type == "Product")
+                {
+                    NavigationHelper.NavigateTo(ContentHost, new ProductProfileView(int.Parse(item.Id)));
+                }
+                else if (item.Type == "Service Entry")
+                {
+                    var entryId = int.Parse(item.Id);
+                    var entryDetails = await App.ApiService.GetAsync<Servitore.Shared.Models.ServiceEntryDetailsDto>($"api/serviceentries/{entryId}");
+                    if (entryDetails != null)
+                    {
+                        var dialog = new Views.Dialogs.ServiceEntryEditDialog(App.ApiService, entryDetails)
+                        {
+                            Owner = Window.GetWindow(this)
+                        };
+                        if (dialog.ShowDialog() == true)
+                        {
+                            if (DataContext is ViewModels.DashboardViewModel vm)
+                            {
+                                vm.LoadCommand.Execute(null);
+                            }
+                        }
+                    }
+                }
+                else if (item.Type == "Employee")
+                {
+                    NavigationHelper.NavigateTo(ContentHost, new UserManagementView());
+                }
+            }
+            catch (Exception ex)
+            {
+                Helpers.ClientLogger.Log("Failed to navigate from search result", ex);
+                DialogHelper.ShowError("Could not load details for the selected item.");
+            }
+        }
+    }
+
+    public class SearchDropdownItem
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;
+        public string Subtitle { get; set; } = string.Empty;
+        public string Type { get; set; } = string.Empty;
     }
 
     private void OnForceLogout()

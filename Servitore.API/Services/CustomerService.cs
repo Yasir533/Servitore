@@ -13,6 +13,7 @@ public interface ICustomerService
     Task<Customer> CreateAsync(CustomerDto dto);
     Task<Customer> UpdateAsync(CustomerDto dto);
     Task DeleteAsync(int id);
+    Task<bool> CheckDuplicateAsync(string name, string mobile);
 }
 
 public class CustomerService : ICustomerService
@@ -25,6 +26,8 @@ public class CustomerService : ICustomerService
 
     public Task<Customer?> GetByIdAsync(int id) => _repository.GetByIdAsync(id);
 
+    public Task<bool> CheckDuplicateAsync(string name, string mobile) => _repository.CheckDuplicateAsync(name, mobile);
+
     public async Task<Servitore.Shared.Models.CustomerProfileDto?> GetProfileAsync(int id)
     {
         var customer = await _repository.GetProfileAsync(id);
@@ -34,26 +37,24 @@ public class CustomerService : ICustomerService
         {
             CustomerId = customer.CustomerId,
             CustomerName = customer.CustomerName,
-            ContactPerson = customer.ContactPerson,
+            Company = customer.Company,
             Mobile = customer.Mobile,
             Email = customer.Email,
             Address = customer.Address,
             CreatedDate = customer.CreatedDate,
-            Assets = customer.Assets.Select(a => new Servitore.Shared.Models.CustomerAssetDto
+            Products = customer.Assets.Select(a => new Servitore.Shared.Models.CustomerProductDto
             {
-                AssetId = a.AssetId,
-                AssetCode = a.AssetCode,
+                ProductId = a.AssetId,
+                ProductCode = a.AssetCode,
                 ProductName = a.ProductName,
                 SerialNumber = a.SerialNumber,
-                Status = a.Status.ToString(),
-                WarrantyStatus = a.Warranty != null ? (a.Warranty.EndDate >= DateTime.UtcNow ? "Active" : "Expired") : "None",
-                WarrantyEndDate = a.Warranty?.EndDate
+                Status = a.Status.ToString()
             }).ToList(),
-            Tickets = customer.ServiceTickets.Select(t => new Servitore.Shared.Models.CustomerTicketDto
+            ServiceEntries = customer.ServiceEntries.Select(t => new Servitore.Shared.Models.CustomerServiceEntryDto
             {
-                TicketId = t.TicketId,
-                TicketNumber = t.TicketNumber,
-                AssetName = t.Asset?.ProductName ?? string.Empty,
+                ServiceEntryId = t.ServiceEntryId,
+                ServiceEntryNumber = t.ServiceEntryNumber,
+                ProductName = t.Asset?.ProductName ?? string.Empty,
                 ProblemDescription = t.ProblemDescription,
                 Priority = t.Priority.ToString(),
                 Status = t.Status.ToString(),
@@ -61,23 +62,6 @@ public class CustomerService : ICustomerService
                 AssignedEngineer = t.AssignedToUser?.FullName
             }).ToList()
         };
-
-        foreach (var asset in customer.Assets)
-        {
-            if (asset.AMCContract != null)
-            {
-                dto.AmcContracts.Add(new Servitore.Shared.Models.CustomerAmcDto
-                {
-                    AMCContractId = asset.AMCContract.AMCContractId,
-                    AssetName = asset.ProductName,
-                    StartDate = asset.AMCContract.StartDate,
-                    EndDate = asset.AMCContract.EndDate,
-                    ContractValue = asset.AMCContract.ContractValue,
-                    VisitsIncluded = asset.AMCContract.VisitsIncluded,
-                    Status = asset.AMCContract.EndDate >= DateTime.UtcNow ? "Active" : "Expired"
-                });
-            }
-        }
 
         return dto;
     }
@@ -87,10 +71,11 @@ public class CustomerService : ICustomerService
         var customer = new Customer
         {
             CustomerName = dto.CustomerName,
-            ContactPerson = dto.ContactPerson,
+            Company = dto.Company,
             Mobile = dto.Mobile,
             Email = dto.Email,
-            Address = dto.Address
+            Address = dto.Address,
+            Notes = dto.Notes
         };
 
         return _repository.AddAsync(customer);
@@ -110,10 +95,11 @@ public class CustomerService : ICustomerService
         }
 
         customer.CustomerName = dto.CustomerName;
-        customer.ContactPerson = dto.ContactPerson;
+        customer.Company = dto.Company;
         customer.Mobile = dto.Mobile;
         customer.Email = dto.Email;
         customer.Address = dto.Address;
+        customer.Notes = dto.Notes;
 
         await _repository.UpdateAsync(customer);
         return customer;

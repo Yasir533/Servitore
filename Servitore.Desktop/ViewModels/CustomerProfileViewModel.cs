@@ -62,9 +62,9 @@ public partial class CustomerProfileViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void ViewAssetDetails(CustomerAssetDto? asset)
+    private void ViewProductDetails(CustomerProductDto? product)
     {
-        if (asset is null) return;
-        NavigationHelper.NavigateTo(new Views.AssetProfileView(asset.AssetId));
+        if (product is null) return;
+        NavigationHelper.NavigateTo(new Views.ProductProfileView(product.ProductId));
     }
 }

@@ -28,18 +28,18 @@ public class AssetRepository : IAssetRepository
     public AssetRepository(AppDbContext context) => _context = context;
 
     public Task<Asset?> GetByIdAsync(int id) =>
-        _context.Assets.Include(a => a.Customer).Include(a => a.Warranty).Include(a => a.AMCContract)
+        _context.Assets.Include(a => a.Customer)
             .FirstOrDefaultAsync(a => a.AssetId == id);
 
     public Task<Asset?> GetByBarcodeAsync(string barcode) =>
-        _context.Assets.Include(a => a.Customer).Include(a => a.Warranty).Include(a => a.AMCContract)
+        _context.Assets.AsNoTracking().Include(a => a.Customer)
             .FirstOrDefaultAsync(a => a.Barcode == barcode);
 
     public Task<List<Asset>> GetByCustomerAsync(int customerId) =>
-        _context.Assets.Where(a => a.CustomerId == customerId).ToListAsync();
+        _context.Assets.AsNoTracking().Where(a => a.CustomerId == customerId).ToListAsync();
 
     public Task<List<Asset>> GetAllAsync() =>
-        _context.Assets.Include(a => a.Customer).Include(a => a.Warranty).Include(a => a.AMCContract).ToListAsync();
+        _context.Assets.AsNoTracking().Include(a => a.Customer).ToListAsync();
 
     public async Task<Asset> AddAsync(Asset asset)
     {
@@ -64,13 +64,10 @@ public class AssetRepository : IAssetRepository
 
     public Task<Asset?> GetProfileAsync(int id) =>
         _context.Assets
+            .AsNoTracking()
             .Include(a => a.Customer)
-            .Include(a => a.Warranty)
-            .Include(a => a.AMCContract)
-                .ThenInclude(c => c!.Visits)
-                    .ThenInclude(v => v!.Engineer)
             .Include(a => a.Documents)
-            .Include(a => a.ServiceTickets)
+            .Include(a => a.ServiceEntries)
             .FirstOrDefaultAsync(a => a.AssetId == id);
 
     public async Task<AssetDocument> AddDocumentAsync(AssetDocument doc)

@@ -1,0 +1,171 @@
+<UserControl x:Class="Servitore.Desktop.Views.ProductProfileView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             Loaded="UserControl_Loaded">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <DockPanel Grid.Row="0" Margin="0,0,0,16">
+            <Button Command="{Binding BackCommand}"
+                    Style="{StaticResource MaterialDesignFlatButton}"
+                    VerticalAlignment="Center" Margin="0,0,16,0" DockPanel.Dock="Left">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="ArrowLeft" Width="16" Height="16" Margin="0,0,6,0" VerticalAlignment="Center" />
+                    <TextBlock Text="Back" VerticalAlignment="Center" />
+                </StackPanel>
+            </Button>
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="{Binding Profile.ProductName, FallbackValue='Product Profile'}"
+                           Style="{StaticResource PageHeaderText}" />
+                <TextBlock Text="Comprehensive view of product details, document attachments, and service entries"
+                           Style="{StaticResource PageSubtitleText}" Margin="0" />
+            </StackPanel>
+        </DockPanel>
+
+        <!-- Loading -->
+        <ProgressBar Grid.Row="1" Style="{StaticResource MaterialDesignLinearProgressBar}"
+                      IsIndeterminate="True" Margin="0,0,0,8"
+                      Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+        <!-- Profile Tabs -->
+        <TabControl Grid.Row="2" Style="{StaticResource MaterialDesignNavigationRailTabControl}"
+                    materialDesign:ColorZoneAssist.Mode="PrimaryLight"
+                    Visibility="{Binding IsLoading, Converter={StaticResource InverseBooleanConverter}}">
+            
+            <!-- 1. Overview -->
+            <TabItem Header="Overview">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="1*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Specifications Card -->
+                        <Border Grid.Column="0" Style="{StaticResource StatCard}" Margin="0,0,16,0" VerticalAlignment="Top">
+                            <StackPanel>
+                                <TextBlock Text="Product Specifications" Style="{StaticResource SectionHeaderText}" />
+                                <Separator Margin="0,0,0,16" />
+
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Product Code -->
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Product Code:" FontWeight="SemiBold" Margin="0,0,0,12" />
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Profile.ProductCode, FallbackValue='N/A'}" Margin="0,0,0,12" />
+
+                                    <!-- Serial Number -->
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Serial Number:" FontWeight="SemiBold" Margin="0,0,0,12" />
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Profile.SerialNumber, FallbackValue='N/A'}" Margin="0,0,0,12" />
+
+                                    <!-- Customer -->
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Assigned Customer:" FontWeight="SemiBold" Margin="0,0,0,12" />
+                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Profile.CustomerName, FallbackValue='N/A'}" Margin="0,0,0,12" />
+
+                                    <!-- Vendor Name -->
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Vendor Name:" FontWeight="SemiBold" Margin="0,0,0,12" />
+                                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Profile.VendorName, FallbackValue='N/A'}" Margin="0,0,0,12" />
+
+                                    <!-- Purchase Date -->
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Purchase Date:" FontWeight="SemiBold" />
+                                    <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Profile.PurchaseDate, StringFormat='{}{0:dd MMM yyyy}', FallbackValue='N/A'}" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Barcode Display Card -->
+                        <StackPanel Grid.Column="1">
+                            <Border Style="{StaticResource StatCard}" Padding="16" Height="300">
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <TextBlock Text="Product Code QR / Barcode" FontWeight="SemiBold" FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,16" />
+                                    <Image Source="{Binding BarcodeImage}" Width="200" Height="200" Stretch="Uniform" HorizontalAlignment="Center" />
+                                    <TextBlock Text="{Binding Profile.ProductCode}" FontSize="12" Opacity="0.5" HorizontalAlignment="Center" Margin="0,8,0,0" />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- 2. Documents -->
+            <TabItem Header="Documents">
+                <Grid Margin="0,16,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Button Grid.Row="0" Content="+ Upload Document"
+                            Style="{StaticResource MaterialDesignRaisedButton}"
+                            Command="{Binding UploadDocumentCommand}"
+                            HorizontalAlignment="Left" Margin="0,0,0,16" />
+
+                    <Border Grid.Row="1" Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="6">
+                        <DataGrid ItemsSource="{Binding Profile.Documents}" AutoGenerateColumns="False" IsReadOnly="True"
+                                  materialDesign:DataGridAssist.CellPadding="14 8 14 8"
+                                  materialDesign:DataGridAssist.ColumnHeaderPadding="14 8 14 8">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="File Name" Binding="{Binding FileName}" Width="*" />
+                                <DataGridTextColumn Header="Uploaded Date" Binding="{Binding UploadedDate, StringFormat='{}{0:dd MMM yyyy HH:mm}'}" Width="200" />
+                                <DataGridTemplateColumn Header="Actions" Width="130">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button Style="{StaticResource MaterialDesignIconButton}"
+                                                        Command="{Binding DataContext.DownloadDocumentCommand,
+                                                                  RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                        CommandParameter="{Binding}" ToolTip="Download File">
+                                                    <materialDesign:PackIcon Kind="Download" Width="16" Height="16" />
+                                                </Button>
+                                                <Button Style="{StaticResource MaterialDesignIconButton}"
+                                                        Command="{Binding DataContext.DeleteDocumentCommand,
+                                                                  RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                        CommandParameter="{Binding}" ToolTip="Delete File"
+                                                        Foreground="{DynamicResource MaterialDesignValidationErrorBrush}">
+                                                    <materialDesign:PackIcon Kind="Delete" Width="16" Height="16" />
+                                                </Button>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+            <!-- 3. Service Entries -->
+            <TabItem Header="Service Entries">
+                <Border Margin="0,16,0,0" Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="6">
+                    <DataGrid ItemsSource="{Binding Profile.ServiceEntries}" AutoGenerateColumns="False" IsReadOnly="True"
+                              materialDesign:DataGridAssist.CellPadding="14 8 14 8"
+                              materialDesign:DataGridAssist.ColumnHeaderPadding="14 8 14 8">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Service Entry #" Binding="{Binding ServiceEntryNumber}" Width="150" />
+                            <DataGridTextColumn Header="Problem Description" Binding="{Binding ProblemDescription}" Width="*" />
+                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="120" />
+                            <DataGridTextColumn Header="Created Date" Binding="{Binding CreatedDate, StringFormat='{}{0:dd MMM yyyy}'}" Width="130" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Border>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</UserControl>

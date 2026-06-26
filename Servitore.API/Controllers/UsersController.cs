@@ -19,6 +19,22 @@ public class UsersController : ControllerBase
         _activityLogService = activityLogService;
     }
 
+    [HttpGet("lookup")]
+    [Authorize]
+    public async Task<IActionResult> GetLookup()
+    {
+        var users = await _userService.GetAllAsync();
+        var activeUsers = users.Where(u => u.IsActive).Select(u => new Servitore.Shared.Models.UserInfo
+        {
+            Id = u.Id,
+            Username = u.Username,
+            FullName = u.FullName,
+            Email = u.Email,
+            Role = Enum.TryParse<Servitore.Shared.Enums.UserRole>(u.Role?.RoleName, out var r) ? r : Servitore.Shared.Enums.UserRole.Operator
+        }).ToList();
+        return Ok(activeUsers);
+    }
+
     [HttpGet]
     public async Task<IActionResult> GetAll() => Ok(await _userService.GetAllAsync());
 

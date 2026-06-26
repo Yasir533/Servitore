@@ -1,0 +1,330 @@
+<Window x:Class="Servitore.Desktop.Views.Dialogs.ServiceEntryEditDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="Service Entry Details" Height="780" Width="1080"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResize"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        Loaded="Window_Loaded"
+        PreviewKeyDown="Window_PreviewKeyDown"
+        Closing="Window_Closing">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Top Header & Banner -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,10">
+            <TextBlock Text="Edit Service Entry" FontSize="20" FontWeight="SemiBold" x:Name="TitleText" />
+            <TextBlock Text="Fill out the details below. Focus on customer details, product details, accessories, and problem description. Required fields are marked with (*)." FontSize="12" Opacity="0.6" Margin="0,2,0,8" />
+            
+            <!-- Inline validation/success banner -->
+            <Border x:Name="ErrorBanner" Background="#FFEBEE" BorderBrush="#EF5350" BorderThickness="1" CornerRadius="4" Padding="10" Visibility="Collapsed" Margin="0,0,0,8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <materialDesign:PackIcon Kind="AlertCircle" x:Name="BannerIcon" Foreground="#E53935" Width="18" Height="18" Margin="0,0,8,0" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" x:Name="ErrorBannerText" Foreground="#C62828" FontSize="12.5" FontWeight="Medium" VerticalAlignment="Center" TextWrapping="Wrap" />
+                </Grid>
+            </Border>
+        </StackPanel>
+
+        <!-- Two-column form layout -->
+        <Grid Grid.Row="1" Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="20" />
+                <ColumnDefinition Width="1.2*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Column 1 (Left): Customer & Product Info -->
+            <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
+                <StackPanel>
+                    
+                    <!-- Customer Info Card -->
+                    <materialDesign:Card Margin="0,0,0,12" Padding="14">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <materialDesign:PackIcon Kind="Account" Width="18" Height="18" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                                <TextBlock Text="Customer Information" FontSize="14" FontWeight="Bold" Margin="8,0,0,0" VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <TextBox x:Name="MobileBox"
+                                     materialDesign:HintAssist.Hint="Mobile Number *"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     TextChanged="MobileBox_TextChanged"
+                                     Margin="0,0,0,10" />
+
+                            <TextBox x:Name="NameBox"
+                                     materialDesign:HintAssist.Hint="Customer Name *"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     TextChanged="Input_Changed"
+                                     Margin="0,0,0,10" />
+
+                            <TextBox x:Name="CompanyBox"
+                                     materialDesign:HintAssist.Hint="Company (Optional)"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     TextChanged="Input_Changed"
+                                     Margin="0,0,0,10" />
+
+                            <TextBox x:Name="EmailBox"
+                                     materialDesign:HintAssist.Hint="Email (Optional)"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     TextChanged="Input_Changed"
+                                     Margin="0,0,0,2" />
+                        </StackPanel>
+                    </materialDesign:Card>
+
+                    <!-- Product Info Card -->
+                    <materialDesign:Card Margin="0,0,0,12" Padding="14">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <materialDesign:PackIcon Kind="Laptop" Width="18" Height="18" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                                <TextBlock Text="Product Information" FontSize="14" FontWeight="Bold" Margin="8,0,0,0" VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <!-- Existing Products Dropdown (Auto-fills when returning customer) -->
+                            <ComboBox x:Name="ExistingAssetsCombo"
+                                      materialDesign:HintAssist.Hint="Select Existing Product (Autofill)"
+                                      Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                                      DisplayMemberPath="ProductName"
+                                      SelectedValuePath="AssetId"
+                                      SelectionChanged="ExistingAssetsCombo_SelectionChanged"
+                                      Visibility="Collapsed"
+                                      Margin="0,0,0,10" />
+
+                            <TextBox x:Name="ProductNameBox"
+                                     materialDesign:HintAssist.Hint="Product Name *"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     TextChanged="Input_Changed"
+                                     Margin="0,0,0,10" />
+
+                            <TextBox x:Name="BrandBox"
+                                     materialDesign:HintAssist.Hint="Brand (Optional)"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     TextChanged="Input_Changed"
+                                     Margin="0,0,0,10" />
+
+                            <TextBox x:Name="ModelBox"
+                                     materialDesign:HintAssist.Hint="Model (Optional)"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     TextChanged="Input_Changed"
+                                     Margin="0,0,0,10" />
+
+                            <TextBox x:Name="SerialNumberBox"
+                                     materialDesign:HintAssist.Hint="Serial Number (Optional)"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     TextChanged="Input_Changed"
+                                     Margin="0,0,0,2" />
+                        </StackPanel>
+                    </materialDesign:Card>
+
+                    <!-- Accessories Card -->
+                    <materialDesign:Card Margin="0,0,0,4" Padding="14">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <materialDesign:PackIcon Kind="CableData" Width="18" Height="18" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                                <TextBlock Text="Accessories Received" FontSize="14" FontWeight="Bold" Margin="8,0,0,0" VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <UniformGrid Columns="2" Margin="0,4,0,8">
+                                <CheckBox x:Name="ChargerChk" Content="Charger" Checked="Input_Changed" Unchecked="Input_Changed" Margin="0,2" />
+                                <CheckBox x:Name="PowerCableChk" Content="Power Cable" Checked="Input_Changed" Unchecked="Input_Changed" Margin="0,2" />
+                                <CheckBox x:Name="BagChk" Content="Bag" Checked="Input_Changed" Unchecked="Input_Changed" Margin="0,2" />
+                                <CheckBox x:Name="BoxChk" Content="Box" Checked="Input_Changed" Unchecked="Input_Changed" Margin="0,2" />
+                                <CheckBox x:Name="AdapterChk" Content="Adapter" Checked="Input_Changed" Unchecked="Input_Changed" Margin="0,2" />
+                                <CheckBox x:Name="CaseChk" Content="Case" Checked="Input_Changed" Unchecked="Input_Changed" Margin="0,2" />
+                            </UniformGrid>
+
+                            <CheckBox x:Name="OthersChk" Content="Others" Checked="OthersChk_Checked" Unchecked="OthersChk_Checked" Margin="0,2,0,4" />
+                            <TextBox x:Name="OthersTextBox"
+                                     materialDesign:HintAssist.Hint="Specify other accessories"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Visibility="Collapsed"
+                                     TextChanged="Input_Changed"
+                                     Margin="0,4,0,2" />
+                        </StackPanel>
+                    </materialDesign:Card>
+
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Column 2 (Right): Problem, Service, Remarks, Solution & Attachments -->
+            <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
+                <StackPanel>
+
+                    <!-- Problem & Service Details Card -->
+                    <materialDesign:Card Margin="0,0,0,12" Padding="14">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <materialDesign:PackIcon Kind="Alert" Width="18" Height="18" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                                <TextBlock Text="Problem &amp; Service Details" FontSize="14" FontWeight="Bold" Margin="8,0,0,0" VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <TextBox x:Name="ProblemBox"
+                                     materialDesign:HintAssist.Hint="Problem Description *"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Height="95" TextWrapping="Wrap" AcceptsReturn="True"
+                                     VerticalScrollBarVisibility="Auto"
+                                     TextChanged="Input_Changed"
+                                     Margin="0,0,0,4" />
+
+                            <!-- Quick Problem Templates -->
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                <TextBlock Text="Quick Templates:" FontSize="11" Opacity="0.5" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                <Button Content="Not Powering" Style="{StaticResource MaterialDesignFlatButton}" FontSize="10.5" Height="22" Padding="4,0" Click="Template_Click" Margin="0,0,4,0" Tag="Laptop not powering on." />
+                                <Button Content="Boot Loop" Style="{StaticResource MaterialDesignFlatButton}" FontSize="10.5" Height="22" Padding="4,0" Click="Template_Click" Margin="0,0,4,0" Tag="Windows is stuck on the loading screen." />
+                                <Button Content="Paper Jam" Style="{StaticResource MaterialDesignFlatButton}" FontSize="10.5" Height="22" Padding="4,0" Click="Template_Click" Margin="0,0,4,0" Tag="Printer shows paper jam although no paper is inside." />
+                                <Button Content="Auto Restart" Style="{StaticResource MaterialDesignFlatButton}" FontSize="10.5" Height="22" Padding="4,0" Click="Template_Click" Tag="Desktop restarts automatically after a few minutes." />
+                            </StackPanel>
+
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="12" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                
+                                <ComboBox Grid.Column="0" x:Name="PriorityCombo"
+                                          materialDesign:HintAssist.Hint="Priority *"
+                                          SelectionChanged="Input_Changed"
+                                          Style="{StaticResource MaterialDesignOutlinedComboBox}">
+                                    <ComboBoxItem Content="Low" Tag="Low" />
+                                    <ComboBoxItem Content="Normal" Tag="Normal" IsSelected="True" />
+                                    <ComboBoxItem Content="High" Tag="High" />
+                                    <ComboBoxItem Content="Urgent" Tag="Urgent" />
+                                </ComboBox>
+
+                                <ComboBox Grid.Column="2" x:Name="StatusCombo"
+                                          materialDesign:HintAssist.Hint="Status *"
+                                          SelectionChanged="Input_Changed"
+                                          Style="{StaticResource MaterialDesignOutlinedComboBox}">
+                                    <ComboBoxItem Content="Pending" Tag="Pending" IsSelected="True" />
+                                    <ComboBoxItem Content="In Progress" Tag="InProgress" />
+                                    <ComboBoxItem Content="Completed" Tag="Completed" />
+                                    <ComboBoxItem Content="Delivered" Tag="Delivered" />
+                                </ComboBox>
+                            </Grid>
+
+                            <ComboBox x:Name="EngineerCombo"
+                                      materialDesign:HintAssist.Hint="Assign Engineer"
+                                      SelectionChanged="Input_Changed"
+                                      Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                                      DisplayMemberPath="FullName"
+                                      SelectedValuePath="Id"
+                                      Margin="0,0,0,10" />
+
+                            <TextBox x:Name="RemarksBox"
+                                     materialDesign:HintAssist.Hint="Internal Remarks (Optional)"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Height="50" TextWrapping="Wrap" AcceptsReturn="True"
+                                     VerticalScrollBarVisibility="Auto"
+                                     TextChanged="Input_Changed"
+                                     Margin="0,0,0,10" />
+
+                            <TextBox x:Name="SolutionBox"
+                                     materialDesign:HintAssist.Hint="Solution / Resolution (Optional)"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     Height="50" TextWrapping="Wrap" AcceptsReturn="True"
+                                     VerticalScrollBarVisibility="Auto"
+                                     TextChanged="Input_Changed"
+                                     Margin="0,0,0,2" />
+                        </StackPanel>
+                    </materialDesign:Card>
+
+                    <!-- Attachments Card -->
+                    <materialDesign:Card Margin="0,0,0,4" Padding="14">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Orientation="Horizontal" Grid.Column="0">
+                                    <materialDesign:PackIcon Kind="Attachment" Width="18" Height="18" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                                    <TextBlock Text="Attachments" FontSize="14" FontWeight="Bold" Margin="8,0,0,0" VerticalAlignment="Center" />
+                                </StackPanel>
+                                <Button Grid.Column="1" x:Name="UploadButton"
+                                        Content="Upload File"
+                                        Style="{StaticResource MaterialDesignOutlinedButton}"
+                                        Height="28" Padding="8,0"
+                                        FontSize="11.5"
+                                        Click="UploadButton_Click" />
+                            </Grid>
+
+                            <!-- Attachments List -->
+                            <TextBlock x:Name="AttachmentsNote"
+                                       Text="Attachments can be uploaded after saving this service entry."
+                                       Foreground="{DynamicResource MaterialDesignBodyLight}"
+                                       FontStyle="Italic" FontSize="12.5" HorizontalAlignment="Center"
+                                       Margin="0,10" />
+
+                            <DataGrid x:Name="AttachmentsGrid"
+                                      AutoGenerateColumns="False"
+                                      IsReadOnly="True"
+                                      Background="Transparent"
+                                      HeadersVisibility="Column"
+                                      GridLinesVisibility="Horizontal"
+                                      MaxHeight="120"
+                                      Visibility="Collapsed"
+                                      Margin="0,4,0,0">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="File Name" Binding="{Binding FileName}" Width="*" />
+                                    <DataGridTextColumn Header="Uploaded Date" Binding="{Binding UploadedDate, StringFormat=\{0:dd MMM HH:mm\}}" Width="120" />
+                                    <DataGridTemplateColumn Width="150">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Button Content="Download"
+                                                            Style="{StaticResource MaterialDesignFlatButton}"
+                                                            Height="24" Padding="4,0" FontSize="10.5"
+                                                            Click="DownloadAttachment_Click" Tag="{Binding}" />
+                                                    <Button Content="Delete"
+                                                            Style="{StaticResource MaterialDesignFlatButton}"
+                                                            Foreground="Red"
+                                                            Height="24" Padding="4,0" FontSize="10.5"
+                                                            Click="DeleteAttachment_Click" Tag="{Binding}" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+                    </materialDesign:Card>
+
+                    <!-- SLA Information Display -->
+                    <Border Background="{DynamicResource MaterialDesignDivider}" CornerRadius="4" Padding="12" Margin="0,10,0,0" x:Name="SlaPanel" Visibility="Collapsed">
+                        <StackPanel>
+                            <TextBlock Text="SLA Due Date:" FontWeight="Bold" FontSize="11" Opacity="0.6" />
+                            <TextBlock x:Name="SlaDueText" FontSize="13" Margin="0,2,0,4" />
+                            <TextBlock x:Name="SlaStatusText" FontSize="12" FontWeight="Bold" />
+                        </StackPanel>
+                    </Border>
+
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+
+        <!-- Bottom Buttons Panel -->
+        <DockPanel Grid.Row="2" Margin="0,8,0,0">
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                <Button Content="Reset" Style="{StaticResource MaterialDesignFlatButton}" Click="Reset_Click" Margin="0,0,8,0" x:Name="ResetButton" />
+                <Button Content="Cancel" Style="{StaticResource MaterialDesignFlatButton}" Click="Cancel_Click" x:Name="CancelButton" />
+            </StackPanel>
+            
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right">
+                <Button x:Name="SaveNewButton" Content="Save &amp; New" Style="{StaticResource MaterialDesignOutlinedButton}" Click="SaveNew_Click" Margin="0,0,8,0" ToolTip="Ctrl+N" />
+                <Button x:Name="SaveButton" Content="Save &amp; Close" Style="{StaticResource MaterialDesignRaisedButton}" Click="SaveClose_Click" Width="130" ToolTip="Ctrl+S" />
+            </StackPanel>
+        </DockPanel>
+    </Grid>
+</Window>

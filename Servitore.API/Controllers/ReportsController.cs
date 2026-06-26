@@ -26,7 +26,7 @@ public class ReportsController : ControllerBase
     [HttpGet("tickets/{format}")]
     public async Task<IActionResult> ExportTickets(string format)
     {
-        var tickets = await _context.ServiceTickets
+        var tickets = await _context.ServiceEntries
             .Include(t => t.Customer)
             .Include(t => t.Asset)
             .Include(t => t.AssignedToUser)
@@ -34,7 +34,7 @@ public class ReportsController : ControllerBase
             .ToListAsync();
 
         var exportFormat = ParseFormat(format);
-        var bytes = _exportService.ExportServiceTickets(tickets, exportFormat);
+        var bytes = _exportService.ExportServiceEntries(tickets, exportFormat);
         return FileResponse(bytes, exportFormat, $"ServiceTickets_{DateTime.Now:yyyyMMdd}");
     }
 
@@ -55,42 +55,12 @@ public class ReportsController : ControllerBase
     {
         var assets = await _context.Assets
             .Include(a => a.Customer)
-            .Include(a => a.Warranty)
-            .Include(a => a.AMCContract)
             .OrderBy(a => a.AssetCode)
             .ToListAsync();
 
         var exportFormat = ParseFormat(format);
         var bytes = _exportService.ExportAssets(assets, exportFormat);
         return FileResponse(bytes, exportFormat, $"Assets_{DateTime.Now:yyyyMMdd}");
-    }
-
-    [HttpGet("warranty/{format}")]
-    public async Task<IActionResult> ExportWarranty(string format)
-    {
-        var warranties = await _context.Warranties
-            .Include(w => w.Asset)
-            .ThenInclude(a => a!.Customer)
-            .OrderBy(w => w.EndDate)
-            .ToListAsync();
-
-        var exportFormat = ParseFormat(format);
-        var bytes = _exportService.ExportWarrantyReport(warranties, exportFormat);
-        return FileResponse(bytes, exportFormat, $"WarrantyReport_{DateTime.Now:yyyyMMdd}");
-    }
-
-    [HttpGet("amc/{format}")]
-    public async Task<IActionResult> ExportAmc(string format)
-    {
-        var contracts = await _context.AMCContracts
-            .Include(c => c.Asset)
-            .ThenInclude(a => a!.Customer)
-            .OrderBy(c => c.EndDate)
-            .ToListAsync();
-
-        var exportFormat = ParseFormat(format);
-        var bytes = _exportService.ExportAmcReport(contracts, exportFormat);
-        return FileResponse(bytes, exportFormat, $"AmcReport_{DateTime.Now:yyyyMMdd}");
     }
 
     private static ExportFormat ParseFormat(string format)

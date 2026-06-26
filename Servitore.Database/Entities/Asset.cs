@@ -10,6 +10,8 @@ public class Asset : IAuditable
     public string? QRCode { get; set; }
     public string? SerialNumber { get; set; }
     public string ProductName { get; set; } = string.Empty;
+    public string? Brand { get; set; }
+    public string? Model { get; set; }
     public int CustomerId { get; set; }
     public AssetStatus Status { get; set; } = AssetStatus.Active;
     public string? VendorName { get; set; }
@@ -22,8 +24,6 @@ public class Asset : IAuditable
     public DateTime? ModifiedDate { get; set; }
 
     public Customer? Customer { get; set; }
-    public Warranty? Warranty { get; set; }
-    public AMCContract? AMCContract { get; set; }
-    public ICollection<ServiceTicket> ServiceTickets { get; set; } = new List<ServiceTicket>();
+    public ICollection<ServiceEntry> ServiceEntries { get; set; } = new List<ServiceEntry>();
     public ICollection<AssetDocument> Documents { get; set; } = new List<AssetDocument>();
 }

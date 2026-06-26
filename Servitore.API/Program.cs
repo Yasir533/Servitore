@@ -95,21 +95,24 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// ── Run migrations and seed data on startup ──────────────────────────────────
-using (var scope = app.Services.CreateScope())
+// ── Run migrations and seed data in background task ──────────────────────────
+_ = Task.Run(async () =>
 {
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    try
+    using (var scope = app.Services.CreateScope())
     {
-        db.Database.Migrate();                          // applies pending migrations
-        await SeedData.SeedAsync(db);                  // seeds admin user if absent
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        try
+        {
+            db.Database.Migrate();                          // applies pending migrations
+            await SeedData.SeedAsync(db);                  // seeds admin user if absent
+        }
+        catch (Exception ex)
+        {
+            var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+            logger.LogError(ex, "An error occurred while migrating or seeding the database.");
+        }
     }
-    catch (Exception ex)
-    {
-        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while migrating or seeding the database.");
-    }
-}
+});
 // ─────────────────────────────────────────────────────────────────────────────
 
 if (app.Environment.IsDevelopment())

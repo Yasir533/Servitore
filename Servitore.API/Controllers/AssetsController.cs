@@ -13,11 +13,13 @@ public class AssetsController : ControllerBase
 {
     private readonly IAssetRepository _assetRepository;
     private readonly IActivityLogService _activityLogService;
+    private readonly IWhatsAppService _whatsAppService;
 
-    public AssetsController(IAssetRepository assetRepository, IActivityLogService activityLogService)
+    public AssetsController(IAssetRepository assetRepository, IActivityLogService activityLogService, IWhatsAppService whatsAppService)
     {
         _assetRepository = assetRepository;
         _activityLogService = activityLogService;
+        _whatsAppService = whatsAppService;
     }
 
     [HttpGet]
@@ -30,7 +32,7 @@ public class AssetsController : ControllerBase
             ProductName = a.ProductName,
             a.SerialNumber,
             CustomerName = a.Customer?.CustomerName,
-            WarrantyStatus = a.Warranty != null ? (a.Warranty.EndDate >= DateTime.UtcNow ? "Active" : "Expired") : "None",
+            WarrantyStatus = "None",
             Status = a.Status.ToString()
         }).ToList();
         return Ok(results);
@@ -58,7 +60,15 @@ public class AssetsController : ControllerBase
     public async Task<IActionResult> Create(Asset asset)
     {
         var created = await _assetRepository.AddAsync(asset);
-        await _activityLogService.LogActivityAsync($"Created Asset: {created.ProductName} ({created.AssetCode})", "Assets", HttpContext);
+        await _activityLogService.LogActivityAsync($"Created Product: {created.ProductName} ({created.AssetCode})", "Assets", HttpContext);
+        
+        var username = User.Identity?.Name ?? "system";
+        try
+        {
+            await _whatsAppService.SendNotificationAsync(username, "Created Product", created.ProductName);
+        }
+        catch (Exception) { /* ignore notification errors */ }
+
         return CreatedAtAction(nameof(GetById), new { id = created.AssetId }, created);
     }
 
@@ -85,7 +95,15 @@ public class AssetsController : ControllerBase
         existing.Barcode = asset.Barcode;
 
         await _assetRepository.UpdateAsync(existing);
-        await _activityLogService.LogActivityAsync($"Updated Asset: {existing.ProductName} ({existing.AssetCode}, ID: {id})", "Assets", HttpContext);
+        await _activityLogService.LogActivityAsync($"Updated Product: {existing.ProductName} ({existing.AssetCode}, ID: {id})", "Assets", HttpContext);
+        
+        var username = User.Identity?.Name ?? "system";
+        try
+        {
+            await _whatsAppService.SendNotificationAsync(username, "Updated Product", existing.ProductName);
+        }
+        catch (Exception) { /* ignore notification errors */ }
+
         return NoContent();
     }
 
@@ -93,7 +111,7 @@ public class AssetsController : ControllerBase
     public async Task<IActionResult> Delete(int id)
     {
         await _assetRepository.DeleteAsync(id);
-        await _activityLogService.LogActivityAsync($"Deleted Asset ID: {id}", "Assets", HttpContext);
+        await _activityLogService.LogActivityAsync($"Deleted Product ID: {id}", "Assets", HttpContext);
         return NoContent();
     }
 
@@ -103,10 +121,10 @@ public class AssetsController : ControllerBase
         var asset = await _assetRepository.GetProfileAsync(id);
         if (asset is null) return NotFound();
 
-        var dto = new Servitore.Shared.Models.AssetDetailsDto
+        var dto = new Servitore.Shared.Models.ProductDetailsDto
         {
-            AssetId = asset.AssetId,
-            AssetCode = asset.AssetCode,
+            ProductId = asset.AssetId,
+            ProductCode = asset.AssetCode,
             ProductName = asset.ProductName,
             SerialNumber = asset.SerialNumber,
             CustomerId = asset.CustomerId,
@@ -114,59 +132,22 @@ public class AssetsController : ControllerBase
             Status = asset.Status.ToString(),
             VendorName = asset.VendorName,
             PurchaseDate = asset.PurchaseDate,
-            Documents = asset.Documents.Select(d => new Servitore.Shared.Models.AssetDocumentDto
+            Documents = asset.Documents.Select(d => new Servitore.Shared.Models.ProductDocumentDto
             {
                 Id = d.Id,
                 FileName = d.FileName,
                 FilePath = d.FilePath,
                 UploadedDate = d.UploadedDate
             }).ToList(),
-            Tickets = asset.ServiceTickets.Select(t => new Servitore.Shared.Models.AssetTicketDto
+            ServiceEntries = asset.ServiceEntries.Select(t => new Servitore.Shared.Models.ProductServiceEntryDto
             {
-                TicketId = t.TicketId,
-                TicketNumber = t.TicketNumber,
+                ServiceEntryId = t.ServiceEntryId,
+                ServiceEntryNumber = t.ServiceEntryNumber,
                 ProblemDescription = t.ProblemDescription,
                 Status = t.Status.ToString(),
                 CreatedDate = t.CreatedDate
             }).ToList()
         };
-
-        if (asset.Warranty != null)
-        {
-            dto.Warranty = new Servitore.Shared.Models.AssetWarrantyDto
-            {
-                WarrantyId = asset.Warranty.WarrantyId,
-                StartDate = asset.Warranty.StartDate,
-                EndDate = asset.Warranty.EndDate,
-                Terms = asset.Warranty.Terms,
-                VendorName = asset.Warranty.VendorName,
-                Status = asset.Warranty.EndDate >= DateTime.UtcNow ? "Active" : "Expired"
-            };
-        }
-
-        if (asset.AMCContract != null)
-        {
-            dto.AMCContract = new Servitore.Shared.Models.AssetAmcDto
-            {
-                AMCContractId = asset.AMCContract.AMCContractId,
-                StartDate = asset.AMCContract.StartDate,
-                EndDate = asset.AMCContract.EndDate,
-                ContractValue = asset.AMCContract.ContractValue,
-                VisitsIncluded = asset.AMCContract.VisitsIncluded,
-                Status = asset.AMCContract.EndDate >= DateTime.UtcNow ? "Active" : "Expired",
-                Visits = asset.AMCContract.Visits.Select(v => new Servitore.Shared.Models.AMCVisitDto
-                {
-                    Id = v.Id,
-                    AMCContractId = v.AMCContractId,
-                    ScheduledDate = v.ScheduledDate,
-                    VisitDate = v.VisitDate,
-                    Status = v.Status.ToString(),
-                    Remarks = v.Remarks,
-                    EngineerId = v.EngineerId,
-                    EngineerName = v.Engineer?.FullName
-                }).ToList()
-            };
-        }
 
         return Ok(dto);
     }
@@ -179,7 +160,7 @@ public class AssetsController : ControllerBase
 
         var asset = await _assetRepository.GetByIdAsync(id);
         if (asset == null) 
-            return NotFound(new { success = false, message = "Asset not found." });
+            return NotFound(new { success = false, message = "Product not found." });
 
         var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
         if (!Directory.Exists(uploadDir)) Directory.CreateDirectory(uploadDir);
@@ -201,8 +182,8 @@ public class AssetsController : ControllerBase
         };
 
         var created = await _assetRepository.AddDocumentAsync(doc);
-        await _activityLogService.LogActivityAsync($"Uploaded document '{file.FileName}' for Asset ID: {id}", "Assets", HttpContext);
-        return Ok(new Servitore.Shared.Models.AssetDocumentDto
+        await _activityLogService.LogActivityAsync($"Uploaded document '{file.FileName}' for Product ID: {id}", "Assets", HttpContext);
+        return Ok(new Servitore.Shared.Models.ProductDocumentDto
         {
             Id = created.Id,
             FileName = created.FileName,

@@ -21,104 +21,58 @@ public partial class LoginWindow : Window
 
     private async void LoginWindow_Loaded(object sender, RoutedEventArgs e)
     {
-        await CheckConnectionAndSetupUiAsync();
+        UsernameBox.Focus();
+        _ = RunConnectionCheckInBackgroundAsync();
     }
 
-    private async System.Threading.Tasks.Task CheckConnectionAndSetupUiAsync()
+    private bool _isServerOnline = false;
+
+    private async System.Threading.Tasks.Task RunConnectionCheckInBackgroundAsync()
     {
-        // 1. Optimize for instant load: Try to ping immediately first
-        try
-        {
-            var pingResult = await App.ApiService.GetAsync<PingResponse>("api/auth/ping");
-            if (pingResult is { Status: "Healthy" })
-            {
-                ConnectionCheckPanel.Visibility = Visibility.Collapsed;
-                LoginFormPanel.Visibility = Visibility.Visible;
-                ConnectionFailedPanel.Visibility = Visibility.Collapsed;
-                UsernameBox.Focus();
-                return;
-            }
-        }
-        catch (System.Exception ex)
-        {
-            Helpers.ClientLogger.Log("Instant connection check failed, initiating retry sequence.", ex);
-        }
+        UpdateStatusLight(false, "Connecting to server...");
 
-        // 2. Slow path: Show Loading UI & attempt retries
-        ConnectionCheckPanel.Visibility = Visibility.Visible;
-        LoginFormPanel.Visibility = Visibility.Collapsed;
-        ConnectionFailedPanel.Visibility = Visibility.Collapsed;
-
-        bool isOnline = false;
-        int maxRetries = 60; // 60 attempts * 500ms = 30 seconds timeout
+        int maxRetries = 60; // 30 seconds
         for (int i = 0; i < maxRetries; i++)
         {
-            // Progressive status text updates based on elapsed time (5s / 15s boundaries)
-            if (i < 10)
-            {
-                ConnectionStatusText.Text = "Starting Servitore...";
-            }
-            else if (i < 30)
-            {
-                ConnectionStatusText.Text = "Connecting to server...";
-            }
-            else
-            {
-                ConnectionStatusText.Text = "Loading data...";
-            }
-
             try
             {
                 var pingResult = await App.ApiService.GetAsync<PingResponse>("api/auth/ping");
                 if (pingResult is { Status: "Healthy" })
                 {
-                    isOnline = true;
-                    break;
+                    _isServerOnline = true;
+                    UpdateStatusLight(true, "Server Online");
+                    return;
                 }
             }
             catch (System.Exception ex)
             {
-                Helpers.ClientLogger.Log($"Startup connection attempt {i + 1} failed.", ex);
+                Helpers.ClientLogger.Log($"Startup connection check attempt {i + 1} failed.", ex);
             }
-            await System.Threading.Tasks.Task.Delay(500);
+            
+            await System.Threading.Tasks.Task.Delay(1000);
         }
 
-        if (isOnline)
-        {
-            ConnectionCheckPanel.Visibility = Visibility.Collapsed;
-            LoginFormPanel.Visibility = Visibility.Visible;
-            ConnectionFailedPanel.Visibility = Visibility.Collapsed;
-            UsernameBox.Focus();
-        }
-        else
-        {
-            var result = MessageBox.Show(
-                this,
-                "Unable to connect to the server. Please ensure the Servitore API is running.",
-                "Connection Failed",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Warning,
-                MessageBoxResult.Yes);
+        UpdateStatusLight(false, "Server Offline. Check API connection.", isFailed: true);
+    }
 
-            if (result == MessageBoxResult.Yes)
+    private void UpdateStatusLight(bool isOnline, string text, bool isFailed = false)
+    {
+        Dispatcher.Invoke(() =>
+        {
+            StatusText.Text = text;
+            if (isOnline)
             {
-                await CheckConnectionAndSetupUiAsync();
+                StatusLight.Fill = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(76, 175, 80)); // Green
+            }
+            else if (isFailed)
+            {
+                StatusLight.Fill = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(244, 67, 54)); // Red
             }
             else
             {
-                Application.Current.Shutdown();
+                StatusLight.Fill = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 179, 0)); // Amber
             }
-        }
-    }
-
-    private async void RetryButton_Click(object sender, RoutedEventArgs e)
-    {
-        await CheckConnectionAndSetupUiAsync();
-    }
-
-    private void ExitButton_Click(object sender, RoutedEventArgs e)
-    {
-        Application.Current.Shutdown();
+        });
     }
 
     private class PingResponse
@@ -128,6 +82,27 @@ public partial class LoginWindow : Window
 
     private async void LoginButton_Click(object sender, RoutedEventArgs e)
     {
+        if (!_isServerOnline)
+        {
+            try
+            {
+                var pingResult = await App.ApiService.GetAsync<PingResponse>("api/auth/ping");
+                if (pingResult is { Status: "Healthy" })
+                {
+                    _isServerOnline = true;
+                    UpdateStatusLight(true, "Server Online");
+                }
+            }
+            catch { }
+        }
+
+        if (!_isServerOnline)
+        {
+            ErrorText.Text = "Cannot log in because the server is offline. Please check your connection.";
+            ErrorText.Visibility = Visibility.Visible;
+            return;
+        }
+
         // PasswordBox cannot be data-bound; pass value manually before executing the command.
         _viewModel.Username = UsernameBox.Text.Trim();
         _viewModel.Password = PasswordBox.Password;

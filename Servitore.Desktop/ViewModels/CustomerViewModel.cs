@@ -57,7 +57,7 @@ public partial class CustomerViewModel : ViewModelBase
         return c.CustomerName.ToLower().Contains(q)
             || (c.Mobile?.ToLower().Contains(q) ?? false)
             || (c.Email?.ToLower().Contains(q) ?? false)
-            || (c.ContactPerson?.ToLower().Contains(q) ?? false);
+            || (c.Company?.ToLower().Contains(q) ?? false);
     }
 
     [RelayCommand]
@@ -141,10 +141,11 @@ public partial class CustomerViewModel : ViewModelBase
         {
             CustomerId = row.CustomerId,
             CustomerName = row.CustomerName,
-            ContactPerson = row.ContactPerson,
+            Company = row.Company,
             Mobile = row.Mobile,
             Email = row.Email,
             Address = row.Address,
+            Notes = row.Notes,
             ModifiedDate = row.ModifiedDate
         };
 
@@ -155,10 +156,11 @@ public partial class CustomerViewModel : ViewModelBase
         if (dialog.ShowDialog() == true)
         {
             row.CustomerName = dialog.Customer.CustomerName;
-            row.ContactPerson = dialog.Customer.ContactPerson;
+            row.Company = dialog.Customer.Company;
             row.Mobile = dialog.Customer.Mobile;
             row.Email = dialog.Customer.Email;
             row.Address = dialog.Customer.Address;
+            row.Notes = dialog.Customer.Notes;
             row.ModifiedDate = dialog.Customer.ModifiedDate;
             CustomersView.Refresh();
 
@@ -217,10 +219,11 @@ public partial class CustomerViewModel : ViewModelBase
     {
         public int CustomerId { get; set; }
         public string CustomerName { get; set; } = string.Empty;
-        public string? ContactPerson { get; set; }
+        public string? Company { get; set; }
         public string? Mobile { get; set; }
         public string? Email { get; set; }
         public string? Address { get; set; }
+        public string? Notes { get; set; }
         public DateTime? ModifiedDate { get; set; }
     }
 }

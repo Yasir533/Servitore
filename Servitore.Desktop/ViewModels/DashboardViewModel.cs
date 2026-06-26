@@ -92,9 +92,9 @@ public partial class DashboardViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task AddAssetAsync()
+    private async Task AddProductAsync()
     {
-        var dialog = new Views.Dialogs.AssetEditDialog(_apiService, null)
+        var dialog = new Views.Dialogs.ProductEditDialog(_apiService, null)
         {
             Owner = System.Windows.Application.Current.MainWindow
         };
@@ -103,7 +103,7 @@ public partial class DashboardViewModel : ViewModelBase
             IsLoading = true;
             try
             {
-                await _apiService.PostAsync<object, object>("api/assets", dialog.Asset);
+                await _apiService.PostAsync<object, object>("api/assets", dialog.Product);
                 await LoadAsync();
             }
             catch (Exception)
@@ -118,9 +118,9 @@ public partial class DashboardViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task CreateTicketAsync()
+    private async Task CreateServiceEntryAsync()
     {
-        var dialog = new Views.Dialogs.TicketEditDialog(_apiService, null)
+        var dialog = new Views.Dialogs.ServiceEntryEditDialog(_apiService, null)
         {
             Owner = System.Windows.Application.Current.MainWindow
         };
@@ -129,57 +129,11 @@ public partial class DashboardViewModel : ViewModelBase
             IsLoading = true;
             try
             {
-                var dto = new
-                {
-                    CustomerId = dialog.Ticket.CustomerId,
-                    AssetId = dialog.Ticket.AssetId,
-                    ProblemDescription = dialog.Ticket.ProblemDescription,
-                    Status = Enum.Parse<TicketStatus>(dialog.Ticket.Status),
-                    Priority = Enum.Parse<TicketPriority>(dialog.Ticket.Priority),
-                    AssignedToUserId = dialog.Ticket.AssignedToUserId,
-                    ResolutionNotes = dialog.Ticket.ResolutionNotes
-                };
-                await _apiService.PostAsync<object, object>("api/servicetickets", dto);
                 await LoadAsync();
             }
             catch (Exception)
             {
-                Helpers.DialogHelper.ShowError("Unable to save changes. Please try again later.");
-            }
-            finally
-            {
-                IsLoading = false;
-            }
-        }
-    }
-
-    [RelayCommand]
-    private async Task CreateAmcAsync()
-    {
-        var dialog = new Views.Dialogs.AMCEditDialog(_apiService, null)
-        {
-            Owner = System.Windows.Application.Current.MainWindow
-        };
-        if (dialog.ShowDialog() == true)
-        {
-            IsLoading = true;
-            try
-            {
-                var requestBody = new
-                {
-                    AssetId = dialog.Contract.AssetId,
-                    StartDate = dialog.Contract.StartDate,
-                    EndDate = dialog.Contract.EndDate,
-                    ContractValue = dialog.Contract.ContractValue,
-                    VisitsIncluded = dialog.Contract.VisitsIncluded,
-                    Status = dialog.Contract.Status
-                };
-                await _apiService.PostAsync<object, object>("api/amc", requestBody);
-                await LoadAsync();
-            }
-            catch (Exception)
-            {
-                Helpers.DialogHelper.ShowError("Unable to save changes. Please try again later.");
+                Helpers.DialogHelper.ShowError("Unable to refresh dashboard data.");
             }
             finally
             {

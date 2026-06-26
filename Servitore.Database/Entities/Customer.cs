@@ -4,10 +4,11 @@ public class Customer : IAuditable
 {
     public int CustomerId { get; set; }
     public string CustomerName { get; set; } = string.Empty;
-    public string? ContactPerson { get; set; }
+    public string? Company { get; set; }
     public string? Mobile { get; set; }
     public string? Email { get; set; }
     public string? Address { get; set; }
+    public string? Notes { get; set; }
     
     // Audit fields
     public string? CreatedBy { get; set; }
@@ -16,5 +17,5 @@ public class Customer : IAuditable
     public DateTime? ModifiedDate { get; set; }
 
     public ICollection<Asset> Assets { get; set; } = new List<Asset>();
-    public ICollection<ServiceTicket> ServiceTickets { get; set; } = new List<ServiceTicket>();
+    public ICollection<ServiceEntry> ServiceEntries { get; set; } = new List<ServiceEntry>();
 }
