@@ -49,7 +49,7 @@
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="ID"           Binding="{Binding CustomerId}"   Width="60" />
                     <DataGridTextColumn Header="Customer Name" Binding="{Binding CustomerName}" Width="*" />
-                    <DataGridTextColumn Header="Contact"      Binding="{Binding ContactPerson}" Width="160" />
+                    <DataGridTextColumn Header="Company"      Binding="{Binding Company}" Width="160" />
                     <DataGridTextColumn Header="Mobile"       Binding="{Binding Mobile}"        Width="130" />
                     <DataGridTextColumn Header="Email"        Binding="{Binding Email}"         Width="200" />
                     <DataGridTextColumn Header="Address"      Binding="{Binding Address}"       Width="220" />

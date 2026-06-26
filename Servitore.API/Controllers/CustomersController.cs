@@ -22,13 +22,41 @@ public class CustomersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll() => Ok(await _customerService.GetAllAsync());
+    public async Task<IActionResult> GetAll()
+    {
+        var customers = await _customerService.GetAllAsync();
+        var dtos = customers.Select(c => new CustomerDto
+        {
+            CustomerId = c.CustomerId,
+            CustomerName = c.CustomerName,
+            Company = c.Company,
+            Mobile = c.Mobile,
+            Email = c.Email,
+            Address = c.Address,
+            Notes = c.Notes,
+            ModifiedDate = c.ModifiedDate
+        }).ToList();
+        return Ok(dtos);
+    }
 
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)
     {
         var customer = await _customerService.GetByIdAsync(id);
-        return customer is null ? NotFound() : Ok(customer);
+        if (customer is null) return NotFound();
+
+        var dto = new CustomerDto
+        {
+            CustomerId = customer.CustomerId,
+            CustomerName = customer.CustomerName,
+            Company = customer.Company,
+            Mobile = customer.Mobile,
+            Email = customer.Email,
+            Address = customer.Address,
+            Notes = customer.Notes,
+            ModifiedDate = customer.ModifiedDate
+        };
+        return Ok(dto);
     }
 
     [HttpGet("{id:int}/profile")]
@@ -62,7 +90,19 @@ public class CustomersController : ControllerBase
         }
         catch (Exception) { /* ignore notification errors */ }
 
-        return CreatedAtAction(nameof(GetById), new { id = created.CustomerId }, created);
+        var createdDto = new CustomerDto
+        {
+            CustomerId = created.CustomerId,
+            CustomerName = created.CustomerName,
+            Company = created.Company,
+            Mobile = created.Mobile,
+            Email = created.Email,
+            Address = created.Address,
+            Notes = created.Notes,
+            ModifiedDate = created.ModifiedDate
+        };
+
+        return CreatedAtAction(nameof(GetById), new { id = createdDto.CustomerId }, createdDto);
     }
 
     [HttpPut("{id:int}")]
@@ -81,12 +121,37 @@ public class CustomersController : ControllerBase
             }
             catch (Exception) { /* ignore notification errors */ }
 
-            return Ok(updated);
+            var updatedDto = new CustomerDto
+            {
+                CustomerId = updated.CustomerId,
+                CustomerName = updated.CustomerName,
+                Company = updated.Company,
+                Mobile = updated.Mobile,
+                Email = updated.Email,
+                Address = updated.Address,
+                Notes = updated.Notes,
+                ModifiedDate = updated.ModifiedDate
+            };
+
+            return Ok(updatedDto);
         }
         catch (Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException)
         {
             var current = await _customerService.GetByIdAsync(id);
-            return Conflict(current);
+            if (current is null) return NotFound();
+
+            var currentDto = new CustomerDto
+            {
+                CustomerId = current.CustomerId,
+                CustomerName = current.CustomerName,
+                Company = current.Company,
+                Mobile = current.Mobile,
+                Email = current.Email,
+                Address = current.Address,
+                Notes = current.Notes,
+                ModifiedDate = current.ModifiedDate
+            };
+            return Conflict(currentDto);
         }
     }
 
