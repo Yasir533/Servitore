@@ -124,19 +124,22 @@ public partial class LoginWindow : Window
             LoginButton_Click(sender, new RoutedEventArgs());
     }
 
-    private async void OnLoginSucceeded()
+    private void OnLoginSucceeded()
     {
-        try
+        var token = App.AuthenticationService.CurrentToken;
+        if (!string.IsNullOrEmpty(token))
         {
-            var token = App.AuthenticationService.CurrentToken;
-            if (!string.IsNullOrEmpty(token))
+            _ = System.Threading.Tasks.Task.Run(async () =>
             {
-                await App.SignalRService.ConnectAsync(App.ApiService.BaseUrl, token);
-            }
-        }
-        catch (System.Exception ex)
-        {
-            Helpers.ClientLogger.Log("Failed to start SignalR connection on login", ex);
+                try
+                {
+                    await App.SignalRService.ConnectAsync(App.ApiService.BaseUrl, token);
+                }
+                catch (System.Exception ex)
+                {
+                    Helpers.ClientLogger.Log("Failed to start SignalR connection on login", ex);
+                }
+            });
         }
 
         var dashboard = new DashboardView();

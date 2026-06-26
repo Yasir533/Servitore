@@ -44,7 +44,7 @@ public partial class ActivityLogViewModel : ViewModelBase
 
     public ObservableCollection<string> Modules { get; } = new()
     {
-        "All", "Auth", "Customers", "Assets", "Service Tickets", "AMC", "Users", "Settings"
+        "All", "Authentication", "Customers", "Products", "Service Entries", "Users", "Settings"
     };
 
     public ActivityLogViewModel(ApiService apiService)
@@ -61,7 +61,15 @@ public partial class ActivityLogViewModel : ViewModelBase
         // Apply module filter
         if (SelectedModule != "All")
         {
-            if (!string.Equals(log.Module, SelectedModule, StringComparison.OrdinalIgnoreCase))
+            var dbModule = SelectedModule switch
+            {
+                "Authentication" => "Auth",
+                "Products" => "Assets",
+                "Service Entries" => "ServiceEntries",
+                _ => SelectedModule
+            };
+
+            if (!string.Equals(log.Module, dbModule, StringComparison.OrdinalIgnoreCase))
                 return false;
         }
 

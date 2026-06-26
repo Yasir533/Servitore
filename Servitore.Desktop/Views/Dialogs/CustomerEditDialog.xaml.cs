@@ -281,6 +281,23 @@ public partial class CustomerEditDialog : Window
                 return false;
             }
         }
+        else
+        {
+            try
+            {
+                var response = await App.ApiService.PostAsync<CustomerViewModel.CustomerRow, CustomerViewModel.CustomerRow>("api/customers", Customer);
+                if (response != null)
+                {
+                    Customer.CustomerId = response.CustomerId;
+                    Customer.ModifiedDate = response.ModifiedDate;
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowValidationError($"Unable to save customer: {ex.Message}");
+                return false;
+            }
+        }
 
         if (!string.IsNullOrEmpty(_recordKey))
         {
@@ -294,8 +311,25 @@ public partial class CustomerEditDialog : Window
 
     private async void SaveClose_Click(object sender, RoutedEventArgs e)
     {
+        bool isNew = Customer.CustomerId == 0;
         if (await SaveAsync())
         {
+            try
+            {
+                await App.SignalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
+                {
+                    EntityType = "Customer",
+                    Action = isNew ? "Created" : "Updated",
+                    RecordId = Customer.CustomerId.ToString(),
+                    DisplayName = Customer.CustomerName,
+                    Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
+                });
+            }
+            catch (Exception ex)
+            {
+                ClientLogger.Log("SignalR broadcast failed inside Customer dialog SaveClose.", ex);
+            }
+
             _isClosingFromSave = true;
             DialogResult = true;
             Close();
@@ -304,13 +338,22 @@ public partial class CustomerEditDialog : Window
 
     private async void SaveNew_Click(object sender, RoutedEventArgs e)
     {
+        bool isNew = Customer.CustomerId == 0;
         if (await SaveAsync())
         {
             try
             {
-                await App.ApiService.PostAsync<object, object>("api/customers", Customer);
-                
+                await App.SignalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
+                {
+                    EntityType = "Customer",
+                    Action = isNew ? "Created" : "Updated",
+                    RecordId = Customer.CustomerId.ToString(),
+                    DisplayName = Customer.CustomerName,
+                    Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
+                });
+
                 // Clear fields
+                _isLoaded = false;
                 NameBox.Text = string.Empty;
                 CompanyBox.Text = string.Empty;
                 MobileBox.Text = string.Empty;
@@ -319,18 +362,18 @@ public partial class CustomerEditDialog : Window
                 NotesBox.Text = string.Empty;
                 Customer = new CustomerViewModel.CustomerRow();
                 _isDirty = false;
+                _isLoaded = true;
+
                 ShowValidationError("Customer saved successfully. Ready for the next one!");
-                
+
                 // Green banner styling
                 ErrorBanner.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(232, 245, 233));
                 ErrorBanner.BorderBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(129, 199, 132));
                 ErrorBannerText.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(46, 125, 50));
-                
-                DialogResult = true;
             }
             catch (Exception ex)
             {
-                ShowValidationError($"Unable to save customer: {ex.Message}");
+                ShowValidationError($"Customer saved, but error resetting: {ex.Message}");
             }
         }
     }

@@ -24,48 +24,26 @@ public partial class ReportsViewModel : ViewModelBase
         => await DownloadFileAsync("api/reports/customers/pdf", "Customers.pdf",
             "PDF Files|*.pdf");
 
-    // ── Assets ─────────────────────────────────────────────────────────────────
+    // ── Products ───────────────────────────────────────────────────────────────
     [RelayCommand]
     private async Task ExportAssetsExcelAsync()
-        => await DownloadFileAsync("api/reports/assets/excel", "Assets.xlsx",
+        => await DownloadFileAsync("api/reports/assets/excel", "Products.xlsx",
             "Excel Files|*.xlsx");
 
     [RelayCommand]
     private async Task ExportAssetsPdfAsync()
-        => await DownloadFileAsync("api/reports/assets/pdf", "Assets.pdf",
+        => await DownloadFileAsync("api/reports/assets/pdf", "Products.pdf",
             "PDF Files|*.pdf");
 
-    // ── Service Tickets ────────────────────────────────────────────────────────
+    // ── Service Entries ────────────────────────────────────────────────────────
     [RelayCommand]
     private async Task ExportTicketsExcelAsync()
-        => await DownloadFileAsync("api/reports/tickets/excel", "ServiceTickets.xlsx",
+        => await DownloadFileAsync("api/reports/tickets/excel", "ServiceEntries.xlsx",
             "Excel Files|*.xlsx");
 
     [RelayCommand]
     private async Task ExportTicketsPdfAsync()
-        => await DownloadFileAsync("api/reports/tickets/pdf", "ServiceTickets.pdf",
-            "PDF Files|*.pdf");
-
-    // ── Warranty ───────────────────────────────────────────────────────────────
-    [RelayCommand]
-    private async Task ExportWarrantyExcelAsync()
-        => await DownloadFileAsync("api/reports/warranty/excel", "Warranty.xlsx",
-            "Excel Files|*.xlsx");
-
-    [RelayCommand]
-    private async Task ExportWarrantyPdfAsync()
-        => await DownloadFileAsync("api/reports/warranty/pdf", "Warranty.pdf",
-            "PDF Files|*.pdf");
-
-    // ── AMC ────────────────────────────────────────────────────────────────────
-    [RelayCommand]
-    private async Task ExportAmcExcelAsync()
-        => await DownloadFileAsync("api/reports/amc/excel", "AMCContracts.xlsx",
-            "Excel Files|*.xlsx");
-
-    [RelayCommand]
-    private async Task ExportAmcPdfAsync()
-        => await DownloadFileAsync("api/reports/amc/pdf", "AMCContracts.pdf",
+        => await DownloadFileAsync("api/reports/tickets/pdf", "ServiceEntries.pdf",
             "PDF Files|*.pdf");
 
     // ── Shared download helper ─────────────────────────────────────────────────

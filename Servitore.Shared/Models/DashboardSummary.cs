@@ -9,6 +9,8 @@ public class DashboardSummary
     public int TotalProducts { get; set; }
     public int OpenServiceEntries { get; set; }
     public int ServiceEntriesResolvedToday { get; set; }
+    public int TodayServiceEntries { get; set; }
+    public int OnlineUsers { get; set; }
     public List<NotificationModel> RecentNotifications { get; set; } = new();
 
     // Extended fields

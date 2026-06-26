@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Servitore.Desktop.Services;
+using Servitore.Desktop.Helpers;
 using Servitore.Shared.Enums;
 using Servitore.Shared.Models;
 
@@ -72,23 +73,8 @@ public partial class DashboardViewModel : ViewModelBase
         {
             Owner = System.Windows.Application.Current.MainWindow
         };
-        if (dialog.ShowDialog() == true)
-        {
-            IsLoading = true;
-            try
-            {
-                await _apiService.PostAsync<object, object>("api/customers", dialog.Customer);
-                await LoadAsync();
-            }
-            catch (Exception)
-            {
-                Helpers.DialogHelper.ShowError("Unable to save changes. Please try again later.");
-            }
-            finally
-            {
-                IsLoading = false;
-            }
-        }
+        dialog.ShowDialog();
+        await LoadAsync();
     }
 
     [RelayCommand]
@@ -98,23 +84,8 @@ public partial class DashboardViewModel : ViewModelBase
         {
             Owner = System.Windows.Application.Current.MainWindow
         };
-        if (dialog.ShowDialog() == true)
-        {
-            IsLoading = true;
-            try
-            {
-                await _apiService.PostAsync<object, object>("api/assets", dialog.Product);
-                await LoadAsync();
-            }
-            catch (Exception)
-            {
-                Helpers.DialogHelper.ShowError("Unable to save changes. Please try again later.");
-            }
-            finally
-            {
-                IsLoading = false;
-            }
-        }
+        dialog.ShowDialog();
+        await LoadAsync();
     }
 
     [RelayCommand]
@@ -140,5 +111,11 @@ public partial class DashboardViewModel : ViewModelBase
                 IsLoading = false;
             }
         }
+    }
+
+    [RelayCommand]
+    private void ViewActivityLogs()
+    {
+        NavigationHelper.NavigateTo(new Views.ActivityLogView());
     }
 }

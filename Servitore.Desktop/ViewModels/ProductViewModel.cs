@@ -126,36 +126,8 @@ public partial class ProductViewModel : ViewModelBase
         {
             Owner = System.Windows.Application.Current.MainWindow
         };
-        if (dialog.ShowDialog() == true)
-        {
-            IsLoading = true;
-            try
-            {
-                var response = await _apiService.PostAsync<ProductRow, ProductRow>("api/assets", dialog.Product);
-                if (response is not null)
-                {
-                    _allProducts.Add(response);
-                    ProductsView.Refresh();
-
-                    await App.SignalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
-                    {
-                        EntityType = "Asset",
-                        Action = "Created",
-                        RecordId = response.ProductId.ToString(),
-                        DisplayName = response.ProductName,
-                        Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
-                    });
-                }
-            }
-            catch (Exception)
-            {
-                Helpers.DialogHelper.ShowError("Unable to save changes. Please try again later.");
-            }
-            finally
-            {
-                IsLoading = false;
-            }
-        }
+        dialog.ShowDialog();
+        await LoadAsync();
     }
 
     [RelayCommand]
@@ -194,15 +166,6 @@ public partial class ProductViewModel : ViewModelBase
             row.PurchaseDate = dialog.Product.PurchaseDate;
             row.ModifiedDate = dialog.Product.ModifiedDate;
             ProductsView.Refresh();
-
-            await App.SignalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
-            {
-                EntityType = "Asset",
-                Action = "Updated",
-                RecordId = row.ProductId.ToString(),
-                DisplayName = row.ProductName,
-                Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
-            });
         }
     }
 

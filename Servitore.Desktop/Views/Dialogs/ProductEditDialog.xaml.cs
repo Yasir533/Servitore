@@ -326,30 +326,7 @@ public partial class ProductEditDialog : Window
                 return false;
             }
         }
-
-        if (!string.IsNullOrEmpty(_recordKey))
-        {
-            await LockHelper.ReleaseLockAsync(_recordKey);
-            _recordKey = string.Empty;
-        }
-
-        _isDirty = false;
-        return true;
-    }
-
-    private async void SaveClose_Click(object sender, RoutedEventArgs e)
-    {
-        if (await SaveAsync())
-        {
-            _isClosingFromSave = true;
-            DialogResult = true;
-            Close();
-        }
-    }
-
-    private async void SaveNew_Click(object sender, RoutedEventArgs e)
-    {
-        if (await SaveAsync())
+        else
         {
             try
             {
@@ -364,9 +341,75 @@ public partial class ProductEditDialog : Window
                     PurchaseDate = Product.PurchaseDate
                 };
 
-                await _apiService.PostAsync<object, object>("api/assets", apiDto);
-                
+                var response = await _apiService.PostAsync<object, ProductViewModel.ProductRow>("api/assets", apiDto);
+                if (response != null)
+                {
+                    Product.ProductId = response.ProductId;
+                    Product.ModifiedDate = response.ModifiedDate;
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowValidationError($"Unable to save product: {ex.Message}");
+                return false;
+            }
+        }
+
+        if (!string.IsNullOrEmpty(_recordKey))
+        {
+            await LockHelper.ReleaseLockAsync(_recordKey);
+            _recordKey = string.Empty;
+        }
+
+        _isDirty = false;
+        return true;
+    }
+
+    private async void SaveClose_Click(object sender, RoutedEventArgs e)
+    {
+        bool isNew = Product.ProductId == 0;
+        if (await SaveAsync())
+        {
+            try
+            {
+                await App.SignalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
+                {
+                    EntityType = "Asset",
+                    Action = isNew ? "Created" : "Updated",
+                    RecordId = Product.ProductId.ToString(),
+                    DisplayName = Product.ProductName,
+                    Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
+                });
+            }
+            catch (Exception ex)
+            {
+                ClientLogger.Log("SignalR broadcast failed inside Product dialog SaveClose.", ex);
+            }
+
+            _isClosingFromSave = true;
+            DialogResult = true;
+            Close();
+        }
+    }
+
+    private async void SaveNew_Click(object sender, RoutedEventArgs e)
+    {
+        bool isNew = Product.ProductId == 0;
+        if (await SaveAsync())
+        {
+            try
+            {
+                await App.SignalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
+                {
+                    EntityType = "Asset",
+                    Action = isNew ? "Created" : "Updated",
+                    RecordId = Product.ProductId.ToString(),
+                    DisplayName = Product.ProductName,
+                    Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
+                });
+
                 // Clear fields
+                _isLoaded = false;
                 ProductNameBox.Text = string.Empty;
                 AssetCodeBox.Text = string.Empty;
                 SerialNumberBox.Text = string.Empty;
@@ -374,18 +417,18 @@ public partial class ProductEditDialog : Window
                 PurchaseDatePicker.SelectedDate = null;
                 Product = new ProductViewModel.ProductRow();
                 _isDirty = false;
+                _isLoaded = true;
+
                 ShowValidationError("Product saved successfully. Ready for the next one!");
-                
+
                 // Green banner styling
                 ErrorBanner.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(232, 245, 233));
                 ErrorBanner.BorderBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(129, 199, 132));
                 ErrorBannerText.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(46, 125, 50));
-                
-                DialogResult = true;
             }
             catch (Exception ex)
             {
-                ShowValidationError($"Unable to save product: {ex.Message}");
+                ShowValidationError($"Product saved, but error resetting: {ex.Message}");
             }
         }
     }

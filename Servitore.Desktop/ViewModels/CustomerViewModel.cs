@@ -100,36 +100,8 @@ public partial class CustomerViewModel : ViewModelBase
         {
             Owner = System.Windows.Application.Current.MainWindow
         };
-        if (dialog.ShowDialog() == true)
-        {
-            IsLoading = true;
-            try
-            {
-                var response = await _apiService.PostAsync<CustomerRow, CustomerRow>("api/customers", dialog.Customer);
-                if (response is not null)
-                {
-                    _allCustomers.Add(response);
-                    CustomersView.Refresh();
-                    
-                    await App.SignalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
-                    {
-                        EntityType = "Customer",
-                        Action = "Created",
-                        RecordId = response.CustomerId.ToString(),
-                        DisplayName = response.CustomerName,
-                        Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
-                    });
-                }
-            }
-            catch (Exception)
-            {
-                Helpers.DialogHelper.ShowError("Unable to save changes. Please try again later.");
-            }
-            finally
-            {
-                IsLoading = false;
-            }
-        }
+        dialog.ShowDialog();
+        await LoadAsync();
     }
 
     [RelayCommand]
@@ -163,15 +135,6 @@ public partial class CustomerViewModel : ViewModelBase
             row.Notes = dialog.Customer.Notes;
             row.ModifiedDate = dialog.Customer.ModifiedDate;
             CustomersView.Refresh();
-
-            await App.SignalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
-            {
-                EntityType = "Customer",
-                Action = "Updated",
-                RecordId = row.CustomerId.ToString(),
-                DisplayName = row.CustomerName,
-                Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
-            });
         }
     }
 

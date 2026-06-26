@@ -34,6 +34,14 @@ public class DashboardController : ControllerBase
                               t.Status == ServiceEntryStatus.Delivered) &&
                              t.CreatedDate.Date == today);
 
+        var todayEntriesCount = await _context.ServiceEntries
+            .CountAsync(t => t.CreatedDate.Date == today);
+
+        var onlineUsers = Servitore.API.SignalR.PresenceManager.GetConnectedUsers()
+            .Select(u => u.Username)
+            .Distinct()
+            .Count();
+
         var recentNotifications = await _context.Notifications
             .OrderByDescending(n => n.CreatedDate)
             .Take(10)
@@ -104,6 +112,8 @@ public class DashboardController : ControllerBase
             TotalProducts = totalProducts,
             OpenServiceEntries = openEntriesCount,
             ServiceEntriesResolvedToday = entriesResolvedToday,
+            TodayServiceEntries = todayEntriesCount,
+            OnlineUsers = onlineUsers,
             RecentNotifications = recentNotifications,
             RecentServiceEntries = recentEntries,
             ServiceEntryStatusCounts = entryStatusCounts,

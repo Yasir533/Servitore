@@ -152,7 +152,7 @@ public class ServiceEntryService : IServiceEntryService
                 $"Service Entry {created.ServiceEntryNumber} for Customer {customer.CustomerName}"
             );
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             // Ignore/Log errors
         }
@@ -191,7 +191,7 @@ public class ServiceEntryService : IServiceEntryService
                 $"Service Entry {entry.ServiceEntryNumber} is now {newStatus}"
             );
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             // Ignore/Log errors
         }
@@ -317,7 +317,7 @@ public class ServiceEntryService : IServiceEntryService
                 $"Service Entry {entry.ServiceEntryNumber} status: {entry.Status}"
             );
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             // Ignore/Log errors
         }
