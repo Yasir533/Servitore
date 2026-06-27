@@ -101,22 +101,38 @@
     <Style x:Key="MaterialDesignOutlinedTextBox" TargetType="TextBox" BasedOn="{StaticResource MaterialDesignOutlinedTextBox}">
         <Setter Property="FontSize" Value="14.5" />
         <Setter Property="Height" Value="42" />
-        <Setter Property="materialDesign:TextFieldAssist.TextBoxViewMargin" Value="1,4,1,4" />
+        <Setter Property="Padding" Value="12,0,12,0" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="materialDesign:TextFieldAssist.TextBoxViewMargin" Value="1,0,1,0" />
+        <Style.Triggers>
+            <Trigger Property="AcceptsReturn" Value="True">
+                <Setter Property="VerticalContentAlignment" Value="Top" />
+                <Setter Property="Padding" Value="12,8,12,8" />
+                <Setter Property="Height" Value="Auto" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <Style x:Key="MaterialDesignOutlinedComboBox" TargetType="ComboBox" BasedOn="{StaticResource MaterialDesignOutlinedComboBox}">
         <Setter Property="FontSize" Value="14.5" />
         <Setter Property="Height" Value="42" />
+        <Setter Property="Padding" Value="12,0,12,0" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
 
     <Style x:Key="MaterialDesignOutlinedDatePicker" TargetType="DatePicker" BasedOn="{StaticResource MaterialDesignOutlinedDatePicker}">
         <Setter Property="FontSize" Value="14.5" />
         <Setter Property="Height" Value="42" />
+        <Setter Property="Padding" Value="12,0,12,0" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
 
     <Style x:Key="MaterialDesignOutlinedPasswordBox" TargetType="PasswordBox" BasedOn="{StaticResource MaterialDesignOutlinedPasswordBox}">
         <Setter Property="FontSize" Value="14.5" />
         <Setter Property="Height" Value="42" />
+        <Setter Property="Padding" Value="12,0,12,0" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="materialDesign:TextFieldAssist.TextBoxViewMargin" Value="1,0,1,0" />
     </Style>
 
     <!-- Global default TextBox, ComboBox, DatePicker, PasswordBox to capture any unstyled ones -->
