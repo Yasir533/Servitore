@@ -54,7 +54,7 @@
                                 <TextBlock Text="Contact Details" Style="{StaticResource SectionHeaderText}" />
                                 <Separator Margin="0,0,0,16" />
 
-                                <Grid>
+                                <Grid TextElement.FontSize="14">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition Height="Auto" />
@@ -115,20 +115,23 @@
                 <Border Margin="0,16,0,0" Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="6">
                     <DataGrid ItemsSource="{Binding Profile.Products}" AutoGenerateColumns="False" IsReadOnly="True"
                               MouseDoubleClick="ProductsGrid_MouseDoubleClick"
-                              materialDesign:DataGridAssist.CellPadding="14 8 14 8"
-                              materialDesign:DataGridAssist.ColumnHeaderPadding="14 8 14 8">
+                              FontSize="14" RowHeight="44"
+                              materialDesign:DataGridAssist.CellPadding="16 10 16 10"
+                              materialDesign:DataGridAssist.ColumnHeaderPadding="16 10 16 10">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Product Code" Binding="{Binding ProductCode}" Width="150" />
                             <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" Width="*" />
                             <DataGridTextColumn Header="Serial Number" Binding="{Binding SerialNumber}" Width="200" />
                             <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="120" />
-                            <DataGridTemplateColumn Header="Actions" Width="100">
+                            <DataGridTemplateColumn Header="Actions" Width="110">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Button Style="{StaticResource MaterialDesignIconButton}"
                                                 Command="{Binding DataContext.ViewProductDetailsCommand,
                                                           RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                CommandParameter="{Binding}" ToolTip="View Details">
+                                                CommandParameter="{Binding}"
+                                                Width="32" Height="32" Padding="0" Margin="4,0"
+                                                ToolTip="View Details">
                                             <materialDesign:PackIcon Kind="Eye" Width="16" Height="16" />
                                         </Button>
                                     </DataTemplate>
@@ -143,8 +146,9 @@
             <TabItem Header="Service Entries">
                 <Border Margin="0,16,0,0" Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="6">
                     <DataGrid ItemsSource="{Binding Profile.ServiceEntries}" AutoGenerateColumns="False" IsReadOnly="True"
-                              materialDesign:DataGridAssist.CellPadding="14 8 14 8"
-                              materialDesign:DataGridAssist.ColumnHeaderPadding="14 8 14 8">
+                              FontSize="14" RowHeight="44"
+                              materialDesign:DataGridAssist.CellPadding="16 10 16 10"
+                              materialDesign:DataGridAssist.ColumnHeaderPadding="16 10 16 10">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Service Entry #" Binding="{Binding ServiceEntryNumber}" Width="150" />
                             <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" Width="200" />

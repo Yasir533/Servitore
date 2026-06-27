@@ -108,8 +108,9 @@ public partial class SettingsViewModel : ViewModelBase
 
             Helpers.DialogHelper.ShowInfo("Settings saved successfully.");
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            Helpers.ClientLogger.Log("Failed to save settings", ex);
             Helpers.DialogHelper.ShowError("Unable to save changes. Please try again later.");
         }
     }

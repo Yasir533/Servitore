@@ -23,7 +23,7 @@
                      <StackPanel>
                          <materialDesign:PackIcon Kind="AccountGroup" Width="36" Height="36" Foreground="#5C6BC0" Margin="0,0,0,12" />
                          <TextBlock Text="Customer Report" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,4" />
-                         <TextBlock Text="All customers with contact details" Opacity="0.55" FontSize="12" Margin="0,0,0,16" TextWrapping="Wrap" />
+                         <TextBlock Text="All customers with contact details" Opacity="0.55" FontSize="13" Margin="0,0,0,16" TextWrapping="Wrap" />
                          <StackPanel Orientation="Horizontal">
                              <Button Content="Excel" Style="{StaticResource MaterialDesignOutlinedButton}"
                                      Command="{Binding ExportCustomersExcelCommand}" Margin="0,0,8,0" />
@@ -39,7 +39,7 @@
                      <StackPanel>
                          <materialDesign:PackIcon Kind="Devices" Width="36" Height="36" Foreground="#26A69A" Margin="0,0,0,12" />
                          <TextBlock Text="Product Report" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,4" />
-                         <TextBlock Text="Full products inventory list" Opacity="0.55" FontSize="12" Margin="0,0,0,16" TextWrapping="Wrap" />
+                         <TextBlock Text="Full products inventory list" Opacity="0.55" FontSize="13" Margin="0,0,0,16" TextWrapping="Wrap" />
                          <StackPanel Orientation="Horizontal">
                              <Button Content="Excel" Style="{StaticResource MaterialDesignOutlinedButton}"
                                      Command="{Binding ExportAssetsExcelCommand}" Margin="0,0,8,0" />
@@ -55,7 +55,7 @@
                      <StackPanel>
                          <materialDesign:PackIcon Kind="TicketOutline" Width="36" Height="36" Foreground="#EF5350" Margin="0,0,0,12" />
                          <TextBlock Text="Service Entry Report" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,4" />
-                         <TextBlock Text="All service entries with status and solution details" Opacity="0.55" FontSize="12" Margin="0,0,0,16" TextWrapping="Wrap" />
+                         <TextBlock Text="All service entries with status and solution details" Opacity="0.55" FontSize="13" Margin="0,0,0,16" TextWrapping="Wrap" />
                          <StackPanel Orientation="Horizontal">
                              <Button Content="Excel" Style="{StaticResource MaterialDesignOutlinedButton}"
                                      Command="{Binding ExportTicketsExcelCommand}" Margin="0,0,8,0" />

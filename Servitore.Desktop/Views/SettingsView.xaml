@@ -139,7 +139,7 @@
                              Style="{StaticResource MaterialDesignOutlinedTextBox}"
                              Text="{Binding TicketNumberFormat}" />
                     <TextBlock Text="Tokens: {YYYY} = year, {MM} = month, {0000} = auto-increment"
-                               Opacity="0.5" FontSize="11" Margin="0,6,0,0" />
+                               Opacity="0.5" FontSize="12.5" Margin="0,6,0,0" />
                 </StackPanel>
             </Border>
 
@@ -152,7 +152,7 @@
                              Style="{StaticResource MaterialDesignOutlinedTextBox}"
                              Text="{Binding RecentlyDeletedRetentionDays, UpdateSourceTrigger=PropertyChanged}" />
                     <TextBlock Text="Standard retention period for soft-deleted records before permanent removal."
-                               Opacity="0.5" FontSize="11" Margin="0,6,0,0" />
+                               Opacity="0.5" FontSize="12.5" Margin="0,6,0,0" />
                 </StackPanel>
             </Border>
 

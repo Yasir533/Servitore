@@ -193,10 +193,10 @@
                                                             <ColumnDefinition Width="Auto" />
                                                         </Grid.ColumnDefinitions>
                                                         <StackPanel Grid.Column="0">
-                                                            <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" FontWeight="SemiBold" FontSize="12" />
-                                                            <TextBlock Text="{Binding Subtitle}" TextTrimming="CharacterEllipsis" Opacity="0.6" FontSize="10" Margin="0,2,0,0"/>
+                                                            <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" FontWeight="SemiBold" FontSize="13.5" />
+                                                            <TextBlock Text="{Binding Subtitle}" TextTrimming="CharacterEllipsis" Opacity="0.6" FontSize="11.5" Margin="0,2,0,0"/>
                                                         </StackPanel>
-                                                        <TextBlock Grid.Column="1" Text="{Binding Type}" Opacity="0.5" FontSize="10" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                                        <TextBlock Grid.Column="1" Text="{Binding Type}" Opacity="0.5" FontSize="11.5" VerticalAlignment="Center" Margin="8,0,0,0"/>
                                                     </Grid>
                                                 </Button>
                                             </DataTemplate>
@@ -245,9 +245,9 @@
                                                                 <RowDefinition Height="Auto" />
                                                                 <RowDefinition Height="Auto" />
                                                             </Grid.RowDefinitions>
-                                                            <TextBlock Text="{Binding Message}" TextWrapping="Wrap" FontSize="12" />
+                                                            <TextBlock Text="{Binding Message}" TextWrapping="Wrap" FontSize="13.5" />
                                                             <TextBlock Grid.Row="1" Text="{Binding CreatedDate, StringFormat='{}{0:dd MMM HH:mm}'}" 
-                                                                       Opacity="0.5" FontSize="10" Margin="0,4,0,0" />
+                                                                       Opacity="0.5" FontSize="11" Margin="0,4,0,0" />
                                                         </Grid>
                                                     </Border>
                                                 </DataTemplate>

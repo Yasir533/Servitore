@@ -7,7 +7,8 @@
         ResizeMode="NoResize"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         Background="{DynamicResource MaterialDesignPaper}"
-        FontFamily="{DynamicResource MaterialDesignFont}">
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        FontSize="14.5">
 
     <Grid Margin="24">
         <Grid.RowDefinitions>
@@ -25,11 +26,14 @@
 
         <!-- Warning Subtext -->
         <TextBlock Grid.Row="1" Text="Another user has updated this record while you were editing. Review the differences below:" 
-                   TextWrapping="Wrap" Opacity="0.8" Margin="0,0,0,16" />
+                    TextWrapping="Wrap" Opacity="0.8" Margin="0,0,0,16" />
 
         <!-- Differences Grid -->
         <DataGrid Grid.Row="2" x:Name="DiffsGrid" AutoGenerateColumns="False" CanUserAddRows="False" 
-                  IsReadOnly="True" HeadersVisibility="Column" Background="Transparent" BorderThickness="0">
+                  IsReadOnly="True" HeadersVisibility="Column" Background="Transparent" BorderThickness="0"
+                  FontSize="14" RowHeight="44"
+                  materialDesign:DataGridAssist.CellPadding="16 10 16 10"
+                  materialDesign:DataGridAssist.ColumnHeaderPadding="16 10 16 10">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Field" Binding="{Binding FieldName}" Width="150" FontWeight="SemiBold" />
                 <DataGridTextColumn Header="Your Value" Binding="{Binding LocalValue}" Width="*" Foreground="#EF5350" />

@@ -27,7 +27,7 @@
                                                   Foreground="#5C6BC0" Margin="0,0,0,8" />
                          <TextBlock Text="{Binding Summary.TotalCustomers}"
                                     FontSize="32" FontWeight="Bold" />
-                         <TextBlock Text="Total Customers" Opacity="0.6" FontSize="12" Margin="0,4,0,0" />
+                         <TextBlock Text="Total Customers" Opacity="0.6" FontSize="13.5" Margin="0,4,0,0" />
                      </StackPanel>
                  </Border>
  
@@ -39,7 +39,7 @@
                                                   Foreground="#26A69A" Margin="0,0,0,8" />
                          <TextBlock Text="{Binding Summary.TotalProducts}"
                                     FontSize="32" FontWeight="Bold" />
-                         <TextBlock Text="Total Products" Opacity="0.6" FontSize="12" Margin="0,4,0,0" />
+                         <TextBlock Text="Total Products" Opacity="0.6" FontSize="13.5" Margin="0,4,0,0" />
                      </StackPanel>
                  </Border>
  
@@ -51,7 +51,7 @@
                                                   Foreground="#EF5350" Margin="0,0,0,8" />
                          <TextBlock Text="{Binding Summary.TodayServiceEntries}"
                                     FontSize="32" FontWeight="Bold" />
-                         <TextBlock Text="Today's Service Entries" Opacity="0.6" FontSize="12" Margin="0,4,0,0" />
+                         <TextBlock Text="Today's Service Entries" Opacity="0.6" FontSize="13.5" Margin="0,4,0,0" />
                      </StackPanel>
                  </Border>
  
@@ -63,7 +63,7 @@
                                                   Foreground="#42A5F5" Margin="0,0,0,8" />
                          <TextBlock Text="{Binding Summary.OnlineUsers}"
                                     FontSize="32" FontWeight="Bold" />
-                         <TextBlock Text="Online Users" Opacity="0.6" FontSize="12" Margin="0,4,0,0" />
+                         <TextBlock Text="Online Users" Opacity="0.6" FontSize="13.5" Margin="0,4,0,0" />
                      </StackPanel>
                  </Border>
  
@@ -117,8 +117,9 @@
                      <TextBlock Text="Recent Service Entries" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,12" />
                      <Border Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="6" Height="300">
                          <DataGrid ItemsSource="{Binding Summary.RecentServiceEntries}" AutoGenerateColumns="False" IsReadOnly="True"
-                                   materialDesign:DataGridAssist.CellPadding="12 8 12 8"
-                                   materialDesign:DataGridAssist.ColumnHeaderPadding="12 8 12 8">
+                                   FontSize="14" RowHeight="44"
+                                   materialDesign:DataGridAssist.CellPadding="16 10 16 10"
+                                   materialDesign:DataGridAssist.ColumnHeaderPadding="16 10 16 10">
                              <DataGrid.Columns>
                                  <DataGridTextColumn Header="Entry #" Binding="{Binding ServiceEntryNumber}" Width="110" />
                                  <DataGridTextColumn Header="Customer" Binding="{Binding CustomerName}" Width="*" />
@@ -137,7 +138,7 @@
                          <Grid>
                              <!-- Empty state when no activities -->
                              <TextBlock Text="No recent activities."
-                                        Opacity="0.45" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Opacity="0.45" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"
                                         Visibility="{Binding HasNoActivities, Converter={StaticResource BooleanToVisibilityConverter}}" />
  
                              <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding HasNoActivities, Converter={StaticResource InverseBooleanConverter}}">
@@ -156,16 +157,16 @@
                                                      <materialDesign:PackIcon Kind="FlashOutline" Foreground="#FFB300" Width="16" Height="16" VerticalAlignment="Center" Margin="0,0,8,0" />
  
                                                      <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                                         <TextBlock FontSize="12" TextWrapping="Wrap">
+                                                         <TextBlock FontSize="13.5" TextWrapping="Wrap">
                                                              <Run Text="{Binding UserName, Mode=OneWay}" FontWeight="SemiBold" />
                                                              <Run Text=" " />
                                                              <Run Text="{Binding Action, Mode=OneWay}" />
                                                          </TextBlock>
-                                                         <TextBlock Text="{Binding Module}" FontSize="10" Opacity="0.55" Margin="0,2,0,0" />
+                                                         <TextBlock Text="{Binding Module}" FontSize="11" Opacity="0.55" Margin="0,2,0,0" />
                                                      </StackPanel>
  
                                                      <TextBlock Grid.Column="2" Text="{Binding DateTime, StringFormat='{}{0:HH:mm:ss}'}"
-                                                                Opacity="0.5" FontSize="10" VerticalAlignment="Center" Margin="8,0,0,0" />
+                                                                Opacity="0.5" FontSize="11" VerticalAlignment="Center" Margin="8,0,0,0" />
                                                  </Grid>
                                              </Border>
                                          </DataTemplate>

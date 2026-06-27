@@ -54,7 +54,7 @@
                                 <TextBlock Text="Product Specifications" Style="{StaticResource SectionHeaderText}" />
                                 <Separator Margin="0,0,0,16" />
 
-                                <Grid>
+                                <Grid TextElement.FontSize="14">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition Height="Auto" />
@@ -119,25 +119,30 @@
 
                     <Border Grid.Row="1" Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="6">
                         <DataGrid ItemsSource="{Binding Profile.Documents}" AutoGenerateColumns="False" IsReadOnly="True"
-                                  materialDesign:DataGridAssist.CellPadding="14 8 14 8"
-                                  materialDesign:DataGridAssist.ColumnHeaderPadding="14 8 14 8">
+                                  FontSize="14" RowHeight="44"
+                                  materialDesign:DataGridAssist.CellPadding="16 10 16 10"
+                                  materialDesign:DataGridAssist.ColumnHeaderPadding="16 10 16 10">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="File Name" Binding="{Binding FileName}" Width="*" />
                                 <DataGridTextColumn Header="Uploaded Date" Binding="{Binding UploadedDate, StringFormat='{}{0:dd MMM yyyy HH:mm}'}" Width="200" />
-                                <DataGridTemplateColumn Header="Actions" Width="130">
+                                <DataGridTemplateColumn Header="Actions" Width="110">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal">
                                                 <Button Style="{StaticResource MaterialDesignIconButton}"
                                                         Command="{Binding DataContext.DownloadDocumentCommand,
                                                                   RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                                        CommandParameter="{Binding}" ToolTip="Download File">
+                                                        CommandParameter="{Binding}"
+                                                        Width="32" Height="32" Padding="0" Margin="4,0"
+                                                        ToolTip="Download File">
                                                     <materialDesign:PackIcon Kind="Download" Width="16" Height="16" />
                                                 </Button>
                                                 <Button Style="{StaticResource MaterialDesignIconButton}"
                                                         Command="{Binding DataContext.DeleteDocumentCommand,
                                                                   RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                                        CommandParameter="{Binding}" ToolTip="Delete File"
+                                                        CommandParameter="{Binding}"
+                                                        Width="32" Height="32" Padding="0" Margin="4,0"
+                                                        ToolTip="Delete File"
                                                         Foreground="{DynamicResource MaterialDesignValidationErrorBrush}">
                                                     <materialDesign:PackIcon Kind="Delete" Width="16" Height="16" />
                                                 </Button>
@@ -155,8 +160,9 @@
             <TabItem Header="Service Entries">
                 <Border Margin="0,16,0,0" Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="6">
                     <DataGrid ItemsSource="{Binding Profile.ServiceEntries}" AutoGenerateColumns="False" IsReadOnly="True"
-                              materialDesign:DataGridAssist.CellPadding="14 8 14 8"
-                              materialDesign:DataGridAssist.ColumnHeaderPadding="14 8 14 8">
+                              FontSize="14" RowHeight="44"
+                              materialDesign:DataGridAssist.CellPadding="16 10 16 10"
+                              materialDesign:DataGridAssist.ColumnHeaderPadding="16 10 16 10">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Service Entry #" Binding="{Binding ServiceEntryNumber}" Width="150" />
                             <DataGridTextColumn Header="Problem Description" Binding="{Binding ProblemDescription}" Width="*" />
