@@ -36,13 +36,39 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll() => Ok(await _userService.GetAllAsync());
+    public async Task<IActionResult> GetAll()
+    {
+        var users = await _userService.GetAllAsync();
+        var dtos = users.Select(u => new
+        {
+            u.Id,
+            u.Username,
+            u.FullName,
+            u.Email,
+            u.PhoneNumber,
+            RoleName = u.Role?.RoleName,
+            u.IsActive
+        }).ToList();
+        return Ok(dtos);
+    }
 
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)
     {
         var user = await _userService.GetByIdAsync(id);
-        return user is null ? NotFound() : Ok(user);
+        if (user is null) return NotFound();
+
+        var dto = new
+        {
+            user.Id,
+            user.Username,
+            user.FullName,
+            user.Email,
+            user.PhoneNumber,
+            RoleName = user.Role?.RoleName,
+            user.IsActive
+        };
+        return Ok(dto);
     }
 
     [HttpPost]

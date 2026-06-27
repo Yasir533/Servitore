@@ -28,10 +28,40 @@ public class ServiceEntriesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll() => Ok(await _entryService.GetAllAsync());
+    public async Task<IActionResult> GetAll()
+    {
+        var entries = await _entryService.GetAllAsync();
+        var dtos = entries.Select(e => new
+        {
+            e.ServiceEntryId,
+            e.ServiceEntryNumber,
+            CustomerName = e.Customer?.CustomerName,
+            AssetName = e.Asset?.ProductName,
+            e.ProblemDescription,
+            Priority = e.Priority.ToString(),
+            Status = e.Status.ToString(),
+            e.CreatedDate
+        }).ToList();
+        return Ok(dtos);
+    }
 
     [HttpGet("open")]
-    public async Task<IActionResult> GetOpen() => Ok(await _entryService.GetOpenAsync());
+    public async Task<IActionResult> GetOpen()
+    {
+        var entries = await _entryService.GetOpenAsync();
+        var dtos = entries.Select(e => new
+        {
+            e.ServiceEntryId,
+            e.ServiceEntryNumber,
+            CustomerName = e.Customer?.CustomerName,
+            AssetName = e.Asset?.ProductName,
+            e.ProblemDescription,
+            Priority = e.Priority.ToString(),
+            Status = e.Status.ToString(),
+            e.CreatedDate
+        }).ToList();
+        return Ok(dtos);
+    }
 
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)
