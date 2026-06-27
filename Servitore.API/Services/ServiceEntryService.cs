@@ -19,6 +19,7 @@ public interface IServiceEntryService
     Task<ServiceEntry> CreateAsync(ServiceEntryDto dto, int createdByUserId);
     Task UpdateStatusAsync(int entryId, ServiceEntryStatus newStatus, string updatedBy, string? remarks);
     Task<ServiceEntry> UpdateAsync(int entryId, ServiceEntryDto dto, string updatedBy);
+    Task DeleteAsync(int id);
 }
 
 public class ServiceEntryService : IServiceEntryService
@@ -324,6 +325,8 @@ public class ServiceEntryService : IServiceEntryService
 
         return entry;
     }
+
+    public Task DeleteAsync(int id) => _repository.DeleteAsync(id);
 
     private static string GenerateEntryNumber() =>
         $"SVT-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString("N")[..6].ToUpper()}";

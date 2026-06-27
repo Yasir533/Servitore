@@ -143,6 +143,19 @@
                 </StackPanel>
             </Border>
 
+            <!-- Data Retention Settings -->
+            <Border Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="6"
+                    Padding="24" Margin="0,0,0,24">
+                <StackPanel>
+                    <TextBlock Text="Data Retention Settings" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,16" />
+                    <TextBox materialDesign:HintAssist.Hint="Recently Deleted Retention Period (Days)"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             Text="{Binding RecentlyDeletedRetentionDays, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Text="Standard retention period for soft-deleted records before permanent removal."
+                               Opacity="0.5" FontSize="11" Margin="0,6,0,0" />
+                </StackPanel>
+            </Border>
+
             <Button Content="Save Settings"
                     Style="{StaticResource MaterialDesignRaisedButton}"
                     Command="{Binding SaveCommand}"

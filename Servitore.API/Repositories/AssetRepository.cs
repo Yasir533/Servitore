@@ -24,8 +24,13 @@ public interface IAssetRepository
 public class AssetRepository : IAssetRepository
 {
     private readonly AppDbContext _context;
+    private readonly ICurrentUserService? _currentUserService;
 
-    public AssetRepository(AppDbContext context) => _context = context;
+    public AssetRepository(AppDbContext context, ICurrentUserService? currentUserService = null)
+    {
+        _context = context;
+        _currentUserService = currentUserService;
+    }
 
     public Task<Asset?> GetByIdAsync(int id) =>
         _context.Assets.Include(a => a.Customer)
@@ -58,7 +63,9 @@ public class AssetRepository : IAssetRepository
     {
         var asset = await _context.Assets.FindAsync(id);
         if (asset is null) return;
-        _context.Assets.Remove(asset);
+        asset.IsDeleted = true;
+        asset.DeletedDate = DateTime.UtcNow;
+        asset.DeletedBy = _currentUserService?.GetCurrentUsername() ?? "System";
         await _context.SaveChangesAsync();
     }
 

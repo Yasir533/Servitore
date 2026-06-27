@@ -227,6 +227,14 @@ public class ServiceEntriesController : ControllerBase
         return NoContent();
     }
 
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        await _entryService.DeleteAsync(id);
+        await _activityLogService.LogActivityAsync($"Deleted Service Entry ID: {id}", "ServiceEntries", HttpContext);
+        return NoContent();
+    }
+
     public class UpdateStatusRequest
     {
         public ServiceEntryStatus Status { get; set; }

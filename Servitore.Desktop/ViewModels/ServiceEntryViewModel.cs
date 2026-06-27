@@ -204,6 +204,42 @@ public partial class ServiceEntryViewModel : ViewModelBase, IDisposable
         }
     }
 
+    [RelayCommand]
+    private async Task DeleteServiceEntry(ServiceEntryRow? row)
+    {
+        if (row is null) return;
+        if (!Helpers.DialogHelper.Confirm($"Are you sure you want to delete service entry {row.ServiceEntryNumber}?\n\nThe record will be moved to Recently Deleted and can be restored within the configured retention period before being permanently removed.", "Confirm Delete")) return;
+
+        IsLoading = true;
+        using (App.SignalRService.GetBusyScope())
+        {
+            try
+            {
+                var id = row.ServiceEntryId;
+                var num = row.ServiceEntryNumber;
+                await _apiService.DeleteAsync($"api/serviceentries/{row.ServiceEntryId}");
+                _allEntries.Remove(row);
+
+                await _signalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
+                {
+                    EntityType = "ServiceEntry",
+                    Action = "Deleted",
+                    RecordId = id.ToString(),
+                    DisplayName = num,
+                    Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
+                });
+            }
+            catch (Exception)
+            {
+                Helpers.DialogHelper.ShowError("Unable to delete service entry. Please try again later.");
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+    }
+
     public class ServiceEntryRow
     {
         public int ServiceEntryId { get; set; }

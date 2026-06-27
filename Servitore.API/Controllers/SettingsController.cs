@@ -37,7 +37,8 @@ public class SettingsController : ControllerBase
             SmtpFromAddress = settingsList.FirstOrDefault(s => s.Key == "SmtpFromAddress")?.Value,
             SmtpFromName = settingsList.FirstOrDefault(s => s.Key == "SmtpFromName")?.Value,
             SmtpUsername = settingsList.FirstOrDefault(s => s.Key == "SmtpUsername")?.Value,
-            TicketNumberFormat = settingsList.FirstOrDefault(s => s.Key == "TicketNumberFormat")?.Value
+            TicketNumberFormat = settingsList.FirstOrDefault(s => s.Key == "TicketNumberFormat")?.Value,
+            RecentlyDeletedRetentionDays = int.TryParse(settingsList.FirstOrDefault(s => s.Key == "RecentlyDeletedRetentionDays")?.Value, out var rdDays) ? rdDays : 10
         };
         return Ok(dto);
     }
@@ -81,6 +82,7 @@ public class SettingsController : ControllerBase
         SaveSetting("SmtpFromName", dto.SmtpFromName);
         SaveSetting("SmtpUsername", dto.SmtpUsername);
         SaveSetting("TicketNumberFormat", dto.TicketNumberFormat);
+        SaveSetting("RecentlyDeletedRetentionDays", dto.RecentlyDeletedRetentionDays?.ToString() ?? "10");
 
         await _context.SaveChangesAsync();
         await _activityLogService.LogActivityAsync("Updated system settings", "Settings", HttpContext);
@@ -125,4 +127,5 @@ public class SettingsDto
     public string? SmtpFromName { get; set; }
     public string? SmtpUsername { get; set; }
     public string? TicketNumberFormat { get; set; }
+    public int? RecentlyDeletedRetentionDays { get; set; }
 }

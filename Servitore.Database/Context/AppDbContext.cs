@@ -57,6 +57,11 @@ public class AppDbContext : DbContext
             new Role { RoleId = 4, RoleName = "Operator" }
         );
 
+        // Soft delete query filters
+        modelBuilder.Entity<Customer>().HasQueryFilter(c => !c.IsDeleted);
+        modelBuilder.Entity<Asset>().HasQueryFilter(a => !a.IsDeleted);
+        modelBuilder.Entity<ServiceEntry>().HasQueryFilter(e => !e.IsDeleted);
+
         base.OnModelCreating(modelBuilder);
     }
 

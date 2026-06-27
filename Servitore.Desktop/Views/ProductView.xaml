@@ -62,26 +62,32 @@
                     <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" Width="*" />
                     <DataGridTextColumn Header="Serial No."   Binding="{Binding SerialNumber}" Width="150" />
                     <DataGridTextColumn Header="Customer"     Binding="{Binding CustomerName}" Width="180" />
-                    <DataGridTemplateColumn Header="Actions" Width="130">
+                    <DataGridTemplateColumn Header="Actions" Width="140">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
                                     <Button Style="{StaticResource MaterialDesignIconButton}"
                                              Command="{Binding DataContext.ViewProfileCommand,
                                                        RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                             CommandParameter="{Binding}" ToolTip="View Details">
+                                             CommandParameter="{Binding}"
+                                             Width="32" Height="32" Padding="0" Margin="4,0"
+                                             ToolTip="View Details">
                                         <materialDesign:PackIcon Kind="Eye" Width="16" Height="16" />
                                     </Button>
                                     <Button Style="{StaticResource MaterialDesignIconButton}"
                                              Command="{Binding DataContext.EditProductCommand,
                                                        RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                             CommandParameter="{Binding}" ToolTip="Edit">
+                                             CommandParameter="{Binding}"
+                                             Width="32" Height="32" Padding="0" Margin="4,0"
+                                             ToolTip="Edit">
                                         <materialDesign:PackIcon Kind="Pencil" Width="16" Height="16" />
                                     </Button>
                                     <Button Style="{StaticResource MaterialDesignIconButton}"
                                              Command="{Binding DataContext.DeleteProductCommand,
                                                        RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                             CommandParameter="{Binding}" ToolTip="Delete"
+                                             CommandParameter="{Binding}"
+                                             Width="32" Height="32" Padding="0" Margin="4,0"
+                                             ToolTip="Delete"
                                              Foreground="{DynamicResource MaterialDesignValidationErrorBrush}">
                                         <materialDesign:PackIcon Kind="Delete" Width="16" Height="16" />
                                     </Button>

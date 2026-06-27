@@ -53,7 +53,7 @@
                     <DataGridTextColumn Header="Mobile"       Binding="{Binding Mobile}"        Width="130" />
                     <DataGridTextColumn Header="Email"        Binding="{Binding Email}"         Width="200" />
                     <DataGridTextColumn Header="Address"      Binding="{Binding Address}"       Width="220" />
-                    <DataGridTemplateColumn Header="Actions"  Width="130">
+                    <DataGridTemplateColumn Header="Actions"  Width="140">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
@@ -61,6 +61,7 @@
                                             Command="{Binding DataContext.ViewProfileCommand,
                                                       RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                             CommandParameter="{Binding}"
+                                            Width="32" Height="32" Padding="0" Margin="4,0"
                                             ToolTip="View Profile">
                                         <materialDesign:PackIcon Kind="CardAccountDetails" Width="16" Height="16" />
                                     </Button>
@@ -68,6 +69,7 @@
                                             Command="{Binding DataContext.EditCustomerCommand,
                                                       RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                             CommandParameter="{Binding}"
+                                            Width="32" Height="32" Padding="0" Margin="4,0"
                                             ToolTip="Edit">
                                         <materialDesign:PackIcon Kind="Pencil" Width="16" Height="16" />
                                     </Button>
@@ -75,6 +77,7 @@
                                             Command="{Binding DataContext.DeleteCustomerCommand,
                                                       RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                             CommandParameter="{Binding}"
+                                            Width="32" Height="32" Padding="0" Margin="4,0"
                                             ToolTip="Delete" Foreground="{DynamicResource MaterialDesignValidationErrorBrush}">
                                         <materialDesign:PackIcon Kind="Delete" Width="16" Height="16" />
                                     </Button>

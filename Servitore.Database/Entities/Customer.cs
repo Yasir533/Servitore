@@ -1,6 +1,6 @@
 namespace Servitore.Database.Entities;
 
-public class Customer : IAuditable
+public class Customer : IAuditable, ISoftDeletable
 {
     public int CustomerId { get; set; }
     public string CustomerName { get; set; } = string.Empty;
@@ -15,6 +15,11 @@ public class Customer : IAuditable
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
     public string? ModifiedBy { get; set; }
     public DateTime? ModifiedDate { get; set; }
+
+    // Soft Delete fields
+    public bool IsDeleted { get; set; }
+    public DateTime? DeletedDate { get; set; }
+    public string? DeletedBy { get; set; }
 
     public ICollection<Asset> Assets { get; set; } = new List<Asset>();
     public ICollection<ServiceEntry> ServiceEntries { get; set; } = new List<ServiceEntry>();

@@ -2,7 +2,7 @@ using Servitore.Shared.Enums;
 
 namespace Servitore.Database.Entities;
 
-public class Asset : IAuditable
+public class Asset : IAuditable, ISoftDeletable
 {
     public int AssetId { get; set; }
     public string AssetCode { get; set; } = string.Empty;
@@ -22,6 +22,11 @@ public class Asset : IAuditable
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
     public string? ModifiedBy { get; set; }
     public DateTime? ModifiedDate { get; set; }
+
+    // Soft Delete fields
+    public bool IsDeleted { get; set; }
+    public DateTime? DeletedDate { get; set; }
+    public string? DeletedBy { get; set; }
 
     public Customer? Customer { get; set; }
     public ICollection<ServiceEntry> ServiceEntries { get; set; } = new List<ServiceEntry>();

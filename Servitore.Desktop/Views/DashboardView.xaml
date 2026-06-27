@@ -124,6 +124,15 @@
                         </StackPanel>
                     </Button>
 
+                    <Button x:Name="RecentlyDeletedBtn" Style="{StaticResource SidebarNavButton}"
+                            Click="NavButton_Click" Tag="RecentlyDeleted">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="DeleteSweep" Width="18" Height="18"
+                                                     VerticalAlignment="Center" Margin="0,0,14,0" />
+                            <TextBlock Text="Recently Deleted" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+
                 </StackPanel>
 
             </DockPanel>

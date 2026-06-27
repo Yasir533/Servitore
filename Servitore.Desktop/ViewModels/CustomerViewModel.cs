@@ -138,7 +138,7 @@ public partial class CustomerViewModel : ViewModelBase, IDisposable
     private async Task DeleteCustomer(CustomerRow? row)
     {
         if (row is null) return;
-        if (!Helpers.DialogHelper.Confirm($"Are you sure you want to delete {row.CustomerName}?", "Confirm Delete")) return;
+        if (!Helpers.DialogHelper.Confirm($"Are you sure you want to delete {row.CustomerName}?\n\nThe record will be moved to Recently Deleted and can be restored within the configured retention period before being permanently removed.", "Confirm Delete")) return;
         
         IsLoading = true;
         using (App.SignalRService.GetBusyScope())

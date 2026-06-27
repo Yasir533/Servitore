@@ -18,8 +18,13 @@ public interface ICustomerRepository
 public class CustomerRepository : ICustomerRepository
 {
     private readonly AppDbContext _context;
+    private readonly ICurrentUserService? _currentUserService;
 
-    public CustomerRepository(AppDbContext context) => _context = context;
+    public CustomerRepository(AppDbContext context, ICurrentUserService? currentUserService = null)
+    {
+        _context = context;
+        _currentUserService = currentUserService;
+    }
 
     public Task<Customer?> GetByIdAsync(int id) =>
         _context.Customers.FirstOrDefaultAsync(c => c.CustomerId == id);
@@ -54,7 +59,9 @@ public class CustomerRepository : ICustomerRepository
     {
         var customer = await _context.Customers.FindAsync(id);
         if (customer is null) return;
-        _context.Customers.Remove(customer);
+        customer.IsDeleted = true;
+        customer.DeletedDate = DateTime.UtcNow;
+        customer.DeletedBy = _currentUserService?.GetCurrentUsername() ?? "System";
         await _context.SaveChangesAsync();
     }
 

@@ -35,6 +35,7 @@ public partial class DashboardView : UserControl
         {
             UsersBtn.Visibility = Visibility.Collapsed;
             SettingsBtn.Visibility = Visibility.Collapsed;
+            RecentlyDeletedBtn.Visibility = Visibility.Collapsed;
         }
 
         if (role != Servitore.Shared.Enums.UserRole.Admin)
@@ -179,6 +180,7 @@ public partial class DashboardView : UserControl
                 "ActivityLogs"   => new ActivityLogView(),
                 "Settings"       => new SettingsView(),
                 "LiveUsers"      => new LiveUsersView(),
+                "RecentlyDeleted"=> new RecentlyDeletedView(),
                 _                => new CustomerView()
             };
 

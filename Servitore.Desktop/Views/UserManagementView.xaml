@@ -53,20 +53,24 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="Actions" Width="100">
+                    <DataGridTemplateColumn Header="Actions" Width="110">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
                                     <Button Style="{StaticResource MaterialDesignIconButton}"
-                                            Command="{Binding DataContext.EditUserCommand,
-                                                      RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                            CommandParameter="{Binding}" ToolTip="Edit">
+                                             Command="{Binding DataContext.EditUserCommand,
+                                                       RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                             CommandParameter="{Binding}"
+                                             Width="32" Height="32" Padding="0" Margin="4,0"
+                                             ToolTip="Edit">
                                         <materialDesign:PackIcon Kind="Pencil" Width="16" Height="16" />
                                     </Button>
                                     <Button Style="{StaticResource MaterialDesignIconButton}"
-                                            Command="{Binding DataContext.ToggleActiveCommand,
-                                                      RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                            CommandParameter="{Binding}" ToolTip="Toggle Active">
+                                             Command="{Binding DataContext.ToggleActiveCommand,
+                                                       RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                             CommandParameter="{Binding}"
+                                             Width="32" Height="32" Padding="0" Margin="4,0"
+                                             ToolTip="Toggle Active">
                                         <materialDesign:PackIcon Kind="AccountOff" Width="16" Height="16" />
                                     </Button>
                                 </StackPanel>

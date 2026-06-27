@@ -12,13 +12,19 @@ public interface IServiceEntryRepository
     Task<List<ServiceEntry>> GetOpenEntriesAsync();
     Task<ServiceEntry> AddAsync(ServiceEntry entry);
     Task UpdateAsync(ServiceEntry entry);
+    Task DeleteAsync(int id);
 }
 
 public class ServiceEntryRepository : IServiceEntryRepository
 {
     private readonly AppDbContext _context;
+    private readonly ICurrentUserService? _currentUserService;
 
-    public ServiceEntryRepository(AppDbContext context) => _context = context;
+    public ServiceEntryRepository(AppDbContext context, ICurrentUserService? currentUserService = null)
+    {
+        _context = context;
+        _currentUserService = currentUserService;
+    }
 
     public Task<ServiceEntry?> GetByIdAsync(int id) =>
         _context.ServiceEntries
@@ -54,6 +60,16 @@ public class ServiceEntryRepository : IServiceEntryRepository
     public async Task UpdateAsync(ServiceEntry entry)
     {
         _context.ServiceEntries.Update(entry);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        var entry = await _context.ServiceEntries.FindAsync(id);
+        if (entry is null) return;
+        entry.IsDeleted = true;
+        entry.DeletedDate = DateTime.UtcNow;
+        entry.DeletedBy = _currentUserService?.GetCurrentUsername() ?? "System";
         await _context.SaveChangesAsync();
     }
 }

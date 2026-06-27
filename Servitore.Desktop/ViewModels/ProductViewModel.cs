@@ -169,7 +169,7 @@ public partial class ProductViewModel : ViewModelBase, IDisposable
     private async Task DeleteProduct(ProductRow? row)
     {
         if (row is null) return;
-        if (!Helpers.DialogHelper.Confirm($"Are you sure you want to delete product {row.ProductCode}?", "Confirm Delete")) return;
+        if (!Helpers.DialogHelper.Confirm($"Are you sure you want to delete product {row.ProductCode}?\n\nThe record will be moved to Recently Deleted and can be restored within the configured retention period before being permanently removed.", "Confirm Delete")) return;
 
         IsLoading = true;
         using (App.SignalRService.GetBusyScope())

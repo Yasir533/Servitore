@@ -21,6 +21,7 @@ public partial class SettingsViewModel : ViewModelBase
     [ObservableProperty] private string smtpUsername = string.Empty;
 
     [ObservableProperty] private string ticketNumberFormat = "TKT-{YYYY}-{0000}";
+    [ObservableProperty] private string recentlyDeletedRetentionDays = "10";
 
     [ObservableProperty] private string waPhoneNumber = string.Empty;
     [ObservableProperty] private string waApiKey = string.Empty;
@@ -49,6 +50,7 @@ public partial class SettingsViewModel : ViewModelBase
                 SmtpUsername    = settings.SmtpUsername ?? string.Empty;
 
                 TicketNumberFormat = settings.TicketNumberFormat ?? "TKT-{YYYY}-{0000}";
+                RecentlyDeletedRetentionDays = settings.RecentlyDeletedRetentionDays?.ToString() ?? "10";
             }
         }
         catch (Exception ex)
@@ -91,7 +93,8 @@ public partial class SettingsViewModel : ViewModelBase
                 SmtpFromAddress = SmtpFromAddress,
                 SmtpFromName   = SmtpFromName,
                 SmtpUsername   = SmtpUsername,
-                TicketNumberFormat = TicketNumberFormat
+                TicketNumberFormat = TicketNumberFormat,
+                RecentlyDeletedRetentionDays = int.TryParse(RecentlyDeletedRetentionDays, out var rd) ? rd : 10
             };
             await _apiService.PutAsync("api/settings", dto);
 
@@ -124,6 +127,7 @@ public partial class SettingsViewModel : ViewModelBase
         public string? SmtpFromName { get; set; }
         public string? SmtpUsername { get; set; }
         public string? TicketNumberFormat { get; set; }
+        public int? RecentlyDeletedRetentionDays { get; set; }
     }
 
     private class WhatsAppSettingsDto
