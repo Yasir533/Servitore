@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         Title="Concurrency Conflict" Height="400" Width="600"
+        Icon="pack://application:,,,/Assets/Icons/logo.ico"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"

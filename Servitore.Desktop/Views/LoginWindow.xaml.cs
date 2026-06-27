@@ -147,7 +147,8 @@ public partial class LoginWindow : Window
         {
             Title = "Servitore - Dashboard",
             Content = dashboard,
-            WindowState = WindowState.Maximized
+            WindowState = WindowState.Maximized,
+            Icon = new System.Windows.Media.Imaging.BitmapImage(new Uri("pack://application:,,,/Assets/Icons/logo.ico", UriKind.Absolute))
         };
         Application.Current.MainWindow = mainWindow;
         mainWindow.Show();

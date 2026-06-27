@@ -28,4 +28,10 @@
     <ProjectReference Include="..\Servitore.Reports\Servitore.Reports.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="databaseSettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

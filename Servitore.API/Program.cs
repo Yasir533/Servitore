@@ -11,11 +11,36 @@ using Servitore.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Load optional databaseSettings.json file
+builder.Configuration.AddJsonFile("databaseSettings.json", optional: true, reloadOnChange: true);
+
 // Startup Configuration Validation
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+string? connectionString;
+var dbSettings = builder.Configuration.GetSection("DatabaseSettings");
+if (dbSettings.Exists() && !string.IsNullOrWhiteSpace(dbSettings["Server"]) && !string.IsNullOrWhiteSpace(dbSettings["Database"]))
+{
+    var server = dbSettings["Server"];
+    var database = dbSettings["Database"];
+    var username = dbSettings["Username"];
+    var password = dbSettings["Password"];
+
+    if (string.IsNullOrWhiteSpace(username))
+    {
+        connectionString = $"Server={server};Database={database};Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=True;";
+    }
+    else
+    {
+        connectionString = $"Server={server};Database={database};User Id={username};Password={password};TrustServerCertificate=True;MultipleActiveResultSets=True;";
+    }
+}
+else
+{
+    connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+}
+
 if (string.IsNullOrWhiteSpace(connectionString))
 {
-    throw new InvalidOperationException("CRITICAL CONFIGURATION ERROR: ConnectionStrings:DefaultConnection is missing or empty.");
+    throw new InvalidOperationException("CRITICAL CONFIGURATION ERROR: Connection string is missing or empty. Please configure databaseSettings.json or ConnectionStrings:DefaultConnection in appsettings.json.");
 }
 
 var jwtKey = builder.Configuration["Jwt:Key"];

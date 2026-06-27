@@ -7,6 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>Servitore.Desktop</RootNamespace>
+    <ApplicationIcon>Assets\Icons\logo.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>

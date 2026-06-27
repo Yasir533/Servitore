@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         Title="Service Entry Details" Height="780" Width="1080"
+        Icon="pack://application:,,,/Assets/Icons/logo.ico"
         WindowStartupLocation="CenterOwner"
         ResizeMode="CanResize"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"

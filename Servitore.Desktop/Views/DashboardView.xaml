@@ -19,20 +19,31 @@
 
                 <!-- Brand header -->
                 <Border DockPanel.Dock="Top"
-                        Padding="20,24,20,20"
+                        Padding="16,20"
                         BorderBrush="#2C3E50"
                         BorderThickness="0,0,0,1">
-                    <StackPanel>
-                        <TextBlock Text="SERVITORE"
-                                   FontSize="18"
-                                   FontWeight="Bold"
-                                   Foreground="White" />
-                        <TextBlock Text="Service Management"
-                                   FontSize="10"
-                                   Opacity="0.45"
-                                   Foreground="White"
-                                   Margin="0,3,0,0" />
-                    </StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Image Source="pack://application:,,,/Assets/Images/logo.png"
+                               Height="36" Width="36"
+                               VerticalAlignment="Center"
+                               Margin="0,0,12,0"
+                               Stretch="Uniform" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="SERVITORE"
+                                       FontSize="18"
+                                       FontWeight="Bold"
+                                       Foreground="White" />
+                            <TextBlock Text="Service Management"
+                                       FontSize="9"
+                                       Opacity="0.45"
+                                       Foreground="White"
+                                       Margin="0,2,0,0" />
+                        </StackPanel>
+                    </Grid>
                 </Border>
 
                 <!-- Nav buttons -->
