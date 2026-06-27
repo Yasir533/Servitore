@@ -17,7 +17,10 @@ builder.Configuration.AddJsonFile("databaseSettings.json", optional: true, reloa
 // Startup Configuration Validation
 string? connectionString;
 var dbSettings = builder.Configuration.GetSection("DatabaseSettings");
-if (dbSettings.Exists() && !string.IsNullOrWhiteSpace(dbSettings["Server"]) && !string.IsNullOrWhiteSpace(dbSettings["Database"]))
+if (dbSettings.Exists() && 
+    !string.IsNullOrWhiteSpace(dbSettings["Server"]) && 
+    dbSettings["Server"] != "PRODUCTION_DATABASE_SERVER" && 
+    !string.IsNullOrWhiteSpace(dbSettings["Database"]))
 {
     var server = dbSettings["Server"];
     var database = dbSettings["Database"];
