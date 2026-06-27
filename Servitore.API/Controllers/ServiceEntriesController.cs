@@ -94,6 +94,21 @@ public class ServiceEntriesController : ControllerBase
             CreatedBy = entry.CreatedByUserId,
             CreatedByUserName = entry.CreatedByUser?.FullName ?? string.Empty,
             CreatedDate = entry.CreatedDate,
+
+            ContactPerson = entry.ContactPerson,
+            ContactNumber = entry.ContactNumber,
+            ServiceType = entry.ServiceType,
+            CallType = entry.CallType,
+            SubCallType = entry.SubCallType,
+            AgreementNumber = entry.AgreementNumber,
+            InvoiceNumber = entry.InvoiceNumber,
+            IsChargeable = entry.IsChargeable,
+            ComplaintMode = entry.ComplaintMode,
+            PendingForDocuments = entry.PendingForDocuments,
+            TomorrowDays = entry.TomorrowDays,
+            IsTomorrow = entry.IsTomorrow,
+            ApproximateCharges = entry.ApproximateCharges,
+            CustodyComponentsJson = entry.CustodyComponentsJson,
             History = entry.History.OrderByDescending(h => h.UpdatedDate).Select(h => new ServiceEntryHistoryDto
             {
                 Id = h.HistoryId,

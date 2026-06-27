@@ -16,6 +16,22 @@ public class ServiceEntry : IAuditable, ISoftDeletable
     public string? AccessoriesReceived { get; set; }
     public string? Solution { get; set; }
     
+    // Upgraded Service Register fields
+    public string? ContactPerson { get; set; }
+    public string? ContactNumber { get; set; }
+    public string? ServiceType { get; set; } = "InHouse";
+    public string? CallType { get; set; } = "OOW";
+    public string? SubCallType { get; set; }
+    public string? AgreementNumber { get; set; }
+    public string? InvoiceNumber { get; set; }
+    public bool IsChargeable { get; set; } = true;
+    public string? ComplaintMode { get; set; } = "Phone";
+    public bool PendingForDocuments { get; set; }
+    public int TomorrowDays { get; set; } = 1;
+    public bool IsTomorrow { get; set; }
+    public decimal? ApproximateCharges { get; set; }
+    public string? CustodyComponentsJson { get; set; }
+    
     // Relationship properties
     public int CreatedByUserId { get; set; }
     public User? CreatedByUser { get; set; }

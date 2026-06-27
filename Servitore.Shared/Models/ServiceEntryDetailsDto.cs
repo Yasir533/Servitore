@@ -28,6 +28,22 @@ public class ServiceEntryDetailsDto
     public string? Remarks { get; set; } // Internal Remarks
     public string? Solution { get; set; } // Solution / Resolution
 
+    // Upgraded Service Register fields
+    public string? ContactPerson { get; set; }
+    public string? ContactNumber { get; set; }
+    public string? ServiceType { get; set; }
+    public string? CallType { get; set; }
+    public string? SubCallType { get; set; }
+    public string? AgreementNumber { get; set; }
+    public string? InvoiceNumber { get; set; }
+    public bool IsChargeable { get; set; }
+    public string? ComplaintMode { get; set; }
+    public bool PendingForDocuments { get; set; }
+    public int TomorrowDays { get; set; }
+    public bool IsTomorrow { get; set; }
+    public decimal? ApproximateCharges { get; set; }
+    public string? CustodyComponentsJson { get; set; }
+
     public ServiceEntryPriority Priority { get; set; } = ServiceEntryPriority.Normal;
     public ServiceEntryStatus Status { get; set; } = ServiceEntryStatus.Pending;
     public int? AssignedToUserId { get; set; }

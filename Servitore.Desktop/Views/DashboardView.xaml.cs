@@ -63,6 +63,13 @@ public partial class DashboardView : UserControl
         OnSignalRStatusChanged(App.SignalRService.CurrentStatus);
 
         App.SignalRService.UpdateCurrentModule("Dashboard");
+
+        var parentWindow = Window.GetWindow(this);
+        if (parentWindow != null)
+        {
+            parentWindow.PreviewKeyDown -= ParentWindow_PreviewKeyDown;
+            parentWindow.PreviewKeyDown += ParentWindow_PreviewKeyDown;
+        }
     }
 
     private void DashboardView_Unloaded(object sender, RoutedEventArgs e)
@@ -76,6 +83,33 @@ public partial class DashboardView : UserControl
         App.SignalRService.Closed -= OnSignalRClosed;
 
         App.SignalRService.CurrentStatusChanged -= OnSignalRStatusChanged;
+
+        var parentWindow = Window.GetWindow(this);
+        if (parentWindow != null)
+        {
+            parentWindow.PreviewKeyDown -= ParentWindow_PreviewKeyDown;
+        }
+    }
+
+    private void ParentWindow_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (e.Key == System.Windows.Input.Key.F3)
+        {
+            e.Handled = true;
+            var dlg = new Dialogs.ServiceEntryEditDialog(App.ApiService);
+            dlg.Owner = Window.GetWindow(this);
+            if (dlg.ShowDialog() == true)
+            {
+                if (_currentTag == "Dashboard")
+                {
+                    ShowSummary();
+                }
+                else if (_currentTag == "ServiceEntries")
+                {
+                    NavButton_Click(new Button { Tag = "ServiceEntries" }, new RoutedEventArgs());
+                }
+            }
+        }
     }
 
     private void OnSignalRStatusChanged(string status)

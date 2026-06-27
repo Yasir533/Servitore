@@ -17,6 +17,7 @@ public partial class ServiceEntryEditDialog : Window
     private readonly ApiService _apiService;
     public ServiceEntryDetailsDto ServiceEntry { get; private set; }
     private readonly ServiceEntryDetailsDto _initialServiceEntry;
+    private readonly System.Collections.ObjectModel.ObservableCollection<CustodyItemRow> _custodyList = new();
     private bool _isLoaded = false;
     private bool _isDirty = false;
     private bool _isClosingFromSave = false;
@@ -31,6 +32,7 @@ public partial class ServiceEntryEditDialog : Window
     public ServiceEntryEditDialog(ApiService apiService, ServiceEntryDetailsDto? serviceEntry = null)
     {
         InitializeComponent();
+        CustodyGrid.ItemsSource = _custodyList;
         _busyScopeValue = App.SignalRService.GetBusyScope();
         _apiService = apiService;
 
@@ -98,7 +100,22 @@ public partial class ServiceEntryEditDialog : Window
             AssignedToUserName = ServiceEntry.AssignedToUserName,
             SlaDueDate = ServiceEntry.SlaDueDate,
             SlaBreached = ServiceEntry.SlaBreached,
-            Attachments = ServiceEntry.Attachments.ToList()
+            Attachments = ServiceEntry.Attachments.ToList(),
+
+            ContactPerson = ServiceEntry.ContactPerson,
+            ContactNumber = ServiceEntry.ContactNumber,
+            ServiceType = ServiceEntry.ServiceType,
+            CallType = ServiceEntry.CallType,
+            SubCallType = ServiceEntry.SubCallType,
+            AgreementNumber = ServiceEntry.AgreementNumber,
+            InvoiceNumber = ServiceEntry.InvoiceNumber,
+            IsChargeable = ServiceEntry.IsChargeable,
+            ComplaintMode = ServiceEntry.ComplaintMode,
+            PendingForDocuments = ServiceEntry.PendingForDocuments,
+            TomorrowDays = ServiceEntry.TomorrowDays,
+            IsTomorrow = ServiceEntry.IsTomorrow,
+            ApproximateCharges = ServiceEntry.ApproximateCharges,
+            CustodyComponentsJson = ServiceEntry.CustodyComponentsJson
         };
     }
 
@@ -123,6 +140,8 @@ public partial class ServiceEntryEditDialog : Window
             {
                 MobileBox.Text = ServiceEntry.CustomerMobile;
                 NameBox.Text = ServiceEntry.CustomerName;
+                ContactPersonBox.Text = ServiceEntry.ContactPerson;
+                ContactNumberBox.Text = ServiceEntry.ContactNumber;
                 CompanyBox.Text = ServiceEntry.CustomerCompany;
                 EmailBox.Text = ServiceEntry.CustomerEmail;
 
@@ -134,6 +153,64 @@ public partial class ServiceEntryEditDialog : Window
                 ProblemBox.Text = ServiceEntry.ProblemDescription;
                 RemarksBox.Text = ServiceEntry.Remarks;
                 SolutionBox.Text = ServiceEntry.Solution;
+
+                // Load Service & Call Details
+                InHouseRadio.IsChecked = ServiceEntry.ServiceType == "InHouse" || string.IsNullOrEmpty(ServiceEntry.ServiceType);
+                OnSiteRadio.IsChecked = ServiceEntry.ServiceType == "OnSite";
+
+                CallOthersRadio.IsChecked = ServiceEntry.CallType == "Others";
+                CallDoaRadio.IsChecked = ServiceEntry.CallType == "DOA";
+                CallOowRadio.IsChecked = ServiceEntry.CallType == "OOW" || string.IsNullOrEmpty(ServiceEntry.CallType);
+                CallWarrantyRadio.IsChecked = ServiceEntry.CallType == "Warranty";
+                CallAmcRadio.IsChecked = ServiceEntry.CallType == "MaintenanceContract";
+
+                if (ServiceEntry.CallType == "MaintenanceContract")
+                {
+                    AmcSubPanel.Visibility = Visibility.Visible;
+                    AmcBdRadio.IsChecked = ServiceEntry.SubCallType == "BD" || string.IsNullOrEmpty(ServiceEntry.SubCallType);
+                    AmcPmRadio.IsChecked = ServiceEntry.SubCallType == "PM";
+                    AgreementNoBox.Text = ServiceEntry.AgreementNumber;
+                }
+                else
+                {
+                    AmcSubPanel.Visibility = Visibility.Collapsed;
+                }
+
+                ChargeableRadio.IsChecked = ServiceEntry.IsChargeable;
+                NonChargeableRadio.IsChecked = !ServiceEntry.IsChargeable;
+
+                InvoiceNoBox.Text = ServiceEntry.InvoiceNumber;
+                PendingDocumentsCheck.IsChecked = ServiceEntry.PendingForDocuments;
+
+                foreach (ComboBoxItem item in ComplaintModeCombo.Items)
+                {
+                    if (item.Tag?.ToString() == ServiceEntry.ComplaintMode)
+                    {
+                        item.IsSelected = true;
+                        break;
+                    }
+                }
+
+                ApproximateChargesBox.Text = ServiceEntry.ApproximateCharges?.ToString();
+
+                TomorrowCheck.IsChecked = ServiceEntry.IsTomorrow;
+                TomorrowDaysBox.Text = ServiceEntry.TomorrowDays.ToString();
+                TomorrowDaysPanel.Visibility = ServiceEntry.IsTomorrow ? Visibility.Visible : Visibility.Collapsed;
+
+                // Load custody components from JSON
+                _custodyList.Clear();
+                if (!string.IsNullOrEmpty(ServiceEntry.CustodyComponentsJson))
+                {
+                    try
+                    {
+                        var items = System.Text.Json.JsonSerializer.Deserialize<List<CustodyItemRow>>(ServiceEntry.CustodyComponentsJson);
+                        if (items != null)
+                        {
+                            foreach (var item in items) _custodyList.Add(item);
+                        }
+                    }
+                    catch { }
+                }
 
                 // Load customer existing products
                 await LoadAssetsForCustomerAsync(ServiceEntry.CustomerId);
@@ -186,6 +263,9 @@ public partial class ServiceEntryEditDialog : Window
                 UploadButton.IsEnabled = false;
                 AttachmentsGrid.Visibility = Visibility.Collapsed;
                 AttachmentsNote.Visibility = Visibility.Visible;
+
+                // Pre-populate complaint/problem template
+                ProblemBox.Text = "WITH:" + Environment.NewLine + "WITHOUT:" + Environment.NewLine + "PROBLEM:" + Environment.NewLine + "WITH SCREW:" + Environment.NewLine + "DAMAGE:";
                 
                 // Focus Mobile number for fast entry
                 MobileBox.Focus();
@@ -395,6 +475,59 @@ public partial class ServiceEntryEditDialog : Window
         ServiceEntry.AssignedToUserId = EngineerCombo.SelectedValue as int?;
         var selectedEng = EngineerCombo.SelectedItem as UserInfo;
         ServiceEntry.AssignedToUserName = selectedEng?.FullName;
+
+        // Upgraded fields
+        ServiceEntry.ContactPerson = ContactPersonBox.Text.Trim();
+        ServiceEntry.ContactNumber = ContactNumberBox.Text.Trim();
+        ServiceEntry.ServiceType = InHouseRadio.IsChecked == true ? "InHouse" : "OnSite";
+        
+        string callType = "OOW";
+        if (CallOthersRadio.IsChecked == true) callType = "Others";
+        else if (CallDoaRadio.IsChecked == true) callType = "DOA";
+        else if (CallWarrantyRadio.IsChecked == true) callType = "Warranty";
+        else if (CallAmcRadio.IsChecked == true) callType = "MaintenanceContract";
+        ServiceEntry.CallType = callType;
+
+        if (callType == "MaintenanceContract")
+        {
+            ServiceEntry.SubCallType = AmcBdRadio.IsChecked == true ? "BD" : "PM";
+            ServiceEntry.AgreementNumber = AgreementNoBox.Text.Trim();
+        }
+        else
+        {
+            ServiceEntry.SubCallType = null;
+            ServiceEntry.AgreementNumber = null;
+        }
+
+        ServiceEntry.IsChargeable = ChargeableRadio.IsChecked == true;
+        ServiceEntry.InvoiceNumber = InvoiceNoBox.Text.Trim();
+        ServiceEntry.PendingForDocuments = PendingDocumentsCheck.IsChecked == true;
+
+        var complaintItem = ComplaintModeCombo.SelectedItem as ComboBoxItem;
+        ServiceEntry.ComplaintMode = complaintItem?.Tag?.ToString() ?? "Phone";
+
+        if (decimal.TryParse(ApproximateChargesBox.Text, out var charges))
+        {
+            ServiceEntry.ApproximateCharges = charges;
+        }
+        else
+        {
+            ServiceEntry.ApproximateCharges = null;
+        }
+
+        ServiceEntry.IsTomorrow = TomorrowCheck.IsChecked == true;
+        if (int.TryParse(TomorrowDaysBox.Text, out var days))
+        {
+            ServiceEntry.TomorrowDays = days;
+        }
+        else
+        {
+            ServiceEntry.TomorrowDays = 1;
+        }
+
+        // Serialize custody components
+        var activeCustody = _custodyList.Where(c => !string.IsNullOrWhiteSpace(c.ComponentName)).ToList();
+        ServiceEntry.CustodyComponentsJson = System.Text.Json.JsonSerializer.Serialize(activeCustody);
     }
 
     private async Task<bool> SaveAsync()
@@ -430,7 +563,22 @@ public partial class ServiceEntryEditDialog : Window
 
                 Status = ServiceEntry.Status,
                 Priority = ServiceEntry.Priority,
-                AssignedToUserId = ServiceEntry.AssignedToUserId
+                AssignedToUserId = ServiceEntry.AssignedToUserId,
+
+                ContactPerson = ServiceEntry.ContactPerson,
+                ContactNumber = ServiceEntry.ContactNumber,
+                ServiceType = ServiceEntry.ServiceType,
+                CallType = ServiceEntry.CallType,
+                SubCallType = ServiceEntry.SubCallType,
+                AgreementNumber = ServiceEntry.AgreementNumber,
+                InvoiceNumber = ServiceEntry.InvoiceNumber,
+                IsChargeable = ServiceEntry.IsChargeable,
+                ComplaintMode = ServiceEntry.ComplaintMode,
+                PendingForDocuments = ServiceEntry.PendingForDocuments,
+                TomorrowDays = ServiceEntry.TomorrowDays,
+                IsTomorrow = ServiceEntry.IsTomorrow,
+                ApproximateCharges = ServiceEntry.ApproximateCharges,
+                CustodyComponentsJson = ServiceEntry.CustodyComponentsJson
             };
 
             if (ServiceEntry.ServiceEntryId > 0)
@@ -483,6 +631,8 @@ public partial class ServiceEntryEditDialog : Window
             
             MobileBox.Text = string.Empty;
             NameBox.Text = string.Empty;
+            ContactPersonBox.Text = string.Empty;
+            ContactNumberBox.Text = string.Empty;
             CompanyBox.Text = string.Empty;
             EmailBox.Text = string.Empty;
 
@@ -512,11 +662,29 @@ public partial class ServiceEntryEditDialog : Window
             AttachmentsNote.Visibility = Visibility.Visible;
             UploadButton.IsEnabled = false;
 
+            // Reset service register fields
+            InHouseRadio.IsChecked = true;
+            CallOowRadio.IsChecked = true;
+            AmcSubPanel.Visibility = Visibility.Collapsed;
+            AgreementNoBox.Text = string.Empty;
+            ChargeableRadio.IsChecked = true;
+            InvoiceNoBox.Text = string.Empty;
+            PendingDocumentsCheck.IsChecked = false;
+            ComplaintModeCombo.SelectedIndex = 0;
+            ApproximateChargesBox.Text = string.Empty;
+            TomorrowCheck.IsChecked = false;
+            TomorrowDaysBox.Text = "1";
+            TomorrowDaysPanel.Visibility = Visibility.Collapsed;
+            _custodyList.Clear();
+
             ServiceEntry = new ServiceEntryDetailsDto();
             _isDirty = false;
             
             ShowSuccessBanner("Service entry saved successfully. Ready for the next one!");
             
+            // Pre-populate complaint/problem template
+            ProblemBox.Text = "WITH:" + Environment.NewLine + "WITHOUT:" + Environment.NewLine + "PROBLEM:" + Environment.NewLine + "WITH SCREW:" + Environment.NewLine + "DAMAGE:";
+
             // Re-focus Mobile number
             MobileBox.Focus();
             
@@ -534,6 +702,8 @@ public partial class ServiceEntryEditDialog : Window
 
         MobileBox.Text = _initialServiceEntry.CustomerMobile;
         NameBox.Text = _initialServiceEntry.CustomerName;
+        ContactPersonBox.Text = _initialServiceEntry.ContactPerson;
+        ContactNumberBox.Text = _initialServiceEntry.ContactNumber;
         CompanyBox.Text = _initialServiceEntry.CustomerCompany;
         EmailBox.Text = _initialServiceEntry.CustomerEmail;
 
@@ -567,6 +737,63 @@ public partial class ServiceEntryEditDialog : Window
         }
 
         EngineerCombo.SelectedValue = _initialServiceEntry.AssignedToUserId;
+
+        // Reset service register fields
+        InHouseRadio.IsChecked = _initialServiceEntry.ServiceType == "InHouse" || string.IsNullOrEmpty(_initialServiceEntry.ServiceType);
+        OnSiteRadio.IsChecked = _initialServiceEntry.ServiceType == "OnSite";
+
+        CallOthersRadio.IsChecked = _initialServiceEntry.CallType == "Others";
+        CallDoaRadio.IsChecked = _initialServiceEntry.CallType == "DOA";
+        CallOowRadio.IsChecked = _initialServiceEntry.CallType == "OOW" || string.IsNullOrEmpty(_initialServiceEntry.CallType);
+        CallWarrantyRadio.IsChecked = _initialServiceEntry.CallType == "Warranty";
+        CallAmcRadio.IsChecked = _initialServiceEntry.CallType == "MaintenanceContract";
+
+        if (_initialServiceEntry.CallType == "MaintenanceContract")
+        {
+            AmcSubPanel.Visibility = Visibility.Visible;
+            AmcBdRadio.IsChecked = _initialServiceEntry.SubCallType == "BD" || string.IsNullOrEmpty(_initialServiceEntry.SubCallType);
+            AmcPmRadio.IsChecked = _initialServiceEntry.SubCallType == "PM";
+            AgreementNoBox.Text = _initialServiceEntry.AgreementNumber;
+        }
+        else
+        {
+            AmcSubPanel.Visibility = Visibility.Collapsed;
+        }
+
+        ChargeableRadio.IsChecked = _initialServiceEntry.IsChargeable;
+        NonChargeableRadio.IsChecked = !_initialServiceEntry.IsChargeable;
+
+        InvoiceNoBox.Text = _initialServiceEntry.InvoiceNumber;
+        PendingDocumentsCheck.IsChecked = _initialServiceEntry.PendingForDocuments;
+
+        foreach (ComboBoxItem item in ComplaintModeCombo.Items)
+        {
+            if (item.Tag?.ToString() == _initialServiceEntry.ComplaintMode)
+            {
+                item.IsSelected = true;
+                break;
+            }
+        }
+
+        ApproximateChargesBox.Text = _initialServiceEntry.ApproximateCharges?.ToString();
+
+        TomorrowCheck.IsChecked = _initialServiceEntry.IsTomorrow;
+        TomorrowDaysBox.Text = _initialServiceEntry.TomorrowDays.ToString();
+        TomorrowDaysPanel.Visibility = _initialServiceEntry.IsTomorrow ? Visibility.Visible : Visibility.Collapsed;
+
+        _custodyList.Clear();
+        if (!string.IsNullOrEmpty(_initialServiceEntry.CustodyComponentsJson))
+        {
+            try
+            {
+                var items = System.Text.Json.JsonSerializer.Deserialize<List<CustodyItemRow>>(_initialServiceEntry.CustodyComponentsJson);
+                if (items != null)
+                {
+                    foreach (var item in items) _custodyList.Add(item);
+                }
+            }
+            catch { }
+        }
 
         ServiceEntry.Attachments = _initialServiceEntry.Attachments.ToList();
         RefreshAttachmentsGrid();
@@ -957,5 +1184,48 @@ public partial class ServiceEntryEditDialog : Window
         public ServiceEntryStatus Status { get; set; }
         public ServiceEntryPriority Priority { get; set; }
         public int? AssignedToUserId { get; set; }
+
+        // Upgraded Service Register fields
+        public string? ContactPerson { get; set; }
+        public string? ContactNumber { get; set; }
+        public string? ServiceType { get; set; }
+        public string? CallType { get; set; }
+        public string? SubCallType { get; set; }
+        public string? AgreementNumber { get; set; }
+        public string? InvoiceNumber { get; set; }
+        public bool IsChargeable { get; set; }
+        public string? ComplaintMode { get; set; }
+        public bool PendingForDocuments { get; set; }
+        public int TomorrowDays { get; set; }
+        public bool IsTomorrow { get; set; }
+        public decimal? ApproximateCharges { get; set; }
+        public string? CustodyComponentsJson { get; set; }
+    }
+
+    public class CustodyItemRow
+    {
+        public string ComponentName { get; set; } = string.Empty;
+        public string MakeSerial { get; set; } = string.Empty;
+    }
+
+    private void CallType_Changed(object sender, RoutedEventArgs e)
+    {
+        if (AmcSubPanel == null) return;
+        bool isAmc = CallAmcRadio.IsChecked == true;
+        AmcSubPanel.Visibility = isAmc ? Visibility.Visible : Visibility.Collapsed;
+        Input_Changed(sender, e);
+    }
+
+    private void TomorrowCheck_Changed(object sender, RoutedEventArgs e)
+    {
+        if (TomorrowDaysPanel == null) return;
+        bool isTomorrow = TomorrowCheck.IsChecked == true;
+        TomorrowDaysPanel.Visibility = isTomorrow ? Visibility.Visible : Visibility.Collapsed;
+        Input_Changed(sender, e);
+    }
+
+    private void CustodyGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+    {
+        _isDirty = true;
     }
 }

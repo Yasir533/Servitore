@@ -71,6 +71,18 @@
                                      TextChanged="Input_Changed"
                                      Margin="0,0,0,10" />
 
+                            <TextBox x:Name="ContactPersonBox"
+                                     materialDesign:HintAssist.Hint="Contact Person"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     TextChanged="Input_Changed"
+                                     Margin="0,0,0,10" />
+
+                            <TextBox x:Name="ContactNumberBox"
+                                     materialDesign:HintAssist.Hint="Contact Number"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     TextChanged="Input_Changed"
+                                     Margin="0,0,0,10" />
+
                             <TextBox x:Name="CompanyBox"
                                      materialDesign:HintAssist.Hint="Company (Optional)"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"
@@ -82,6 +94,93 @@
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"
                                      TextChanged="Input_Changed"
                                      Margin="0,0,0,2" />
+                        </StackPanel>
+                    </materialDesign:Card>
+
+                    <!-- Service & Call Details Card -->
+                    <materialDesign:Card Margin="0,0,0,12" Padding="14">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <materialDesign:PackIcon Kind="PhoneCall" Width="18" Height="18" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                                <TextBlock Text="Service &amp; Call Details" FontSize="14" FontWeight="Bold" Margin="8,0,0,0" VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <!-- Service Type -->
+                            <TextBlock Text="Service Type" FontSize="12.5" FontWeight="SemiBold" Opacity="0.7" Margin="0,0,0,4" />
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                <RadioButton x:Name="InHouseRadio" Content="In House Service" IsChecked="True" Checked="Input_Changed" Margin="0,0,16,0" />
+                                <RadioButton x:Name="OnSiteRadio" Content="OnSite Service" Checked="Input_Changed" />
+                            </StackPanel>
+
+                            <!-- Call Type -->
+                            <TextBlock Text="Call Type" FontSize="12.5" FontWeight="SemiBold" Opacity="0.7" Margin="0,0,0,4" />
+                            <UniformGrid Columns="2" Margin="0,0,0,6">
+                                <RadioButton x:Name="CallOthersRadio" Content="Others" Checked="CallType_Changed" Margin="0,2" />
+                                <RadioButton x:Name="CallDoaRadio" Content="DOA" Checked="CallType_Changed" Margin="0,2" />
+                                <RadioButton x:Name="CallOowRadio" Content="OOW" IsChecked="True" Checked="CallType_Changed" Margin="0,2" />
+                                <RadioButton x:Name="CallWarrantyRadio" Content="Warranty" Checked="CallType_Changed" Margin="0,2" />
+                                <RadioButton x:Name="CallAmcRadio" Content="Maintenance Contract" Checked="CallType_Changed" Margin="0,2" />
+                            </UniformGrid>
+
+                            <!-- AMC Sub Call Type (Visible only when AMC is selected) -->
+                            <StackPanel x:Name="AmcSubPanel" Visibility="Collapsed" Margin="12,0,0,10">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                    <RadioButton x:Name="AmcBdRadio" Content="BD (Breakdown)" IsChecked="True" Checked="Input_Changed" Margin="0,0,12,0" />
+                                    <RadioButton x:Name="AmcPmRadio" Content="PM (Preventive)" Checked="Input_Changed" />
+                                </StackPanel>
+                                <TextBox x:Name="AgreementNoBox"
+                                         materialDesign:HintAssist.Hint="Agreement Number"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                         TextChanged="Input_Changed"
+                                         Margin="0,0,0,2" />
+                            </StackPanel>
+
+                            <!-- Service Charge Type -->
+                            <TextBlock Text="Service Charge Type" FontSize="12.5" FontWeight="SemiBold" Opacity="0.7" Margin="0,0,0,4" />
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                <RadioButton x:Name="ChargeableRadio" Content="Chargeable" IsChecked="True" Checked="Input_Changed" Margin="0,0,16,0" />
+                                <RadioButton x:Name="NonChargeableRadio" Content="Non Chargeable" Checked="Input_Changed" />
+                            </StackPanel>
+
+                            <!-- Invoice & Documents -->
+                            <TextBox x:Name="InvoiceNoBox"
+                                     materialDesign:HintAssist.Hint="Invoice Number"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                     TextChanged="Input_Changed"
+                                     Margin="0,0,0,10" />
+
+                            <CheckBox x:Name="PendingDocumentsCheck" Content="Pending for Documents" Checked="Input_Changed" Unchecked="Input_Changed" Margin="0,0,0,10" />
+
+                            <!-- Complaint Mode & Approx Charges -->
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="10" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <ComboBox Grid.Column="0" x:Name="ComplaintModeCombo"
+                                          materialDesign:HintAssist.Hint="Complaint Mode"
+                                          SelectionChanged="Input_Changed"
+                                          Style="{StaticResource MaterialDesignOutlinedComboBox}">
+                                    <ComboBoxItem Content="Phone" Tag="Phone" IsSelected="True" />
+                                    <ComboBoxItem Content="Walk-In" Tag="Walk-In" />
+                                    <ComboBoxItem Content="Email" Tag="Email" />
+                                    <ComboBoxItem Content="Website" Tag="Website" />
+                                </ComboBox>
+                                <TextBox Grid.Column="2" x:Name="ApproximateChargesBox"
+                                         materialDesign:HintAssist.Hint="Approx. Charges"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                         TextChanged="Input_Changed" />
+                            </Grid>
+
+                            <!-- Tomorrow scheduling -->
+                            <StackPanel Orientation="Horizontal" Margin="0,4,0,2">
+                                <CheckBox x:Name="TomorrowCheck" Content="Tomorrow" Checked="TomorrowCheck_Changed" Unchecked="TomorrowCheck_Changed" VerticalAlignment="Center" Margin="0,0,12,0" />
+                                <StackPanel x:Name="TomorrowDaysPanel" Orientation="Horizontal" Visibility="Collapsed" VerticalAlignment="Center">
+                                    <TextBox x:Name="TomorrowDaysBox" Width="40" Text="1" TextAlignment="Center" InputScope="Number" Style="{StaticResource MaterialDesignOutlinedTextBox}" Height="28" Padding="2" TextChanged="Input_Changed" />
+                                    <TextBlock Text=" Day(s)" VerticalAlignment="Center" FontSize="12.5" Opacity="0.7" />
+                                </StackPanel>
+                            </StackPanel>
                         </StackPanel>
                     </materialDesign:Card>
 
@@ -153,6 +252,30 @@
                                      Visibility="Collapsed"
                                      TextChanged="Input_Changed"
                                      Margin="0,4,0,2" />
+                        </StackPanel>
+                    </materialDesign:Card>
+
+                    <!-- Custody Components Card -->
+                    <materialDesign:Card Margin="0,12,0,4" Padding="14">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <materialDesign:PackIcon Kind="GridLarge" Width="18" Height="18" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                                <TextBlock Text="Components taken into custody" FontSize="14" FontWeight="Bold" Margin="8,0,0,0" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <DataGrid x:Name="CustodyGrid"
+                                      AutoGenerateColumns="False"
+                                      CanUserAddRows="True"
+                                      Background="Transparent"
+                                      HeadersVisibility="Column"
+                                      GridLinesVisibility="Horizontal"
+                                      Height="120"
+                                      RowHeight="34"
+                                      CellEditEnding="CustodyGrid_CellEditEnding">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Component" Binding="{Binding ComponentName, UpdateSourceTrigger=PropertyChanged}" Width="*" />
+                                    <DataGridTextColumn Header="Make / Serial No" Binding="{Binding MakeSerial, UpdateSourceTrigger=PropertyChanged}" Width="150" />
+                                </DataGrid.Columns>
+                            </DataGrid>
                         </StackPanel>
                     </materialDesign:Card>
 

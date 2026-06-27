@@ -123,7 +123,22 @@ public class ServiceEntryService : IServiceEntryService
             Priority = dto.Priority,
             AssignedToUserId = dto.AssignedToUserId,
             CreatedByUserId = createdByUserId,
-            CreatedDate = DateTime.UtcNow
+            CreatedDate = DateTime.UtcNow,
+
+            ContactPerson = dto.ContactPerson,
+            ContactNumber = dto.ContactNumber,
+            ServiceType = dto.ServiceType,
+            CallType = dto.CallType,
+            SubCallType = dto.SubCallType,
+            AgreementNumber = dto.AgreementNumber,
+            InvoiceNumber = dto.InvoiceNumber,
+            IsChargeable = dto.IsChargeable,
+            ComplaintMode = dto.ComplaintMode,
+            PendingForDocuments = dto.PendingForDocuments,
+            TomorrowDays = dto.TomorrowDays,
+            IsTomorrow = dto.IsTomorrow,
+            ApproximateCharges = dto.ApproximateCharges,
+            CustodyComponentsJson = dto.CustodyComponentsJson
         };
 
         var created = await _repository.AddAsync(entry);
@@ -284,6 +299,21 @@ public class ServiceEntryService : IServiceEntryService
         entry.Remarks = dto.Remarks;
         entry.ModifiedBy = updatedBy;
         entry.ModifiedDate = DateTime.UtcNow;
+
+        entry.ContactPerson = dto.ContactPerson;
+        entry.ContactNumber = dto.ContactNumber;
+        entry.ServiceType = dto.ServiceType;
+        entry.CallType = dto.CallType;
+        entry.SubCallType = dto.SubCallType;
+        entry.AgreementNumber = dto.AgreementNumber;
+        entry.InvoiceNumber = dto.InvoiceNumber;
+        entry.IsChargeable = dto.IsChargeable;
+        entry.ComplaintMode = dto.ComplaintMode;
+        entry.PendingForDocuments = dto.PendingForDocuments;
+        entry.TomorrowDays = dto.TomorrowDays;
+        entry.IsTomorrow = dto.IsTomorrow;
+        entry.ApproximateCharges = dto.ApproximateCharges;
+        entry.CustodyComponentsJson = dto.CustodyComponentsJson;
 
         var changes = new List<string>();
         if (oldStatus != dto.Status) changes.Add($"Status changed to {dto.Status}");
