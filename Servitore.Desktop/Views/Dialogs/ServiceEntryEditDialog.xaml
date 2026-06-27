@@ -312,6 +312,34 @@
                         </StackPanel>
                     </Border>
 
+                    <!-- History Timeline Card -->
+                    <materialDesign:Card Margin="0,12,0,4" Padding="14" x:Name="HistoryCard" Visibility="Collapsed">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <materialDesign:PackIcon Kind="History" Width="18" Height="18" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                                <TextBlock Text="Service Entry Timeline" FontSize="14" FontWeight="Bold" Margin="8,0,0,0" VerticalAlignment="Center" />
+                            </StackPanel>
+                            
+                            <DataGrid x:Name="HistoryGrid"
+                                      AutoGenerateColumns="False"
+                                      IsReadOnly="True"
+                                      Background="Transparent"
+                                      HeadersVisibility="Column"
+                                      GridLinesVisibility="Horizontal"
+                                      MaxHeight="180"
+                                      FontSize="13"
+                                      RowHeight="36"
+                                      materialDesign:DataGridAssist.CellPadding="8 4 8 4"
+                                      materialDesign:DataGridAssist.ColumnHeaderPadding="8 4 8 4">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Date &amp; Time" Binding="{Binding UpdatedDate, StringFormat='{}{0:dd MMM yyyy HH:mm}'}" Width="130" />
+                                    <DataGridTextColumn Header="User" Binding="{Binding UpdatedBy}" Width="100" />
+                                    <DataGridTextColumn Header="Event / Remarks" Binding="{Binding Remarks}" Width="*" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+                    </materialDesign:Card>
+
                 </StackPanel>
             </ScrollViewer>
         </Grid>

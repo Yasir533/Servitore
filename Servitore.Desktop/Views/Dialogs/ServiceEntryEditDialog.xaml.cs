@@ -167,6 +167,17 @@ public partial class ServiceEntryEditDialog : Window
                 RefreshAttachmentsGrid();
                 UploadButton.IsEnabled = true;
 
+                // Bind history timeline
+                if (ServiceEntry.History != null && ServiceEntry.History.Count > 0)
+                {
+                    HistoryGrid.ItemsSource = ServiceEntry.History.OrderByDescending(h => h.UpdatedDate).ToList();
+                    HistoryCard.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    HistoryCard.Visibility = Visibility.Collapsed;
+                }
+
                 ProblemBox.Focus();
             }
             else
