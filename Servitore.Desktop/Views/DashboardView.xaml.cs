@@ -31,16 +31,16 @@ public partial class DashboardView : UserControl
 
         // Enforce role-based menu hiding
         var role = App.AuthenticationService.CurrentUser?.Role;
-        if (role == Servitore.Shared.Enums.UserRole.Engineer || role == Servitore.Shared.Enums.UserRole.Operator)
+        if (role != Servitore.Shared.Enums.UserRole.Admin)
         {
             UsersBtn.Visibility = Visibility.Collapsed;
             SettingsBtn.Visibility = Visibility.Collapsed;
-            RecentlyDeletedBtn.Visibility = Visibility.Collapsed;
+            ActivityLogsBtn.Visibility = Visibility.Collapsed;
         }
 
-        if (role != Servitore.Shared.Enums.UserRole.Admin)
+        if (role == Servitore.Shared.Enums.UserRole.Engineer || role == Servitore.Shared.Enums.UserRole.Operator)
         {
-            ActivityLogsBtn.Visibility = Visibility.Collapsed;
+            RecentlyDeletedBtn.Visibility = Visibility.Collapsed;
         }
 
         Loaded += DashboardView_Loaded;
@@ -328,7 +328,14 @@ public partial class DashboardView : UserControl
                 }
                 else if (item.Type == "Employee")
                 {
-                    NavigationHelper.NavigateTo(ContentHost, new UserManagementView());
+                    if (App.AuthenticationService.CurrentUser?.Role == Servitore.Shared.Enums.UserRole.Admin)
+                    {
+                        NavigationHelper.NavigateTo(ContentHost, new UserManagementView());
+                    }
+                    else
+                    {
+                        DialogHelper.ShowError("Only Administrators are permitted to view or manage employee accounts.", "Access Denied");
+                    }
                 }
             }
             catch (Exception ex)

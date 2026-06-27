@@ -76,20 +76,24 @@ public class SearchController : ControllerBase
             .ToListAsync();
 
         // 4. Search Employees (Users)
-        var employees = await _context.Users
-            .AsNoTracking()
-            .Where(u => u.IsActive && 
-                        (u.FullName.ToLower().Contains(term) ||
-                         u.Username.ToLower().Contains(term) ||
-                         u.Email.ToLower().Contains(term)))
-            .Take(10)
-            .Select(u => new SearchItemDto
-            {
-                Id = u.Id.ToString(),
-                Title = u.FullName,
-                Subtitle = $"Username: {u.Username} | Email: {u.Email}"
-            })
-            .ToListAsync();
+        var employees = new List<SearchItemDto>();
+        if (User.IsInRole("Admin"))
+        {
+            employees = await _context.Users
+                .AsNoTracking()
+                .Where(u => u.IsActive && 
+                            (u.FullName.ToLower().Contains(term) ||
+                             u.Username.ToLower().Contains(term) ||
+                             u.Email.ToLower().Contains(term)))
+                .Take(10)
+                .Select(u => new SearchItemDto
+                {
+                    Id = u.Id.ToString(),
+                    Title = u.FullName,
+                    Subtitle = $"Username: {u.Username} | Email: {u.Email}"
+                })
+                .ToListAsync();
+        }
 
         var result = new SearchResultDto
         {
