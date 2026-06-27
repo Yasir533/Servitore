@@ -41,23 +41,12 @@ public partial class DashboardViewModel : ViewModelBase
         IsLoading = true;
         try
         {
-            int maxRetries = 15;
-            for (int i = 0; i < maxRetries; i++)
-            {
-                try
-                {
-                    Summary = await _apiService.GetAsync<DashboardSummary>("api/dashboard/summary");
-                    return; // Success!
-                }
-                catch (Exception ex)
-                {
-                    Helpers.ClientLogger.Log($"Attempt {i + 1} to load dashboard summary failed", ex);
-                    if (i < maxRetries - 1)
-                    {
-                        await Task.Delay(2000);
-                    }
-                }
-            }
+            Summary = await _apiService.GetAsync<DashboardSummary>("api/dashboard/summary");
+        }
+        catch (Exception ex)
+        {
+            Helpers.ClientLogger.Log("Failed to load dashboard summary", ex);
+            Helpers.ToastHelper.ShowToast("Failed to refresh dashboard summary.");
             Summary = new DashboardSummary();
         }
         finally

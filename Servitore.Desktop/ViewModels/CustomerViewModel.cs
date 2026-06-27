@@ -8,7 +8,7 @@ using Servitore.Desktop.Services;
 
 namespace Servitore.Desktop.ViewModels;
 
-public partial class CustomerViewModel : ViewModelBase
+public partial class CustomerViewModel : ViewModelBase, IDisposable
 {
     private readonly ApiService _apiService;
     private readonly ObservableCollection<CustomerRow> _allCustomers = new();
@@ -66,31 +66,27 @@ public partial class CustomerViewModel : ViewModelBase
         IsLoading = true;
         try
         {
-            int maxRetries = 15;
-            for (int i = 0; i < maxRetries; i++)
+            var results = await _apiService.GetAsync<List<CustomerRow>>("api/customers");
+            _allCustomers.Clear();
+            if (results is not null)
             {
-                try
-                {
-                    var results = await _apiService.GetAsync<List<CustomerRow>>("api/customers");
-                    _allCustomers.Clear();
-                    if (results is not null)
-                        foreach (var c in results) _allCustomers.Add(c);
-                    return; // Success!
-                }
-                catch (Exception ex)
-                {
-                    Helpers.ClientLogger.Log($"Attempt {i + 1} to load customer data failed", ex);
-                    if (i < maxRetries - 1)
-                    {
-                        await Task.Delay(2000);
-                    }
-                }
+                foreach (var c in results) _allCustomers.Add(c);
             }
+        }
+        catch (Exception ex)
+        {
+            Helpers.ClientLogger.Log("Failed to load customer data", ex);
+            Helpers.ToastHelper.ShowToast("Failed to load customer data.");
         }
         finally
         {
             IsLoading = false;
         }
+    }
+
+    public void Dispose()
+    {
+        App.SignalRService.DataChanged -= OnDataChanged;
     }
 
     [RelayCommand]

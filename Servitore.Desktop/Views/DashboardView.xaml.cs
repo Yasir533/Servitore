@@ -49,6 +49,9 @@ public partial class DashboardView : UserControl
         App.SignalRService.DataChanged += OnDataChanged;
         App.SignalRService.ActivityLogged += OnActivityLogged;
         App.SignalRService.ForceLogoutReceived += OnForceLogout;
+        App.SignalRService.Reconnecting += OnSignalRReconnecting;
+        App.SignalRService.Reconnected += OnSignalRReconnected;
+        App.SignalRService.Closed += OnSignalRClosed;
 
         ShowSummary();
     }
@@ -71,6 +74,9 @@ public partial class DashboardView : UserControl
         App.SignalRService.DataChanged -= OnDataChanged;
         App.SignalRService.ActivityLogged -= OnActivityLogged;
         App.SignalRService.ForceLogoutReceived -= OnForceLogout;
+        App.SignalRService.Reconnecting -= OnSignalRReconnecting;
+        App.SignalRService.Reconnected -= OnSignalRReconnected;
+        App.SignalRService.Closed -= OnSignalRClosed;
     }
 
     private void StatusSelectorCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -81,6 +87,31 @@ public partial class DashboardView : UserControl
             _manualStatus = status;
             _ = App.SignalRService.UpdatePresenceAsync(_currentTag, status);
         }
+    }
+
+    private void OnSignalRReconnecting(string? message)
+    {
+        Dispatcher.Invoke(() =>
+        {
+            ToastHelper.ShowToast("Connection lost. Reconnecting to server...");
+        });
+    }
+
+    private void OnSignalRReconnected(string? connectionId)
+    {
+        Dispatcher.Invoke(() =>
+        {
+            ToastHelper.ShowToast("Connected to server.");
+            ShowSummary();
+        });
+    }
+
+    private void OnSignalRClosed(Exception? exception)
+    {
+        Dispatcher.Invoke(() =>
+        {
+            ToastHelper.ShowToast("Offline. Connection to server closed.");
+        });
     }
 
     private void OnLockTakenOver(string recordKey, string newOwner)
@@ -310,7 +341,7 @@ public partial class DashboardView : UserControl
     {
         Dispatcher.Invoke(async () =>
         {
-            MessageBox.Show("An Administrator has forced your session to log out.", "Forced Logout", MessageBoxButton.OK, MessageBoxImage.Warning);
+            DialogHelper.ShowError("An Administrator has forced your session to log out.", "Forced Logout");
             App.AuthenticationService.Logout();
             await App.SignalRService.DisconnectAsync();
 

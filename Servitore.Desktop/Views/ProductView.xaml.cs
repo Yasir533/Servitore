@@ -21,6 +21,10 @@ public partial class ProductView : UserControl
                 Helpers.ClientLogger.Log("Failed to execute LoadCommand in ProductView", ex);
             }
         };
+        Unloaded += (s, e) =>
+        {
+            vm.Dispose();
+        };
     }
 
     private void DataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)

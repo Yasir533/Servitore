@@ -20,6 +20,9 @@ public class SignalRService
     public event Action<string, string>? LockTakenOver; // (recordKey, newOwner)
     public event Action? LocksUpdated;
     public event Action? ForceLogoutReceived;
+    public event Action<string?>? Reconnecting;
+    public event Action<string?>? Reconnected;
+    public event Action<Exception?>? Closed;
 
     public string? ConnectionId => _connection?.ConnectionId;
 
@@ -36,6 +39,24 @@ public class SignalRService
             })
             .WithAutomaticReconnect()
             .Build();
+
+        _connection.Reconnecting += ex =>
+        {
+            Reconnecting?.Invoke(ex?.Message);
+            return Task.CompletedTask;
+        };
+
+        _connection.Reconnected += connectionId =>
+        {
+            Reconnected?.Invoke(connectionId);
+            return Task.CompletedTask;
+        };
+
+        _connection.Closed += ex =>
+        {
+            Closed?.Invoke(ex);
+            return Task.CompletedTask;
+        };
 
         _connection.On<NotificationModel>("ReceiveNotification", notification =>
         {

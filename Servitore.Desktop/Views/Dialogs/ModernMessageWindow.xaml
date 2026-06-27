@@ -44,13 +44,13 @@
 
             <!-- Action Buttons -->
             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button x:Name="BtnCancel" Content="Cancel" Style="{StaticResource MaterialDesignFlatButton}" Margin="0,0,8,0" Click="BtnCancel_Click" Visibility="Collapsed" />
-                <Button x:Name="BtnNo" Content="No" Style="{StaticResource MaterialDesignFlatButton}" Margin="0,0,8,0" Click="BtnNo_Click" Visibility="Collapsed" />
+                <Button x:Name="BtnCancel" Content="Cancel" Style="{StaticResource MaterialDesignFlatButton}" Margin="0,0,8,0" Click="BtnCancel_Click" Visibility="Collapsed" IsCancel="True" />
+                <Button x:Name="BtnNo" Content="No" Style="{StaticResource MaterialDesignFlatButton}" Margin="0,0,8,0" Click="BtnNo_Click" Visibility="Collapsed" IsCancel="True" />
                 <Button x:Name="BtnDiscard" Content="Discard" Style="{StaticResource MaterialDesignFlatButton}" Margin="0,0,8,0" Click="BtnDiscard_Click" Visibility="Collapsed" />
                 
-                <Button x:Name="BtnOk" Content="OK" Style="{StaticResource MaterialDesignRaisedButton}" Click="BtnOk_Click" Visibility="Collapsed" />
-                <Button x:Name="BtnYes" Content="Yes" Style="{StaticResource MaterialDesignRaisedButton}" Click="BtnYes_Click" Visibility="Collapsed" />
-                <Button x:Name="BtnSave" Content="Save" Style="{StaticResource MaterialDesignRaisedButton}" Click="BtnSave_Click" Visibility="Collapsed" />
+                <Button x:Name="BtnOk" Content="OK" Style="{StaticResource MaterialDesignRaisedButton}" Click="BtnOk_Click" Visibility="Collapsed" IsDefault="True" />
+                <Button x:Name="BtnYes" Content="Yes" Style="{StaticResource MaterialDesignRaisedButton}" Click="BtnYes_Click" Visibility="Collapsed" IsDefault="True" />
+                <Button x:Name="BtnSave" Content="Save" Style="{StaticResource MaterialDesignRaisedButton}" Click="BtnSave_Click" Visibility="Collapsed" IsDefault="True" />
             </StackPanel>
         </Grid>
     </Border>

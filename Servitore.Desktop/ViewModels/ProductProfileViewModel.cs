@@ -41,27 +41,16 @@ public partial class ProductProfileViewModel : ViewModelBase
         IsLoading = true;
         try
         {
-            int maxRetries = 15;
-            for (int i = 0; i < maxRetries; i++)
+            Profile = await _apiService.GetAsync<ProductDetailsDto>($"api/assets/{_productId}/profile");
+            if (Profile != null)
             {
-                try
-                {
-                    Profile = await _apiService.GetAsync<ProductDetailsDto>($"api/assets/{_productId}/profile");
-                    if (Profile != null)
-                    {
-                        await LoadBarcodeImageAsync();
-                    }
-                    return; // Success!
-                }
-                catch (Exception ex)
-                {
-                    ClientLogger.Log($"Attempt {i + 1} to load product profile data failed", ex);
-                    if (i < maxRetries - 1)
-                    {
-                        await Task.Delay(2000);
-                    }
-                }
+                await LoadBarcodeImageAsync();
             }
+        }
+        catch (Exception ex)
+        {
+            ClientLogger.Log("Failed to load product profile data", ex);
+            Helpers.ToastHelper.ShowToast("Failed to load product profile.");
         }
         finally
         {

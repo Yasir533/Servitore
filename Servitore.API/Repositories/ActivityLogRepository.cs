@@ -21,6 +21,7 @@ public class ActivityLogRepository : IActivityLogRepository
 
     public Task<List<ActivityLog>> GetAllAsync() =>
         _context.ActivityLogs
+            .AsNoTracking()
             .OrderByDescending(l => l.DateTime)
             .Take(1000)
             .ToListAsync();

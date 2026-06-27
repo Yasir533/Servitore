@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Servitore.Shared.Models;
+using Servitore.Desktop.Helpers;
 
 namespace Servitore.Desktop.Views;
 
@@ -17,6 +18,7 @@ public partial class LiveUsersView : UserControl
 
     private async void UserControl_Loaded(object sender, RoutedEventArgs e)
     {
+        App.SignalRService.UserPresenceListUpdated -= OnPresenceUpdated;
         App.SignalRService.UserPresenceListUpdated += OnPresenceUpdated;
 
         // Apply admin/manager visibility constraints
@@ -128,7 +130,7 @@ public partial class LiveUsersView : UserControl
                           $"Last Activity: {user.LastActivity.ToLocalTime():HH:mm:ss}\n" +
                           $"Connection ID: {user.ConnectionId}";
 
-            MessageBox.Show(Window.GetWindow(this), details, "User Session Details", MessageBoxButton.OK, MessageBoxImage.Information);
+            DialogHelper.ShowInfo(details, "User Session Details");
         }
     }
 
@@ -138,20 +140,18 @@ public partial class LiveUsersView : UserControl
         {
             if (user.ConnectionId == App.SignalRService.ConnectionId)
             {
-                MessageBox.Show(Window.GetWindow(this), "You cannot force log out yourself.", "Action Prohibited", MessageBoxButton.OK, MessageBoxImage.Warning);
+                DialogHelper.ShowError("You cannot force log out yourself.", "Action Prohibited");
                 return;
             }
 
-            var confirm = MessageBox.Show(Window.GetWindow(this), 
+            var confirm = DialogHelper.Confirm(
                 $"Are you sure you want to force logout user '{user.Username}'?", 
-                "Force User Logout", 
-                MessageBoxButton.YesNo, 
-                MessageBoxImage.Question);
+                "Force User Logout");
 
-            if (confirm == MessageBoxResult.Yes)
+            if (confirm)
             {
                 await App.SignalRService.ForceLogoutAsync(user.ConnectionId);
-                MessageBox.Show(Window.GetWindow(this), $"Forced logout signal sent to connection {user.ConnectionId}.", "Logout Signal Sent", MessageBoxButton.OK, MessageBoxImage.Information);
+                DialogHelper.ShowInfo($"Forced logout signal sent to connection {user.ConnectionId}.", "Logout Signal Sent");
             }
         }
     }

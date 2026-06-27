@@ -31,23 +31,12 @@ public partial class CustomerProfileViewModel : ViewModelBase
         IsLoading = true;
         try
         {
-            int maxRetries = 15;
-            for (int i = 0; i < maxRetries; i++)
-            {
-                try
-                {
-                    Profile = await _apiService.GetAsync<CustomerProfileDto>($"api/customers/{_customerId}/profile");
-                    return; // Success!
-                }
-                catch (Exception ex)
-                {
-                    ClientLogger.Log($"Attempt {i + 1} to load customer profile data failed", ex);
-                    if (i < maxRetries - 1)
-                    {
-                        await Task.Delay(2000);
-                    }
-                }
-            }
+            Profile = await _apiService.GetAsync<CustomerProfileDto>($"api/customers/{_customerId}/profile");
+        }
+        catch (Exception ex)
+        {
+            ClientLogger.Log("Failed to load customer profile data", ex);
+            Helpers.ToastHelper.ShowToast("Failed to load customer profile.");
         }
         finally
         {

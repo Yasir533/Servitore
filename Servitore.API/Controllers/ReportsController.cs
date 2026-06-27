@@ -27,6 +27,7 @@ public class ReportsController : ControllerBase
     public async Task<IActionResult> ExportTickets(string format)
     {
         var tickets = await _context.ServiceEntries
+            .AsNoTracking()
             .Include(t => t.Customer)
             .Include(t => t.Asset)
             .Include(t => t.AssignedToUser)
@@ -42,6 +43,7 @@ public class ReportsController : ControllerBase
     public async Task<IActionResult> ExportCustomers(string format)
     {
         var customers = await _context.Customers
+            .AsNoTracking()
             .OrderBy(c => c.CustomerName)
             .ToListAsync();
 
@@ -54,6 +56,7 @@ public class ReportsController : ControllerBase
     public async Task<IActionResult> ExportAssets(string format)
     {
         var assets = await _context.Assets
+            .AsNoTracking()
             .Include(a => a.Customer)
             .OrderBy(a => a.AssetCode)
             .ToListAsync();

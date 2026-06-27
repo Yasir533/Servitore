@@ -21,5 +21,9 @@ public partial class ServiceEntryView : UserControl
                 Helpers.ClientLogger.Log("Failed to execute LoadCommand in ServiceEntryView", ex);
             }
         };
+        Unloaded += (s, e) =>
+        {
+            vm.Dispose();
+        };
     }
 }

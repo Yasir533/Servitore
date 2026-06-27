@@ -163,6 +163,8 @@ public partial class ServiceEntryEditDialog : Window
                 // Bind attachments
                 RefreshAttachmentsGrid();
                 UploadButton.IsEnabled = true;
+
+                ProblemBox.Focus();
             }
             else
             {
@@ -448,8 +450,10 @@ public partial class ServiceEntryEditDialog : Window
 
     private async void SaveClose_Click(object sender, RoutedEventArgs e)
     {
+        bool isNew = ServiceEntry.ServiceEntryId == 0;
         if (await SaveAsync())
         {
+            ToastHelper.ShowToast(isNew ? "Service Entry Saved Successfully" : "Service Entry Updated Successfully");
             _isClosingFromSave = true;
             DialogResult = true;
             Close();
@@ -800,10 +804,10 @@ public partial class ServiceEntryEditDialog : Window
     {
         if (sender is Button btn && btn.Tag is ServiceEntryAttachmentDto attachment)
         {
-            var confirm = MessageBox.Show($"Are you sure you want to delete '{attachment.FileName}'?",
-                "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            var confirm = DialogHelper.Confirm($"Are you sure you want to delete '{attachment.FileName}'?",
+                "Confirm Delete");
 
-            if (confirm == MessageBoxResult.Yes)
+            if (confirm)
             {
                 try
                 {

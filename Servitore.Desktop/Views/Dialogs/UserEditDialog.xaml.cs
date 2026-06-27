@@ -1,6 +1,7 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using Servitore.Desktop.Helpers;
 using Servitore.Desktop.ViewModels;
 
 namespace Servitore.Desktop.Views.Dialogs;
@@ -9,6 +10,10 @@ public partial class UserEditDialog : Window
 {
     public UserManagementViewModel.UserRow User { get; }
     public string? Password { get; private set; }
+
+    private bool _isLoaded = false;
+    private bool _isDirty = false;
+    private bool _isClosingFromSave = false;
 
     public UserEditDialog(UserManagementViewModel.UserRow? user = null)
     {
@@ -35,6 +40,8 @@ public partial class UserEditDialog : Window
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
+        FullNameBox.Focus();
+
         if (User.Id > 0 && !string.IsNullOrEmpty(User.RoleName))
         {
             foreach (ComboBoxItem item in RoleCombo.Items)
@@ -46,6 +53,15 @@ public partial class UserEditDialog : Window
                 }
             }
         }
+        _isLoaded = true;
+    }
+
+    private void Input_Changed(object sender, EventArgs e)
+    {
+        if (_isLoaded)
+        {
+            _isDirty = true;
+        }
     }
 
     private void Save_Click(object sender, RoutedEventArgs e)
@@ -56,19 +72,19 @@ public partial class UserEditDialog : Window
 
         if (string.IsNullOrWhiteSpace(fullName) || string.IsNullOrWhiteSpace(username))
         {
-            MessageBox.Show("Full Name and Username are required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            DialogHelper.ShowError("Full Name and Username are required.", "Validation Error");
             return;
         }
 
         if (User.Id == 0 && string.IsNullOrWhiteSpace(password))
         {
-            MessageBox.Show("Password is required for a new user.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            DialogHelper.ShowError("Password is required for a new user.", "Validation Error");
             return;
         }
 
         if (RoleCombo.SelectedItem is not ComboBoxItem roleItem)
         {
-            MessageBox.Show("Please select a system role.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            DialogHelper.ShowError("Please select a system role.", "Validation Error");
             return;
         }
 
@@ -80,6 +96,7 @@ public partial class UserEditDialog : Window
         User.IsActive = IsActiveCheck.IsChecked ?? true;
         Password = string.IsNullOrWhiteSpace(password) ? null : password;
 
+        _isClosingFromSave = true;
         DialogResult = true;
         Close();
     }
@@ -88,5 +105,32 @@ public partial class UserEditDialog : Window
     {
         DialogResult = false;
         Close();
+    }
+
+    private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    {
+        if (_isClosingFromSave) return;
+
+        if (_isDirty)
+        {
+            var result = DialogHelper.ConfirmSaveDiscardCancel("You have unsaved changes. Do you want to save them before closing?", "Unsaved Changes");
+            if (result == ModernMessageResult.Save)
+            {
+                e.Cancel = true;
+                Save_Click(sender, new RoutedEventArgs());
+            }
+            else if (result == ModernMessageResult.Discard)
+            {
+                DialogResult = false;
+            }
+            else
+            {
+                e.Cancel = true;
+            }
+        }
+        else
+        {
+            DialogResult = false;
+        }
     }
 }

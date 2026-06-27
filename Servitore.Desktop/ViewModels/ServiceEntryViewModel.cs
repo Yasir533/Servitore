@@ -12,7 +12,7 @@ using Servitore.Shared.Models;
 
 namespace Servitore.Desktop.ViewModels;
 
-public partial class ServiceEntryViewModel : ViewModelBase
+public partial class ServiceEntryViewModel : ViewModelBase, IDisposable
 {
     private readonly ApiService _apiService;
     private readonly SignalRService _signalRService;
@@ -46,8 +46,13 @@ public partial class ServiceEntryViewModel : ViewModelBase
         _signalRService = signalRService;
         ServiceEntriesView = CollectionViewSource.GetDefaultView(_allEntries);
         ServiceEntriesView.Filter = FilterServiceEntry;
-        _signalRService.NotificationReceived += async _ => await LoadAsync();
+        _signalRService.NotificationReceived += OnNotificationReceived;
         _signalRService.DataChanged += OnDataChanged;
+    }
+
+    private async void OnNotificationReceived(NotificationModel notification)
+    {
+        await LoadAsync();
     }
 
     private async void OnDataChanged(Servitore.Shared.Models.DataEventModel dataEvent)
@@ -78,31 +83,28 @@ public partial class ServiceEntryViewModel : ViewModelBase
         IsLoading = true;
         try
         {
-            int maxRetries = 15;
-            for (int i = 0; i < maxRetries; i++)
+            var results = await _apiService.GetAsync<List<ServiceEntryRow>>("api/serviceentries");
+            _allEntries.Clear();
+            if (results is not null)
             {
-                try
-                {
-                    var results = await _apiService.GetAsync<List<ServiceEntryRow>>("api/serviceentries");
-                    _allEntries.Clear();
-                    if (results is not null)
-                        foreach (var t in results) _allEntries.Add(t);
-                    return; // Success!
-                }
-                catch (Exception ex)
-                {
-                    Helpers.ClientLogger.Log($"Attempt {i + 1} to load service entry data failed", ex);
-                    if (i < maxRetries - 1)
-                    {
-                        await Task.Delay(2000);
-                    }
-                }
+                foreach (var t in results) _allEntries.Add(t);
             }
+        }
+        catch (Exception ex)
+        {
+            Helpers.ClientLogger.Log("Failed to load service entry data", ex);
+            Helpers.ToastHelper.ShowToast("Failed to load service entries.");
         }
         finally
         {
             IsLoading = false;
         }
+    }
+
+    public void Dispose()
+    {
+        _signalRService.NotificationReceived -= OnNotificationReceived;
+        _signalRService.DataChanged -= OnDataChanged;
     }
 
     [RelayCommand]

@@ -8,7 +8,8 @@
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="{DynamicResource MaterialDesignFont}"
-        Loaded="Window_Loaded">
+        Loaded="Window_Loaded"
+        Closing="Window_Closing">
 
     <Grid Margin="24">
         <Grid.RowDefinitions>
@@ -24,26 +25,31 @@
                 <TextBox x:Name="FullNameBox"
                          materialDesign:HintAssist.Hint="Full Name *"
                          Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         TextChanged="Input_Changed"
                          Margin="0,0,0,12" />
 
                 <TextBox x:Name="UsernameBox"
                          materialDesign:HintAssist.Hint="Username *"
                          Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         TextChanged="Input_Changed"
                          Margin="0,0,0,12" />
 
                 <TextBox x:Name="EmailBox"
                          materialDesign:HintAssist.Hint="Email"
                          Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         TextChanged="Input_Changed"
                          Margin="0,0,0,12" />
 
                 <TextBox x:Name="PhoneBox"
                          materialDesign:HintAssist.Hint="Phone Number"
                          Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         TextChanged="Input_Changed"
                          Margin="0,0,0,12" />
 
                 <ComboBox x:Name="RoleCombo"
                           materialDesign:HintAssist.Hint="System Role *"
                           Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                          SelectionChanged="Input_Changed"
                           Margin="0,0,0,12">
                     <ComboBoxItem Content="Admin" Tag="Admin" />
                     <ComboBoxItem Content="Manager" Tag="Manager" />
@@ -54,18 +60,21 @@
                 <PasswordBox x:Name="PasswordBox"
                              materialDesign:HintAssist.Hint="Password (Leave blank to keep current)"
                              Style="{StaticResource MaterialDesignOutlinedPasswordBox}"
+                             PasswordChanged="Input_Changed"
                              Margin="0,0,0,12" />
 
                 <CheckBox x:Name="IsActiveCheck"
                           Content="Account Active"
                           Style="{StaticResource MaterialDesignActionLightCheckBox}"
+                          Checked="Input_Changed"
+                          Unchecked="Input_Changed"
                           IsChecked="True" />
             </StackPanel>
         </ScrollViewer>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
-            <Button Content="Cancel" Style="{StaticResource MaterialDesignFlatButton}" Click="Cancel_Click" Margin="0,0,8,0" />
-            <Button Content="Save" Style="{StaticResource MaterialDesignRaisedButton}" Click="Save_Click" Width="90" />
+            <Button Content="Cancel" Style="{StaticResource MaterialDesignFlatButton}" Click="Cancel_Click" Margin="0,0,8,0" IsCancel="True" />
+            <Button Content="Save" Style="{StaticResource MaterialDesignRaisedButton}" Click="Save_Click" Width="90" IsDefault="True" />
         </StackPanel>
     </Grid>
 </Window>

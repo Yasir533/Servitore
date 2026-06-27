@@ -21,5 +21,9 @@ public partial class CustomerView : UserControl
                 Helpers.ClientLogger.Log("Failed to execute LoadCommand in CustomerView", ex);
             }
         };
+        Unloaded += (s, e) =>
+        {
+            vm.Dispose();
+        };
     }
 }

@@ -47,26 +47,17 @@ public partial class UserManagementViewModel : ViewModelBase
         IsLoading = true;
         try
         {
-            int maxRetries = 15;
-            for (int i = 0; i < maxRetries; i++)
+            var results = await _apiService.GetAsync<List<UserRow>>("api/users");
+            _all.Clear();
+            if (results is not null)
             {
-                try
-                {
-                    var results = await _apiService.GetAsync<List<UserRow>>("api/users");
-                    _all.Clear();
-                    if (results is not null)
-                        foreach (var u in results) _all.Add(u);
-                    return; // Success!
-                }
-                catch (Exception ex)
-                {
-                    Helpers.ClientLogger.Log($"Attempt {i + 1} to load user data failed", ex);
-                    if (i < maxRetries - 1)
-                    {
-                        await Task.Delay(2000);
-                    }
-                }
+                foreach (var u in results) _all.Add(u);
             }
+        }
+        catch (Exception ex)
+        {
+            Helpers.ClientLogger.Log("Failed to load user data", ex);
+            Helpers.ToastHelper.ShowToast("Failed to load users.");
         }
         finally
         {

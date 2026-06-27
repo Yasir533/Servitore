@@ -45,6 +45,13 @@ public partial class ModernMessageWindow : Window
 
         ConfigureIcon(icon);
         ConfigureButtons(buttons);
+
+        Loaded += (s, e) =>
+        {
+            if (BtnOk.Visibility == Visibility.Visible) BtnOk.Focus();
+            else if (BtnYes.Visibility == Visibility.Visible) BtnYes.Focus();
+            else if (BtnSave.Visibility == Visibility.Visible) BtnSave.Focus();
+        };
     }
 
     private void ConfigureIcon(ModernMessageIcon icon)

@@ -10,7 +10,7 @@ using Servitore.Desktop.Services;
 
 namespace Servitore.Desktop.ViewModels;
 
-public partial class ProductViewModel : ViewModelBase
+public partial class ProductViewModel : ViewModelBase, IDisposable
 {
     private readonly ApiService _apiService;
     private readonly BarcodeService _barcodeService;
@@ -73,31 +73,27 @@ public partial class ProductViewModel : ViewModelBase
         IsLoading = true;
         try
         {
-            int maxRetries = 15;
-            for (int i = 0; i < maxRetries; i++)
+            var results = await _apiService.GetAsync<List<ProductRow>>("api/assets");
+            _allProducts.Clear();
+            if (results is not null)
             {
-                try
-                {
-                    var results = await _apiService.GetAsync<List<ProductRow>>("api/assets");
-                    _allProducts.Clear();
-                    if (results is not null)
-                        foreach (var a in results) _allProducts.Add(a);
-                    return; // Success!
-                }
-                catch (Exception ex)
-                {
-                    Helpers.ClientLogger.Log($"Attempt {i + 1} to load product data failed", ex);
-                    if (i < maxRetries - 1)
-                    {
-                        await Task.Delay(2000);
-                    }
-                }
+                foreach (var a in results) _allProducts.Add(a);
             }
+        }
+        catch (Exception ex)
+        {
+            Helpers.ClientLogger.Log("Failed to load product data", ex);
+            Helpers.ToastHelper.ShowToast("Failed to load product data.");
         }
         finally
         {
             IsLoading = false;
         }
+    }
+
+    public void Dispose()
+    {
+        App.SignalRService.DataChanged -= OnDataChanged;
     }
 
     [RelayCommand]

@@ -24,10 +24,10 @@ public class UserRepository : IUserRepository
         _context.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Id == id);
 
     public Task<User?> GetByUsernameAsync(string username) =>
-        _context.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Username == username);
+        _context.Users.AsNoTracking().Include(u => u.Role).FirstOrDefaultAsync(u => u.Username == username);
 
     public Task<List<User>> GetAllAsync() =>
-        _context.Users.Include(u => u.Role).ToListAsync();
+        _context.Users.AsNoTracking().Include(u => u.Role).ToListAsync();
 
     public async Task<User> AddAsync(User user)
     {

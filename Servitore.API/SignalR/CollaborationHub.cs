@@ -3,11 +3,18 @@ using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Servitore.Shared.Models;
+using Servitore.API.Services;
 
 namespace Servitore.API.SignalR;
 
 public class CollaborationHub : Hub
 {
+    private readonly IActivityLogService _activityLogService;
+
+    public CollaborationHub(IActivityLogService activityLogService)
+    {
+        _activityLogService = activityLogService;
+    }
     public override async Task OnConnectedAsync()
     {
         var httpContext = Context.GetHttpContext();
@@ -72,6 +79,16 @@ public class CollaborationHub : Hub
             CreatedBy = "System",
             CreatedDate = DateTime.UtcNow
         });
+
+        // Log logout activity in database and broadcast to live feed
+        var httpContext = Context.GetHttpContext();
+        if (httpContext != null)
+        {
+            var userIdStr = Context.User?.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value
+                            ?? Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            int userId = int.TryParse(userIdStr, out var id) ? id : 0;
+            await _activityLogService.LogActivityAsync("User logged out successfully", "Auth", userId, username, httpContext);
+        }
 
         await base.OnDisconnectedAsync(exception);
     }

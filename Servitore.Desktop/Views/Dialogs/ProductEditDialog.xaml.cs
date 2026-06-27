@@ -82,6 +82,7 @@ public partial class ProductEditDialog : Window
             }
 
             _isLoaded = true;
+            ProductNameBox.Focus();
         }
         catch (Exception)
         {
@@ -386,6 +387,7 @@ public partial class ProductEditDialog : Window
                 ClientLogger.Log("SignalR broadcast failed inside Product dialog SaveClose.", ex);
             }
 
+            ToastHelper.ShowToast(isNew ? "Product Added Successfully" : "Product Updated Successfully");
             _isClosingFromSave = true;
             DialogResult = true;
             Close();

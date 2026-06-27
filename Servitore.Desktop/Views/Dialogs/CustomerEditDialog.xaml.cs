@@ -109,6 +109,7 @@ public partial class CustomerEditDialog : Window
                 App.SignalRService.LockTakenOver += OnLockTakenOver;
             }
         }
+        NameBox.Focus();
         _isLoaded = true;
     }
 
@@ -330,6 +331,7 @@ public partial class CustomerEditDialog : Window
                 ClientLogger.Log("SignalR broadcast failed inside Customer dialog SaveClose.", ex);
             }
 
+            ToastHelper.ShowToast(isNew ? "Customer Added Successfully" : "Customer Updated Successfully");
             _isClosingFromSave = true;
             DialogResult = true;
             Close();
