@@ -36,7 +36,7 @@ public partial class CustomerProfileViewModel : ViewModelBase
         catch (Exception ex)
         {
             ClientLogger.Log("Failed to load customer profile data", ex);
-            Helpers.ToastHelper.ShowToast("Failed to load customer profile.");
+            Helpers.ToastHelper.ShowToast("Unable to load customer profile. Please try again.");
         }
         finally
         {

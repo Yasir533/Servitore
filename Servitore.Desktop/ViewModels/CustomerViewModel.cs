@@ -76,7 +76,7 @@ public partial class CustomerViewModel : ViewModelBase, IDisposable
         catch (Exception ex)
         {
             Helpers.ClientLogger.Log("Failed to load customer data", ex);
-            Helpers.ToastHelper.ShowToast("Failed to load customer data.");
+            Helpers.ToastHelper.ShowToast("Unable to load customers. Please try again.");
         }
         finally
         {

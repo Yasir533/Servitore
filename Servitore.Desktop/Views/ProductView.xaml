@@ -54,8 +54,9 @@
             <DataGrid ItemsSource="{Binding ProductsView}"
                        AutoGenerateColumns="False" IsReadOnly="True" CanUserSortColumns="True"
                        MouseDoubleClick="DataGrid_MouseDoubleClick"
-                       materialDesign:DataGridAssist.CellPadding="14 8 14 8"
-                       materialDesign:DataGridAssist.ColumnHeaderPadding="14 8 14 8">
+                       FontSize="14" RowHeight="44"
+                       materialDesign:DataGridAssist.CellPadding="16 10 16 10"
+                       materialDesign:DataGridAssist.ColumnHeaderPadding="16 10 16 10">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="ID"           Binding="{Binding ProductId}"   Width="60" />
                     <DataGridTextColumn Header="Product Code" Binding="{Binding ProductCode}" Width="120" />

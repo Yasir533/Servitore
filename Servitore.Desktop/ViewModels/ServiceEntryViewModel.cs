@@ -93,7 +93,7 @@ public partial class ServiceEntryViewModel : ViewModelBase, IDisposable
         catch (Exception ex)
         {
             Helpers.ClientLogger.Log("Failed to load service entry data", ex);
-            Helpers.ToastHelper.ShowToast("Failed to load service entries.");
+            Helpers.ToastHelper.ShowToast("Unable to load service entries. Please try again.");
         }
         finally
         {

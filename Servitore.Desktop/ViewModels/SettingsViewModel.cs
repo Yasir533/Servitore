@@ -56,7 +56,7 @@ public partial class SettingsViewModel : ViewModelBase
         catch (Exception ex)
         {
             Helpers.ClientLogger.Log("Failed to load settings", ex);
-            Helpers.ToastHelper.ShowToast("Failed to load system settings.");
+            Helpers.ToastHelper.ShowToast("Unable to load system settings. Please try again.");
         }
 
         try
@@ -72,7 +72,7 @@ public partial class SettingsViewModel : ViewModelBase
         catch (Exception ex)
         {
             Helpers.ClientLogger.Log("Failed to load WhatsApp settings", ex);
-            Helpers.ToastHelper.ShowToast("Failed to load WhatsApp settings.");
+            Helpers.ToastHelper.ShowToast("Unable to load WhatsApp settings. Please try again.");
         }
     }
 

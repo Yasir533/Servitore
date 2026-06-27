@@ -9,6 +9,8 @@
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="{DynamicResource MaterialDesignFont}"
+        FontSize="14.5"
+        FocusManager.FocusedElement="{Binding ElementName=NameBox}"
         PreviewKeyDown="Window_PreviewKeyDown"
         Closing="Window_Closing">
 

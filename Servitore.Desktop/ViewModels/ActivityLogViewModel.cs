@@ -101,7 +101,7 @@ public partial class ActivityLogViewModel : ViewModelBase
         catch (Exception ex)
         {
             Helpers.ClientLogger.Log("Failed to load activity log data", ex);
-            Helpers.ToastHelper.ShowToast("Failed to load activity logs.");
+            Helpers.ToastHelper.ShowToast("Unable to load activity logs. Please try again.");
         }
         finally 
         { 

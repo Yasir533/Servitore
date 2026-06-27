@@ -63,8 +63,9 @@
         <!-- Data Grid -->
         <Border Grid.Row="2" Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="6" Padding="12">
             <DataGrid x:Name="UsersDataGrid" AutoGenerateColumns="False" IsReadOnly="True"
-                      materialDesign:DataGridAssist.CellPadding="12 8 12 8"
-                      materialDesign:DataGridAssist.ColumnHeaderPadding="12 8 12 8">
+                      FontSize="14" RowHeight="44"
+                      materialDesign:DataGridAssist.CellPadding="16 10 16 10"
+                      materialDesign:DataGridAssist.ColumnHeaderPadding="16 10 16 10">
                 <DataGrid.Columns>
                     <DataGridTemplateColumn Header="Status" Width="90">
                         <DataGridTemplateColumn.CellTemplate>

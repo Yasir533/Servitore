@@ -50,7 +50,7 @@ public partial class ProductProfileViewModel : ViewModelBase
         catch (Exception ex)
         {
             ClientLogger.Log("Failed to load product profile data", ex);
-            Helpers.ToastHelper.ShowToast("Failed to load product profile.");
+            Helpers.ToastHelper.ShowToast("Unable to load product profile. Please try again.");
         }
         finally
         {

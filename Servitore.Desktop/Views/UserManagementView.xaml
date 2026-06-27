@@ -35,8 +35,9 @@
         <Border Grid.Row="3" Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="6">
             <DataGrid ItemsSource="{Binding UsersView}"
                       AutoGenerateColumns="False" IsReadOnly="True" CanUserSortColumns="True"
-                      materialDesign:DataGridAssist.CellPadding="14 8 14 8"
-                      materialDesign:DataGridAssist.ColumnHeaderPadding="14 8 14 8">
+                      FontSize="14" RowHeight="44"
+                      materialDesign:DataGridAssist.CellPadding="16 10 16 10"
+                      materialDesign:DataGridAssist.ColumnHeaderPadding="16 10 16 10">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="ID"         Binding="{Binding Id}"        Width="60" />
                     <DataGridTextColumn Header="Full Name"  Binding="{Binding FullName}"  Width="*" />

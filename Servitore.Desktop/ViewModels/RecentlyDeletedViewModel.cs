@@ -69,7 +69,7 @@ public partial class RecentlyDeletedViewModel : ViewModelBase, IDisposable
         catch (Exception ex)
         {
             ClientLogger.Log("Failed to load recently deleted items", ex);
-            ToastHelper.ShowToast("Failed to load recently deleted items.");
+            ToastHelper.ShowToast("Unable to load recently deleted items. Please try again.");
         }
         finally
         {

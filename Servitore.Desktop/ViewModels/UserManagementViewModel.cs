@@ -57,7 +57,7 @@ public partial class UserManagementViewModel : ViewModelBase
         catch (Exception ex)
         {
             Helpers.ClientLogger.Log("Failed to load user data", ex);
-            Helpers.ToastHelper.ShowToast("Failed to load users.");
+            Helpers.ToastHelper.ShowToast("Unable to load users. Please try again.");
         }
         finally
         {
