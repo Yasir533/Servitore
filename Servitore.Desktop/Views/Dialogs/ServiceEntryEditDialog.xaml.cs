@@ -690,10 +690,16 @@ public partial class ServiceEntryEditDialog : Window
             await Task.Delay(350, token);
             if (token.IsCancellationRequested) return;
 
-            var mobileInput = MobileBox.Text.Trim();
-            if (mobileInput.Length >= 5)
+            var rawInput = MobileBox.Text.Trim();
+            var digitsInput = new string(rawInput.Where(char.IsDigit).ToArray());
+            if (digitsInput.Length >= 5)
             {
-                var match = _allCustomers.FirstOrDefault(c => c.Mobile == mobileInput);
+                var match = _allCustomers.FirstOrDefault(c => 
+                {
+                    var cleanMobile = new string(c.Mobile.Where(char.IsDigit).ToArray());
+                    return cleanMobile.Contains(digitsInput) || cleanMobile == digitsInput;
+                });
+
                 if (match != null)
                 {
                     NameBox.Text = match.CustomerName;
