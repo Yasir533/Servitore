@@ -57,15 +57,18 @@ public partial class ReportsViewModel : ViewModelBase
 
         if (dialog.ShowDialog() != true) return;
 
-        try
+        using (App.SignalRService.GetBusyScope())
         {
-            var bytes = await _apiService.GetByteArrayAsync(endpoint);
-            await File.WriteAllBytesAsync(dialog.FileName, bytes);
-            Helpers.DialogHelper.ShowInfo("Report exported successfully.");
-        }
-        catch (Exception)
-        {
-            Helpers.DialogHelper.ShowError("Unable to download report. Please try again.");
+            try
+            {
+                var bytes = await _apiService.GetByteArrayAsync(endpoint);
+                await File.WriteAllBytesAsync(dialog.FileName, bytes);
+                Helpers.DialogHelper.ShowInfo("Report exported successfully.");
+            }
+            catch (Exception)
+            {
+                Helpers.DialogHelper.ShowError("Unable to download report. Please try again.");
+            }
         }
     }
 }

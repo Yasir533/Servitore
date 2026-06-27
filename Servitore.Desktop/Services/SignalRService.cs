@@ -24,6 +24,26 @@ public class SignalRService
     public event Action<string?>? Reconnected;
     public event Action<Exception?>? Closed;
 
+    private int _busyRefCount = 0;
+    private string _currentStatus = "Offline";
+    private string _currentModule = "Dashboard";
+
+    public event Action<string>? CurrentStatusChanged;
+
+    public string CurrentStatus
+    {
+        get => _currentStatus;
+        private set
+        {
+            if (_currentStatus != value)
+            {
+                _currentStatus = value;
+                CurrentStatusChanged?.Invoke(value);
+                _ = UpdatePresenceAsync(_currentModule, value);
+            }
+        }
+    }
+
     public string? ConnectionId => _connection?.ConnectionId;
 
     public async Task ConnectAsync(string apiBaseUrl, string token)
@@ -42,18 +62,25 @@ public class SignalRService
 
         _connection.Reconnecting += ex =>
         {
+            EvaluateStatus();
             Reconnecting?.Invoke(ex?.Message);
             return Task.CompletedTask;
         };
 
-        _connection.Reconnected += connectionId =>
+        _connection.Reconnected += async connectionId =>
         {
+            EvaluateStatus();
+            try
+            {
+                await _connection.SendAsync("LogConnectionRestored");
+            }
+            catch (Exception) { }
             Reconnected?.Invoke(connectionId);
-            return Task.CompletedTask;
         };
 
         _connection.Closed += ex =>
         {
+            EvaluateStatus();
             Closed?.Invoke(ex);
             return Task.CompletedTask;
         };
@@ -105,6 +132,7 @@ public class SignalRService
         });
 
         await _connection.StartAsync();
+        EvaluateStatus();
     }
 
     public async Task UpdatePresenceAsync(string currentModule, string status)
@@ -167,6 +195,70 @@ public class SignalRService
         {
             await _connection.DisposeAsync();
             _connection = null;
+        }
+        EvaluateStatus();
+    }
+
+    public void UpdateCurrentModule(string module)
+    {
+        _currentModule = module;
+        _ = UpdatePresenceAsync(module, CurrentStatus);
+    }
+
+    public void IncrementBusy()
+    {
+        System.Threading.Interlocked.Increment(ref _busyRefCount);
+        EvaluateStatus();
+    }
+
+    public void DecrementBusy()
+    {
+        if (System.Threading.Interlocked.Decrement(ref _busyRefCount) < 0)
+        {
+            System.Threading.Interlocked.Exchange(ref _busyRefCount, 0);
+        }
+        EvaluateStatus();
+    }
+
+    public IDisposable GetBusyScope()
+    {
+        return new BusyScope(this);
+    }
+
+    private void EvaluateStatus()
+    {
+        if (_connection?.State != HubConnectionState.Connected)
+        {
+            CurrentStatus = "Offline";
+        }
+        else if (_busyRefCount > 0)
+        {
+            CurrentStatus = "Busy";
+        }
+        else
+        {
+            CurrentStatus = "Online";
+        }
+    }
+
+    private class BusyScope : IDisposable
+    {
+        private readonly SignalRService _service;
+        private bool _disposed;
+
+        public BusyScope(SignalRService service)
+        {
+            _service = service;
+            _service.IncrementBusy();
+        }
+
+        public void Dispose()
+        {
+            if (!_disposed)
+            {
+                _service.DecrementBusy();
+                _disposed = true;
+            }
         }
     }
 }

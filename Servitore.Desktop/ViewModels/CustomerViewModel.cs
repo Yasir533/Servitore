@@ -141,29 +141,32 @@ public partial class CustomerViewModel : ViewModelBase, IDisposable
         if (!Helpers.DialogHelper.Confirm($"Are you sure you want to delete {row.CustomerName}?", "Confirm Delete")) return;
         
         IsLoading = true;
-        try
+        using (App.SignalRService.GetBusyScope())
         {
-            var name = row.CustomerName;
-            var id = row.CustomerId;
-            await _apiService.DeleteAsync($"api/customers/{row.CustomerId}");
-            _allCustomers.Remove(row);
-
-            await App.SignalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
+            try
             {
-                EntityType = "Customer",
-                Action = "Deleted",
-                RecordId = id.ToString(),
-                DisplayName = name,
-                Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
-            });
-        }
-        catch (Exception)
-        {
-            Helpers.DialogHelper.ShowError("Unable to delete customer. Please try again later.");
-        }
-        finally
-        {
-            IsLoading = false;
+                var name = row.CustomerName;
+                var id = row.CustomerId;
+                await _apiService.DeleteAsync($"api/customers/{row.CustomerId}");
+                _allCustomers.Remove(row);
+
+                await App.SignalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
+                {
+                    EntityType = "Customer",
+                    Action = "Deleted",
+                    RecordId = id.ToString(),
+                    DisplayName = name,
+                    Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
+                });
+            }
+            catch (Exception)
+            {
+                Helpers.DialogHelper.ShowError("Unable to delete customer. Please try again later.");
+            }
+            finally
+            {
+                IsLoading = false;
+            }
         }
     }
 

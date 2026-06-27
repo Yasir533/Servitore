@@ -26,9 +26,12 @@ public partial class ServiceEntryEditDialog : Window
     private List<AssetLookupItem> _customerAssets = new();
     private System.Threading.CancellationTokenSource? _debounceCts = null;
 
+    private readonly IDisposable _busyScopeValue;
+
     public ServiceEntryEditDialog(ApiService apiService, ServiceEntryDetailsDto? serviceEntry = null)
     {
         InitializeComponent();
+        _busyScopeValue = App.SignalRService.GetBusyScope();
         _apiService = apiService;
 
         if (serviceEntry != null)
@@ -632,6 +635,7 @@ public partial class ServiceEntryEditDialog : Window
     protected override void OnClosed(EventArgs e)
     {
         App.SignalRService.LockTakenOver -= OnLockTakenOver;
+        _busyScopeValue.Dispose();
         base.OnClosed(e);
     }
 

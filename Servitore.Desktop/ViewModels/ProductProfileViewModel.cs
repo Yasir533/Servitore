@@ -159,19 +159,22 @@ public partial class ProductProfileViewModel : ViewModelBase
         if (!DialogHelper.Confirm($"Are you sure you want to delete {doc.FileName}?", "Confirm Delete")) return;
 
         IsLoading = true;
-        try
+        using (App.SignalRService.GetBusyScope())
         {
-            await _apiService.DeleteAsync($"api/assets/documents/{doc.Id}");
-            Profile?.Documents.Remove(doc);
-            OnPropertyChanged(nameof(Profile));
-        }
-        catch (Exception)
-        {
-            DialogHelper.ShowError("Unable to save changes. Please try again later.");
-        }
-        finally
-        {
-            IsLoading = false;
+            try
+            {
+                await _apiService.DeleteAsync($"api/assets/documents/{doc.Id}");
+                Profile?.Documents.Remove(doc);
+                OnPropertyChanged(nameof(Profile));
+            }
+            catch (Exception)
+            {
+                DialogHelper.ShowError("Unable to save changes. Please try again later.");
+            }
+            finally
+            {
+                IsLoading = false;
+            }
         }
     }
 }

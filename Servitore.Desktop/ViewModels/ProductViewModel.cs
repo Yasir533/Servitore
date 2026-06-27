@@ -172,29 +172,32 @@ public partial class ProductViewModel : ViewModelBase, IDisposable
         if (!Helpers.DialogHelper.Confirm($"Are you sure you want to delete product {row.ProductCode}?", "Confirm Delete")) return;
 
         IsLoading = true;
-        try
+        using (App.SignalRService.GetBusyScope())
         {
-            var id = row.ProductId;
-            var code = row.ProductCode;
-            await _apiService.DeleteAsync($"api/assets/{row.ProductId}");
-            _allProducts.Remove(row);
-
-            await App.SignalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
+            try
             {
-                EntityType = "Asset",
-                Action = "Deleted",
-                RecordId = id.ToString(),
-                DisplayName = code,
-                Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
-            });
-        }
-        catch (Exception)
-        {
-            Helpers.DialogHelper.ShowError("Unable to delete product. Please try again later.");
-        }
-        finally
-        {
-            IsLoading = false;
+                var id = row.ProductId;
+                var code = row.ProductCode;
+                await _apiService.DeleteAsync($"api/assets/{row.ProductId}");
+                _allProducts.Remove(row);
+
+                await App.SignalRService.BroadcastDataChangeAsync(new Servitore.Shared.Models.DataEventModel
+                {
+                    EntityType = "Asset",
+                    Action = "Deleted",
+                    RecordId = id.ToString(),
+                    DisplayName = code,
+                    Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
+                });
+            }
+            catch (Exception)
+            {
+                Helpers.DialogHelper.ShowError("Unable to delete product. Please try again later.");
+            }
+            finally
+            {
+                IsLoading = false;
+            }
         }
     }
 

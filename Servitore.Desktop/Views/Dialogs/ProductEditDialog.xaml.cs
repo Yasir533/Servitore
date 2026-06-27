@@ -20,9 +20,12 @@ public partial class ProductEditDialog : Window
     private string _recordKey = string.Empty;
     private bool _isReadOnly = false;
 
+    private readonly IDisposable _busyScopeValue;
+
     public ProductEditDialog(ApiService apiService, ProductViewModel.ProductRow? product = null)
     {
         InitializeComponent();
+        _busyScopeValue = App.SignalRService.GetBusyScope();
         _apiService = apiService;
 
         if (product != null)
@@ -531,6 +534,7 @@ public partial class ProductEditDialog : Window
     protected override void OnClosed(EventArgs e)
     {
         App.SignalRService.LockTakenOver -= OnLockTakenOver;
+        _busyScopeValue.Dispose();
         base.OnClosed(e);
     }
 

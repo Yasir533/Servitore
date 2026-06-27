@@ -19,9 +19,12 @@ public partial class CustomerEditDialog : Window
     private string _recordKey = string.Empty;
     private bool _isReadOnly = false;
 
+    private readonly IDisposable _busyScopeValue;
+
     public CustomerEditDialog(CustomerViewModel.CustomerRow? customer = null)
     {
         InitializeComponent();
+        _busyScopeValue = App.SignalRService.GetBusyScope();
         
         if (customer != null)
         {
@@ -467,6 +470,7 @@ public partial class CustomerEditDialog : Window
     protected override void OnClosed(EventArgs e)
     {
         App.SignalRService.LockTakenOver -= OnLockTakenOver;
+        _busyScopeValue.Dispose();
         base.OnClosed(e);
     }
 

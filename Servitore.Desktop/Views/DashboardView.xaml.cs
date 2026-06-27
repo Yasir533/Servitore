@@ -56,16 +56,12 @@ public partial class DashboardView : UserControl
         ShowSummary();
     }
 
-    private bool _updatingStatusFromCode = false;
-    private string _manualStatus = "Online";
-
     private void DashboardView_Loaded(object sender, RoutedEventArgs e)
     {
-        _updatingStatusFromCode = true;
-        StatusSelectorCombo.SelectedIndex = 0; // Default: Online
-        _updatingStatusFromCode = false;
+        App.SignalRService.CurrentStatusChanged += OnSignalRStatusChanged;
+        OnSignalRStatusChanged(App.SignalRService.CurrentStatus);
 
-        _ = App.SignalRService.UpdatePresenceAsync(_currentTag, "Online");
+        App.SignalRService.UpdateCurrentModule("Dashboard");
     }
 
     private void DashboardView_Unloaded(object sender, RoutedEventArgs e)
@@ -77,16 +73,28 @@ public partial class DashboardView : UserControl
         App.SignalRService.Reconnecting -= OnSignalRReconnecting;
         App.SignalRService.Reconnected -= OnSignalRReconnected;
         App.SignalRService.Closed -= OnSignalRClosed;
+
+        App.SignalRService.CurrentStatusChanged -= OnSignalRStatusChanged;
     }
 
-    private void StatusSelectorCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void OnSignalRStatusChanged(string status)
     {
-        if (_updatingStatusFromCode) return;
-        if (StatusSelectorCombo.SelectedItem is ComboBoxItem item && item.Tag is string status)
+        Dispatcher.Invoke(() =>
         {
-            _manualStatus = status;
-            _ = App.SignalRService.UpdatePresenceAsync(_currentTag, status);
-        }
+            CurrentUserStatusText.Text = status;
+            switch (status)
+            {
+                case "Online":
+                    CurrentUserStatusLight.Fill = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(76, 175, 80));
+                    break;
+                case "Busy":
+                    CurrentUserStatusLight.Fill = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(244, 67, 54));
+                    break;
+                default:
+                    CurrentUserStatusLight.Fill = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(158, 158, 158));
+                    break;
+            }
+        });
     }
 
     private void OnSignalRReconnecting(string? message)
@@ -151,7 +159,7 @@ public partial class DashboardView : UserControl
         if (sender is not Button { Tag: string tag }) return;
 
         _currentTag = tag;
-        _ = App.SignalRService.UpdatePresenceAsync(tag, _manualStatus);
+        App.SignalRService.UpdateCurrentModule(tag);
 
         if (tag == "Dashboard")
         {

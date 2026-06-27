@@ -74,7 +74,7 @@ public class CollaborationHub : Hub
         // Broadcast a user logged out system notification
         await Clients.All.SendAsync("ReceiveNotification", new NotificationModel
         {
-            Message = $"{username} logged out.",
+            Message = exception != null ? $"{username} lost connection." : $"{username} logged out.",
             Type = Servitore.Shared.Enums.NotificationType.Info,
             CreatedBy = "System",
             CreatedDate = DateTime.UtcNow
@@ -87,10 +87,30 @@ public class CollaborationHub : Hub
             var userIdStr = Context.User?.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value
                             ?? Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             int userId = int.TryParse(userIdStr, out var id) ? id : 0;
-            await _activityLogService.LogActivityAsync("User logged out successfully", "Auth", userId, username, httpContext);
+            if (exception != null)
+            {
+                await _activityLogService.LogActivityAsync("Connection lost unexpectedly", "Auth", userId, username, httpContext);
+            }
+            else
+            {
+                await _activityLogService.LogActivityAsync("User logged out successfully", "Auth", userId, username, httpContext);
+            }
         }
 
         await base.OnDisconnectedAsync(exception);
+    }
+
+    public async Task LogConnectionRestored()
+    {
+        var username = Context.User?.Identity?.Name ?? "Anonymous";
+        var httpContext = Context.GetHttpContext();
+        if (httpContext != null)
+        {
+            var userIdStr = Context.User?.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value
+                            ?? Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            int userId = int.TryParse(userIdStr, out var id) ? id : 0;
+            await _activityLogService.LogActivityAsync("Connection restored successfully", "Auth", userId, username, httpContext);
+        }
     }
 
     public async Task UpdatePresence(string currentModule, string status)

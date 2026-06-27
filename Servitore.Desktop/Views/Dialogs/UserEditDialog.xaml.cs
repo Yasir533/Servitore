@@ -15,9 +15,12 @@ public partial class UserEditDialog : Window
     private bool _isDirty = false;
     private bool _isClosingFromSave = false;
 
+    private readonly IDisposable _busyScopeValue;
+
     public UserEditDialog(UserManagementViewModel.UserRow? user = null)
     {
         InitializeComponent();
+        _busyScopeValue = App.SignalRService.GetBusyScope();
 
         if (user != null)
         {
@@ -132,5 +135,11 @@ public partial class UserEditDialog : Window
         {
             DialogResult = false;
         }
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        _busyScopeValue.Dispose();
+        base.OnClosed(e);
     }
 }

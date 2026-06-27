@@ -50,4 +50,21 @@ public partial class App : Application
             // Ignore write failures
         }
     }
+
+    protected override void OnExit(ExitEventArgs e)
+    {
+        try
+        {
+            if (SignalRService.ConnectionId != null)
+            {
+                SignalRService.UpdatePresenceAsync("Dashboard", "Offline").Wait(500);
+                SignalRService.DisconnectAsync().Wait(500);
+            }
+        }
+        catch
+        {
+            // Ignore connection errors on shutdown
+        }
+        base.OnExit(e);
+    }
 }
