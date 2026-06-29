@@ -101,7 +101,7 @@
                     <materialDesign:Card Margin="0,0,0,12" Padding="14">
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                                <materialDesign:PackIcon Kind="PhoneCall" Width="18" Height="18" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" />
+                                <materialDesign:PackIcon Kind="Phone" Width="18" Height="18" VerticalAlignment="Center" Foreground="{DynamicResource PrimaryHueMidBrush}" />
                                 <TextBlock Text="Service &amp; Call Details" FontSize="14" FontWeight="Bold" Margin="8,0,0,0" VerticalAlignment="Center" />
                             </StackPanel>
 
