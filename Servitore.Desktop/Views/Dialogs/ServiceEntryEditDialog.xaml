@@ -50,6 +50,28 @@
             <!-- Column 1 (Left): Customer & Product Info -->
             <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                 <StackPanel>
+    <!-- Top Fields: TYPE, BRAND, SL NO -->
+    <materialDesign:Card Margin="0,0,0,12" Padding="14">
+        <StackPanel>
+            <!-- TYPE (Service Type) -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                <RadioButton x:Name="InHouseRadio" Content="In House Service" IsChecked="True" Checked="Input_Changed" Margin="0,0,16,0"/>
+                <RadioButton x:Name="OnSiteRadio" Content="OnSite Service" Checked="Input_Changed"/>
+            </StackPanel>
+            <!-- BRAND -->
+            <TextBox x:Name="BrandBox"
+                     materialDesign:HintAssist.Hint="Brand *"
+                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                     TextChanged="Input_Changed"
+                     Margin="0,0,0,10"/>
+            <!-- SL NO -->
+            <TextBox x:Name="SerialNumberBox"
+                     materialDesign:HintAssist.Hint="Serial Number *"
+                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                     TextChanged="Input_Changed"
+                     Margin="0,0,0,2"/>
+        </StackPanel>
+    </materialDesign:Card>
                     
                     <!-- Customer Info Card -->
                     <materialDesign:Card Margin="0,0,0,12" Padding="14">
