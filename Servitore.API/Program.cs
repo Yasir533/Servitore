@@ -10,20 +10,21 @@ using Servitore.Database.Context;
 using Servitore.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-// Change the default listening URL to avoid port conflicts (was 127.0.0.1:5000)
-builder.WebHost.UseUrls("http://127.0.0.1:5001");
+builder.WebHost.UseUrls("http://0.0.0.0:5000");
 
 // Load optional databaseSettings.json file
 builder.Configuration.AddJsonFile("databaseSettings.json", optional: true, reloadOnChange: true);
 
 // Startup Configuration Validation
 string? connectionString;
+bool isCustomDbSettings = false;
 var dbSettings = builder.Configuration.GetSection("DatabaseSettings");
 if (dbSettings.Exists() && 
     !string.IsNullOrWhiteSpace(dbSettings["Server"]) && 
     dbSettings["Server"] != "PRODUCTION_DATABASE_SERVER" && 
     !string.IsNullOrWhiteSpace(dbSettings["Database"]))
 {
+    isCustomDbSettings = true;
     var server = dbSettings["Server"];
     var database = dbSettings["Database"];
     var username = dbSettings["Username"];
@@ -47,6 +48,19 @@ if (string.IsNullOrWhiteSpace(connectionString))
 {
     throw new InvalidOperationException("CRITICAL CONFIGURATION ERROR: Connection string is missing or empty. Please configure databaseSettings.json or ConnectionStrings:DefaultConnection in appsettings.json.");
 }
+
+// Log connection string (masking password)
+var maskedConnectionString = connectionString;
+if (maskedConnectionString.Contains("Password="))
+{
+    var idx = maskedConnectionString.IndexOf("Password=");
+    var endIdx = maskedConnectionString.IndexOf(";", idx);
+    if (endIdx > idx)
+    {
+        maskedConnectionString = maskedConnectionString.Substring(0, idx + 9) + "******" + maskedConnectionString.Substring(endIdx);
+    }
+}
+Console.WriteLine($"[DIAGNOSTIC] API startup: Using database connection string from {(isCustomDbSettings ? "databaseSettings.json" : "appsettings.json ConnectionStrings:DefaultConnection")}: {maskedConnectionString}");
 
 var jwtKey = builder.Configuration["Jwt:Key"];
 if (string.IsNullOrWhiteSpace(jwtKey))
@@ -132,15 +146,24 @@ _ = Task.Run(async () =>
     using (var scope = app.Services.CreateScope())
     {
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
         try
         {
+            logger.LogInformation("[DIAGNOSTIC] Checking database connection by testing DbConnection...");
+            var canConnect = await db.Database.CanConnectAsync();
+            logger.LogInformation($"[DIAGNOSTIC] Database connection status: {(canConnect ? "SUCCESS" : "FAILED")}");
+
+            logger.LogInformation("[DIAGNOSTIC] Applying pending database migrations...");
             db.Database.Migrate();                          // applies pending migrations
+            logger.LogInformation("[DIAGNOSTIC] Database migrations applied successfully.");
+
+            logger.LogInformation("[DIAGNOSTIC] Seeding database...");
             await SeedData.SeedAsync(db);                  // seeds admin user if absent
+            logger.LogInformation("[DIAGNOSTIC] Database seeding completed successfully.");
         }
         catch (Exception ex)
         {
-            var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-            logger.LogError(ex, "An error occurred while migrating or seeding the database.");
+            logger.LogError(ex, "[DIAGNOSTIC] An error occurred while migrating or seeding the database.");
         }
     }
 });

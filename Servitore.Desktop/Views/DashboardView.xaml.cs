@@ -28,7 +28,7 @@ public partial class DashboardView : UserControl
 
         // Register Toast helper
         ToastHelper.MessageQueue = MainSnackbar.MessageQueue;
-
+          
         // Enforce role-based menu hiding
         var role = App.AuthenticationService.CurrentUser?.Role;
         if (role != Servitore.Shared.Enums.UserRole.Admin)

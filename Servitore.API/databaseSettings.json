@@ -1,8 +1,8 @@
 {
   "DatabaseSettings": {
-    "Server": "PRODUCTION_DATABASE_SERVER",
+    "Server": "DESKTOP-230BTIQ",
     "Database": "ServitoreDB",
-    "Username": "",
-    "Password": ""
+    "Username": "servitore",
+    "Password": "Servitore@123"
   }
 }
