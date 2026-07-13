@@ -105,6 +105,7 @@ public class ServiceEntryService : IServiceEntryService
         {
             if (!string.IsNullOrEmpty(dto.ProductBrand)) asset.Brand = dto.ProductBrand;
             if (!string.IsNullOrEmpty(dto.ProductModel)) asset.Model = dto.ProductModel;
+            if (!string.IsNullOrEmpty(dto.ProductSerialNumber)) asset.SerialNumber = dto.ProductSerialNumber;
             _context.Assets.Update(asset);
             await _context.SaveChangesAsync();
         }
@@ -280,6 +281,7 @@ public class ServiceEntryService : IServiceEntryService
         {
             if (!string.IsNullOrEmpty(dto.ProductBrand)) asset.Brand = dto.ProductBrand;
             if (!string.IsNullOrEmpty(dto.ProductModel)) asset.Model = dto.ProductModel;
+            if (!string.IsNullOrEmpty(dto.ProductSerialNumber)) asset.SerialNumber = dto.ProductSerialNumber;
             _context.Assets.Update(asset);
             await _context.SaveChangesAsync();
         }

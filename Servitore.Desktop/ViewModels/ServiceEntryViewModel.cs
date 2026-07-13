@@ -71,7 +71,8 @@ public partial class ServiceEntryViewModel : ViewModelBase, IDisposable
         {
             var q = SearchText.ToLower();
             if (!t.ServiceEntryNumber.ToLower().Contains(q) &&
-                !(t.CustomerName?.ToLower().Contains(q) ?? false))
+                !(t.CustomerName?.ToLower().Contains(q) ?? false) &&
+                !(t.ProductSerialNumber?.ToLower().Contains(q) ?? false))
                 return false;
         }
         return true;
@@ -246,6 +247,7 @@ public partial class ServiceEntryViewModel : ViewModelBase, IDisposable
         public string ServiceEntryNumber { get; set; } = string.Empty;
         public string? CustomerName { get; set; }
         public string? AssetName { get; set; }
+        public string? ProductSerialNumber { get; set; }
         public string ProblemDescription { get; set; } = string.Empty;
         public string Priority { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
