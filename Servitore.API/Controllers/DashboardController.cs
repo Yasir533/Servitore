@@ -106,6 +106,34 @@ public class DashboardController : ControllerBase
             })
             .ToListAsync();
 
+        // 4. Quick View metrics
+        var quickViewServiceCalls = await _context.ServiceEntries.CountAsync(t => !t.IsDeleted);
+        var quickViewPendingCalls = await _context.ServiceEntries
+            .CountAsync(t => !t.IsDeleted && (t.Status == ServiceEntryStatus.Pending || t.Status == ServiceEntryStatus.InProgress));
+        var quickViewDeadlineCalls = await _context.ServiceEntries
+            .CountAsync(t => !t.IsDeleted && t.IsTomorrow && (t.Status == ServiceEntryStatus.Pending || t.Status == ServiceEntryStatus.InProgress));
+        var quickViewPriorityCalls = await _context.ServiceEntries
+            .CountAsync(t => !t.IsDeleted && (t.Priority == ServiceEntryPriority.High || t.Priority == ServiceEntryPriority.Urgent) && (t.Status == ServiceEntryStatus.Pending || t.Status == ServiceEntryStatus.InProgress));
+        var quickViewRegisteredClosedToday = await _context.ServiceEntries
+            .CountAsync(t => !t.IsDeleted && t.CreatedDate.Date == today)
+            + await _context.ServiceEntries.CountAsync(t => !t.IsDeleted && (t.Status == ServiceEntryStatus.Completed || t.Status == ServiceEntryStatus.Delivered) && t.ModifiedDate != null && t.ModifiedDate.Value.Date == today);
+        var quickViewPendingCustomerResponse = await _context.ServiceEntries
+            .CountAsync(t => !t.IsDeleted && t.SubCallType == "Pending for Customer Response" && (t.Status == ServiceEntryStatus.Pending || t.Status == ServiceEntryStatus.InProgress));
+        var quickViewPendingSpare = await _context.ServiceEntries
+            .CountAsync(t => !t.IsDeleted && t.SubCallType == "Pending for Spare" && (t.Status == ServiceEntryStatus.Pending || t.Status == ServiceEntryStatus.InProgress));
+        var quickViewPendingTechnicalSupport = await _context.ServiceEntries
+            .CountAsync(t => !t.IsDeleted && t.SubCallType == "Pending for Technical Support" && (t.Status == ServiceEntryStatus.Pending || t.Status == ServiceEntryStatus.InProgress));
+        var quickViewPendingOthers = await _context.ServiceEntries
+            .CountAsync(t => !t.IsDeleted && t.SubCallType == "Pending for Others Reason" && (t.Status == ServiceEntryStatus.Pending || t.Status == ServiceEntryStatus.InProgress));
+        var quickViewItemNotDelivered = await _context.ServiceEntries
+            .CountAsync(t => !t.IsDeleted && t.Status != ServiceEntryStatus.Delivered && t.ServiceType == "InHouse");
+        var quickViewUnassignedCalls = await _context.ServiceEntries
+            .CountAsync(t => !t.IsDeleted && t.AssignedToUserId == null && (t.Status == ServiceEntryStatus.Pending || t.Status == ServiceEntryStatus.InProgress));
+        var quickViewTransferRequested = await _context.ServiceEntries
+            .CountAsync(t => !t.IsDeleted && t.SubCallType == "Transfer Requested" && (t.Status == ServiceEntryStatus.Pending || t.Status == ServiceEntryStatus.InProgress));
+        var quickViewDeliveryChallan = await _context.ServiceEntries
+            .CountAsync(t => !t.IsDeleted && t.Status == ServiceEntryStatus.Delivered);
+
         var summary = new Servitore.Shared.Models.DashboardSummary
         {
             TotalCustomers = totalCustomers,
@@ -117,7 +145,21 @@ public class DashboardController : ControllerBase
             RecentNotifications = recentNotifications,
             RecentServiceEntries = recentEntries,
             ServiceEntryStatusCounts = entryStatusCounts,
-            RecentActivities = recentActivities
+            RecentActivities = recentActivities,
+
+            QuickViewServiceCalls = quickViewServiceCalls,
+            QuickViewPendingCalls = quickViewPendingCalls,
+            QuickViewDeadlineCalls = quickViewDeadlineCalls,
+            QuickViewPriorityCalls = quickViewPriorityCalls,
+            QuickViewRegisteredClosedToday = quickViewRegisteredClosedToday,
+            QuickViewPendingCustomerResponse = quickViewPendingCustomerResponse,
+            QuickViewPendingSpare = quickViewPendingSpare,
+            QuickViewPendingTechnicalSupport = quickViewPendingTechnicalSupport,
+            QuickViewPendingOthers = quickViewPendingOthers,
+            QuickViewItemNotDelivered = quickViewItemNotDelivered,
+            QuickViewUnassignedCalls = quickViewUnassignedCalls,
+            QuickViewTransferRequested = quickViewTransferRequested,
+            QuickViewDeliveryChallan = quickViewDeliveryChallan
         };
 
         return Ok(summary);

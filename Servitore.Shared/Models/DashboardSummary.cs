@@ -17,6 +17,21 @@ public class DashboardSummary
     public List<DashboardServiceEntryDto> RecentServiceEntries { get; set; } = new();
     public Dictionary<string, int> ServiceEntryStatusCounts { get; set; } = new();
     public List<ActivityLogDto> RecentActivities { get; set; } = new();
+
+    // Quick View fields
+    public int QuickViewServiceCalls { get; set; }
+    public int QuickViewPendingCalls { get; set; }
+    public int QuickViewDeadlineCalls { get; set; }
+    public int QuickViewPriorityCalls { get; set; }
+    public int QuickViewRegisteredClosedToday { get; set; }
+    public int QuickViewPendingCustomerResponse { get; set; }
+    public int QuickViewPendingSpare { get; set; }
+    public int QuickViewPendingTechnicalSupport { get; set; }
+    public int QuickViewPendingOthers { get; set; }
+    public int QuickViewItemNotDelivered { get; set; }
+    public int QuickViewUnassignedCalls { get; set; }
+    public int QuickViewTransferRequested { get; set; }
+    public int QuickViewDeliveryChallan { get; set; }
 }
 
 public class DashboardServiceEntryDto

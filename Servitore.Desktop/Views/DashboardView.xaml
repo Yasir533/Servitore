@@ -152,12 +152,84 @@
         <!-- Main Content Area -->
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="64" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
+            <!-- Main Menu Bar -->
+            <Menu Grid.Row="0" Background="{DynamicResource MaterialDesignPaper}" BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0,0,0,1" FontSize="13.5" Padding="8,4">
+                <MenuItem Header="Masters">
+                    <MenuItem Header="Customer Type">
+                        <MenuItem Header="Add" Click="Menu_CustomerTypeAdd_Click" />
+                        <MenuItem Header="Display" Click="Menu_CustomerTypeDisplay_Click" />
+                    </MenuItem>
+                    <MenuItem Header="Customer" Click="Menu_Customer_Click" />
+                    <MenuItem Header="Authorised Service Provider" Click="Menu_ASP_Click" />
+                    <MenuItem Header="Tax Master" Click="Menu_TaxMaster_Click" />
+                    <MenuItem Header="Service Category">
+                        <MenuItem Header="Add" Click="Menu_ServiceCategoryAdd_Click" />
+                        <MenuItem Header="Display" Click="Menu_ServiceCategoryDisplay_Click" />
+                    </MenuItem>
+                    <MenuItem Header="Item Category" Click="Menu_ItemCategory_Click" />
+                    <MenuItem Header="Manufacturer" Click="Menu_Manufacturer_Click" />
+                    <MenuItem Header="Item" Click="Menu_Item_Click" />
+                    <MenuItem Header="Area Master" Click="Menu_AreaMaster_Click" />
+                    <MenuItem Header="Service Center" Click="Menu_ServiceCenter_Click" />
+                </MenuItem>
+                <MenuItem Header="Maintenance Contract">
+                    <MenuItem Header="New Contract" Click="Menu_NewContract_Click" />
+                    <MenuItem Header="Display Contracts" Click="Menu_DisplayContracts_Click" />
+                    <MenuItem Header="PM Calls Pending to be Registered" Click="Menu_PMCallsPending_Click" />
+                </MenuItem>
+                <MenuItem Header="Warranty">
+                    <MenuItem Header="Add Warranty Info" Click="Menu_AddWarrantyInfo_Click" />
+                    <MenuItem Header="View Warranty Info" Click="Menu_ViewWarrantyInfo_Click" />
+                </MenuItem>
+                <MenuItem Header="Service">
+                    <MenuItem Header="Service Call Register (F3)" InputGestureText="F3" Click="Menu_ServiceCallRegister_Click" />
+                    <MenuItem Header="Pending Calls (Ctrl+P)" InputGestureText="Ctrl+P" Click="Menu_PendingCalls_Click" />
+                    <MenuItem Header="Transfer Requested Calls" Click="Menu_TransferRequestedCalls_Click" />
+                </MenuItem>
+                <MenuItem Header="Delivery Challan">
+                    <MenuItem Header="Add Delivery Challan" Click="Menu_AddDeliveryChallan_Click" />
+                    <MenuItem Header="View Delivery Challans" Click="Menu_ViewDeliveryChallans_Click" />
+                </MenuItem>
+                <MenuItem Header="Reports">
+                    <MenuItem Header="Service Bills">
+                        <MenuItem Header="Bill Ledger" Click="Menu_BillLedger_Click" />
+                    </MenuItem>
+                    <MenuItem Header="Display Service Calls (F6)" InputGestureText="F6" Click="Menu_DisplayServiceCalls_Click" />
+                    <MenuItem Header="ASP Reports">
+                        <MenuItem Header="Company Wise Reports" Click="Menu_CompanyWiseReports_Click" />
+                    </MenuItem>
+                    <MenuItem Header="Area Related Reports">
+                        <MenuItem Header="Area Wise" Click="Menu_AreaWise_Click" />
+                        <MenuItem Header="Area Wise Customer Wise" Click="Menu_AreaWiseCustomerWise_Click" />
+                        <MenuItem Header="Area Wise Engineer Wise" Click="Menu_AreaWiseEngineerWise_Click" />
+                        <MenuItem Header="Area Wise Calls Closed Bills Not Raised" Click="Menu_AreaWiseClosedBillsNotRaised_Click" />
+                        <MenuItem Header="Area Wise Payment Pending Report" Click="Menu_AreaWisePaymentPending_Click" />
+                        <MenuItem Header="Area Wise Items Not Delivered Report" Click="Menu_AreaWiseItemsNotDelivered_Click" />
+                    </MenuItem>
+                    <MenuItem Header="Engineer Wise">
+                        <MenuItem Header="Revenue / Expenditure" Click="Menu_EngineerRevenueExpenditure_Click" />
+                        <MenuItem Header="Pending Calls (F8)" InputGestureText="F8" Click="Menu_EngineerPendingCalls_Click" />
+                    </MenuItem>
+                    <MenuItem Header="Maintenance Contract Reports" Click="Menu_MaintenanceContractReports_Click" />
+                    <MenuItem Header="Warranty Reports">
+                        <MenuItem Header="Warranty Wise Expenditure Reports" Click="Menu_WarrantyExpenditure_Click" />
+                        <MenuItem Header="Near Expiry Warranty Report" Click="Menu_WarrantyNearExpiry_Click" />
+                    </MenuItem>
+                    <MenuItem Header="StandBy Reports" Click="Menu_StandByReports_Click" />
+                </MenuItem>
+                <MenuItem Header="Administration" Click="Menu_Administration_Click" />
+                <MenuItem Header="Settings" Click="Menu_Settings_Click" />
+                <MenuItem Header="Window" Click="Menu_Window_Click" />
+                <MenuItem Header="Logout" Click="Menu_Logout_Click" />
+            </Menu>
+
             <!-- Top Header Bar -->
-            <Border Grid.Row="0"
+            <Border Grid.Row="1"
                     BorderBrush="{DynamicResource MaterialDesignDivider}"
                     BorderThickness="0,0,0,1"
                     Background="{DynamicResource MaterialDesignPaper}"
@@ -293,10 +365,10 @@
             </Border>
 
             <!-- Main Content Area Host -->
-            <ContentControl x:Name="ContentHost" Grid.Row="1" />
+            <ContentControl x:Name="ContentHost" Grid.Row="2" />
 
             <!-- Toast Notification Area -->
-            <materialDesign:Snackbar x:Name="MainSnackbar" Grid.Row="1"
+            <materialDesign:Snackbar x:Name="MainSnackbar" Grid.Row="2"
                                      MessageQueue="{materialDesign:MessageQueue}"
                                      HorizontalAlignment="Left" VerticalAlignment="Bottom"
                                      Margin="24,0,0,24" />

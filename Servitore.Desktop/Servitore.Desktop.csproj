@@ -13,6 +13,7 @@
   <ItemGroup>
     <Resource Include="Assets\Icons\logo.ico" />
     <Resource Include="Assets\Images\logo.png" />
+    <Resource Include="Assets\Images\dashboard_background.png" />
   </ItemGroup>
 
   <ItemGroup>

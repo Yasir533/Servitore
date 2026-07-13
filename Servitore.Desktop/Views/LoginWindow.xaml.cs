@@ -143,9 +143,10 @@ public partial class LoginWindow : Window
         }
 
         var dashboard = new DashboardView();
+        var username = App.AuthenticationService.CurrentUser?.Username ?? "admin";
         var mainWindow = new Window
         {
-            Title = "Servitore - Dashboard",
+            Title = $"Servitore - Sai services - {username}",
             Content = dashboard,
             WindowState = WindowState.Maximized,
             Icon = new System.Windows.Media.Imaging.BitmapImage(new Uri("pack://application:,,,/Assets/Icons/logo.ico", UriKind.Absolute))

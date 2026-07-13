@@ -10,6 +10,8 @@ using Servitore.Database.Context;
 using Servitore.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+// Change the default listening URL to avoid port conflicts (was 127.0.0.1:5000)
+builder.WebHost.UseUrls("http://127.0.0.1:5001");
 
 // Load optional databaseSettings.json file
 builder.Configuration.AddJsonFile("databaseSettings.json", optional: true, reloadOnChange: true);

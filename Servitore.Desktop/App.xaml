@@ -14,6 +14,9 @@
                 <ResourceDictionary Source="Assets/Themes/AppTheme.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
+            <!-- Font Override to Times New Roman -->
+            <FontFamily x:Key="MaterialDesignFont">Times New Roman</FontFamily>
+
             <!-- Converters available application-wide -->
             <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
