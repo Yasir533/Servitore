@@ -1,4 +1,4 @@
 {
-  "ApiBaseUrl": "https://192.168.1.109:5001/",
+  "ApiBaseUrl": "http://localhost:5000",
   "IdleTimeoutMinutes": 10
 }

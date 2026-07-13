@@ -58,6 +58,7 @@ public class ApiService
             // Fallback to default
         }
 
+        Helpers.ClientLogger.Log($"[DIAGNOSTIC] ApiService initialized with API URL: {baseUrl}");
         BaseUrl = baseUrl;
         IdleTimeoutMinutes = idleTimeout;
         _httpClient = new HttpClient
@@ -93,59 +94,72 @@ public class ApiService
         }
         catch (JsonException ex)
         {
-            Helpers.ClientLogger.Log("JSON deserialization failed", ex);
+            Helpers.ClientLogger.Log("[DIAGNOSTIC] JSON deserialization failed", ex);
             throw new InvalidOperationException("Failed to process the server response.", ex);
         }
     }
 
     public async Task<T?> GetAsync<T>(string endpoint)
     {
+        var requestUrl = new Uri(_httpClient.BaseAddress!, endpoint).ToString();
+        Helpers.ClientLogger.Log($"[DIAGNOSTIC] GET Request URL: {requestUrl}");
         try
         {
             var response = await _httpClient.GetAsync(endpoint);
+            Helpers.ClientLogger.Log($"[DIAGNOSTIC] GET Response code for {endpoint}: {(int)response.StatusCode} ({response.StatusCode})");
             response.EnsureSuccessStatusCode();
             return await ReadContentSafeAsync<T>(response.Content);
         }
         catch (Exception ex)
         {
-            Helpers.ClientLogger.Log($"GET request failed for endpoint: {endpoint}", ex);
+            Helpers.ClientLogger.Log($"[DIAGNOSTIC] GET request failed for endpoint: {endpoint}. Error: {ex.Message}", ex);
             throw;
         }
     }
 
     public async Task<byte[]> GetByteArrayAsync(string endpoint)
     {
+        var requestUrl = new Uri(_httpClient.BaseAddress!, endpoint).ToString();
+        Helpers.ClientLogger.Log($"[DIAGNOSTIC] GET Byte Array Request URL: {requestUrl}");
         try
         {
-            return await _httpClient.GetByteArrayAsync(endpoint);
+            var data = await _httpClient.GetByteArrayAsync(endpoint);
+            Helpers.ClientLogger.Log($"[DIAGNOSTIC] GET Byte Array Success for {endpoint}");
+            return data;
         }
         catch (Exception ex)
         {
-            Helpers.ClientLogger.Log($"GET byte array request failed for endpoint: {endpoint}", ex);
+            Helpers.ClientLogger.Log($"[DIAGNOSTIC] GET byte array request failed for endpoint: {endpoint}. Error: {ex.Message}", ex);
             throw;
         }
     }
 
     public async Task<TResponse?> PostAsync<TRequest, TResponse>(string endpoint, TRequest body)
     {
+        var requestUrl = new Uri(_httpClient.BaseAddress!, endpoint).ToString();
+        Helpers.ClientLogger.Log($"[DIAGNOSTIC] POST Request URL: {requestUrl}");
         try
         {
             var response = await _httpClient.PostAsJsonAsync(endpoint, body);
+            Helpers.ClientLogger.Log($"[DIAGNOSTIC] POST Response code for {endpoint}: {(int)response.StatusCode} ({response.StatusCode})");
             response.EnsureSuccessStatusCode();
             return await ReadContentSafeAsync<TResponse>(response.Content);
         }
         catch (Exception ex)
         {
-            Helpers.ClientLogger.Log($"POST request failed for endpoint: {endpoint}", ex);
+            Helpers.ClientLogger.Log($"[DIAGNOSTIC] POST request failed for endpoint: {endpoint}. Error: {ex.Message}", ex);
             throw;
         }
     }
 
     public async Task<string> PutAsync<TRequest>(string endpoint, TRequest body)
     {
+        var requestUrl = new Uri(_httpClient.BaseAddress!, endpoint).ToString();
+        Helpers.ClientLogger.Log($"[DIAGNOSTIC] PUT Request URL: {requestUrl}");
         try
         {
             var response = await _httpClient.PutAsJsonAsync(endpoint, body);
+            Helpers.ClientLogger.Log($"[DIAGNOSTIC] PUT Response code for {endpoint}: {(int)response.StatusCode} ({response.StatusCode})");
             if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
             {
                 var contentStr = await response.Content.ReadAsStringAsync();
@@ -156,7 +170,7 @@ public class ApiService
         }
         catch (Exception ex)
         {
-            Helpers.ClientLogger.Log($"PUT request failed for endpoint: {endpoint}", ex);
+            Helpers.ClientLogger.Log($"[DIAGNOSTIC] PUT request failed for endpoint: {endpoint}. Error: {ex.Message}", ex);
             throw;
         }
     }
@@ -172,20 +186,25 @@ public class ApiService
 
     public async Task DeleteAsync(string endpoint)
     {
+        var requestUrl = new Uri(_httpClient.BaseAddress!, endpoint).ToString();
+        Helpers.ClientLogger.Log($"[DIAGNOSTIC] DELETE Request URL: {requestUrl}");
         try
         {
             var response = await _httpClient.DeleteAsync(endpoint);
+            Helpers.ClientLogger.Log($"[DIAGNOSTIC] DELETE Response code for {endpoint}: {(int)response.StatusCode} ({response.StatusCode})");
             response.EnsureSuccessStatusCode();
         }
         catch (Exception ex)
         {
-            Helpers.ClientLogger.Log($"DELETE request failed for endpoint: {endpoint}", ex);
+            Helpers.ClientLogger.Log($"[DIAGNOSTIC] DELETE request failed for endpoint: {endpoint}. Error: {ex.Message}", ex);
             throw;
         }
     }
 
     public async Task<TResponse?> UploadFileAsync<TResponse>(string endpoint, string filePath)
     {
+        var requestUrl = new Uri(_httpClient.BaseAddress!, endpoint).ToString();
+        Helpers.ClientLogger.Log($"[DIAGNOSTIC] FileUpload Request URL: {requestUrl}, file: {filePath}");
         try
         {
             using var content = new MultipartFormDataContent();
@@ -195,12 +214,13 @@ public class ApiService
             content.Add(streamContent, "file", Path.GetFileName(filePath));
 
             var response = await _httpClient.PostAsync(endpoint, content);
+            Helpers.ClientLogger.Log($"[DIAGNOSTIC] FileUpload Response code for {endpoint}: {(int)response.StatusCode} ({response.StatusCode})");
             response.EnsureSuccessStatusCode();
             return await ReadContentSafeAsync<TResponse>(response.Content);
         }
         catch (Exception ex)
         {
-            Helpers.ClientLogger.Log($"FileUpload request failed for endpoint: {endpoint}, file: {filePath}", ex);
+            Helpers.ClientLogger.Log($"[DIAGNOSTIC] FileUpload request failed for endpoint: {endpoint}, file: {filePath}. Error: {ex.Message}", ex);
             throw;
         }
     }

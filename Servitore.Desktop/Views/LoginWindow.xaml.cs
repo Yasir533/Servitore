@@ -30,6 +30,7 @@ public partial class LoginWindow : Window
     private async System.Threading.Tasks.Task RunConnectionCheckInBackgroundAsync()
     {
         UpdateStatusLight(false, "Connecting to server...");
+        Helpers.ClientLogger.Log($"[DIAGNOSTIC] Starting background connection check. API base URL: {App.ApiService.BaseUrl}");
 
         int maxRetries = 60; // 30 seconds
         for (int i = 0; i < maxRetries; i++)
@@ -41,18 +42,20 @@ public partial class LoginWindow : Window
                 {
                     _isServerOnline = true;
                     UpdateStatusLight(true, "Server Online");
+                    Helpers.ClientLogger.Log("[DIAGNOSTIC] Background connection check: Server is ONLINE.");
                     return;
                 }
             }
             catch (System.Exception ex)
             {
-                Helpers.ClientLogger.Log($"Startup connection check attempt {i + 1} failed.", ex);
+                Helpers.ClientLogger.Log($"[DIAGNOSTIC] Startup connection check attempt {i + 1} failed. Endpoint: {App.ApiService.BaseUrl}api/auth/ping", ex);
             }
             
             await System.Threading.Tasks.Task.Delay(1000);
         }
 
         UpdateStatusLight(false, "Server Offline. Check API connection.", isFailed: true);
+        Helpers.ClientLogger.Log("[DIAGNOSTIC] Background connection check: Server is OFFLINE after 60 retries.");
     }
 
     private void UpdateStatusLight(bool isOnline, string text, bool isFailed = false)
@@ -86,14 +89,19 @@ public partial class LoginWindow : Window
         {
             try
             {
+                Helpers.ClientLogger.Log("[DIAGNOSTIC] LoginButton clicked, server not online yet. Pinging server...");
                 var pingResult = await App.ApiService.GetAsync<PingResponse>("api/auth/ping");
                 if (pingResult is { Status: "Healthy" })
                 {
                     _isServerOnline = true;
                     UpdateStatusLight(true, "Server Online");
+                    Helpers.ClientLogger.Log("[DIAGNOSTIC] Ping during LoginButton click succeeded: Server is ONLINE.");
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Helpers.ClientLogger.Log("[DIAGNOSTIC] Ping during LoginButton click failed.", ex);
+            }
         }
 
         if (!_isServerOnline)
