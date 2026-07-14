@@ -300,7 +300,6 @@ public partial class ServiceEntryEditDialog : Window
                     _isReadOnly = true;
                     TitleText.Text += " (View Only)";
                     SaveButton.Visibility = Visibility.Collapsed;
-                    SaveNewButton.Visibility = Visibility.Collapsed;
                     DisableInputs();
                 }
                 else if (conflictDialog.Result == LockConflictResult.TakeOver)
@@ -312,7 +311,6 @@ public partial class ServiceEntryEditDialog : Window
                         _isReadOnly = true;
                         TitleText.Text += " (View Only)";
                         SaveButton.Visibility = Visibility.Collapsed;
-                        SaveNewButton.Visibility = Visibility.Collapsed;
                         DisableInputs();
                     }
                     else
@@ -343,7 +341,6 @@ public partial class ServiceEntryEditDialog : Window
                 _isReadOnly = true;
                 TitleText.Text = TitleText.Text.Replace("Details", "Details (View Only)");
                 SaveButton.Visibility = Visibility.Collapsed;
-                SaveNewButton.Visibility = Visibility.Collapsed;
                 DisableInputs();
             });
         }
