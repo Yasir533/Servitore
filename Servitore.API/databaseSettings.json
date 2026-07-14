@@ -1,6 +1,6 @@
 {
   "DatabaseSettings": {
-    "Server": "hp",
+    "Server": "(localdb)\\MSSQLLocalDB",
     "Database": "ServitoreDB",
     "Username": "",
     "Password": ""
