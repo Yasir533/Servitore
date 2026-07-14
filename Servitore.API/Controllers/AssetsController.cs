@@ -52,6 +52,28 @@ public class AssetsController : ControllerBase
         return asset is null ? NotFound() : Ok(asset);
     }
 
+    [HttpGet("by-serial/{serialNumber}")]
+    public async Task<IActionResult> GetBySerialNumber(string serialNumber)
+    {
+        var assets = await _assetRepository.GetAllAsync();
+        var asset = assets.FirstOrDefault(a => a.SerialNumber != null && a.SerialNumber.Equals(serialNumber, StringComparison.OrdinalIgnoreCase));
+        if (asset == null) return NotFound();
+
+        return Ok(new
+        {
+            asset.AssetId,
+            asset.ProductName,
+            asset.Brand,
+            asset.Model,
+            asset.SerialNumber,
+            asset.CustomerId,
+            CustomerName = asset.Customer?.CustomerName,
+            CustomerMobile = asset.Customer?.Mobile,
+            CustomerCompany = asset.Customer?.Company,
+            CustomerEmail = asset.Customer?.Email
+        });
+    }
+
     [HttpGet("by-customer/{customerId:int}")]
     public async Task<IActionResult> GetByCustomer(int customerId) =>
         Ok(await _assetRepository.GetByCustomerAsync(customerId));

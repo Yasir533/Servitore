@@ -40,6 +40,13 @@ public partial class ServiceEntryViewModel : ViewModelBase, IDisposable
         set { SetProperty(ref _searchText, value); ServiceEntriesView.Refresh(); }
     }
 
+    private string _searchBy = "SCR No.";
+    public string SearchBy
+    {
+        get => _searchBy;
+        set { SetProperty(ref _searchBy, value); ServiceEntriesView.Refresh(); }
+    }
+
     public ServiceEntryViewModel(ApiService apiService, SignalRService signalRService)
     {
         _apiService = apiService;
@@ -70,10 +77,25 @@ public partial class ServiceEntryViewModel : ViewModelBase, IDisposable
         if (!string.IsNullOrWhiteSpace(SearchText))
         {
             var q = SearchText.ToLower();
-            if (!t.ServiceEntryNumber.ToLower().Contains(q) &&
-                !(t.CustomerName?.ToLower().Contains(q) ?? false) &&
-                !(t.ProductSerialNumber?.ToLower().Contains(q) ?? false))
-                return false;
+            if (SearchBy == "SCR No.")
+            {
+                return t.ServiceEntryNumber.ToLower().Contains(q);
+            }
+            else if (SearchBy == "Customer Name")
+            {
+                return t.CustomerName?.ToLower().Contains(q) ?? false;
+            }
+            else if (SearchBy == "Serial No.")
+            {
+                return t.ProductSerialNumber?.ToLower().Contains(q) ?? false;
+            }
+            else
+            {
+                if (!t.ServiceEntryNumber.ToLower().Contains(q) &&
+                    !(t.CustomerName?.ToLower().Contains(q) ?? false) &&
+                    !(t.ProductSerialNumber?.ToLower().Contains(q) ?? false))
+                    return false;
+            }
         }
         return true;
     }
@@ -198,10 +220,36 @@ public partial class ServiceEntryViewModel : ViewModelBase, IDisposable
                 DisplayName = row.ServiceEntryNumber,
                 Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
             });
+
+            try
+            {
+                var summary = await _apiService.GetAsync<DashboardSummary>("api/dashboard/summary");
+                int deadlineCount = summary?.QuickViewDeadlineCalls ?? 0;
+                Helpers.DialogHelper.ShowInfo($"Service entry {row.ServiceEntryNumber} was closed successfully.\n\nTotal remaining deadline calls: {deadlineCount}", "Call Closed");
+            }
+            catch
+            {
+                Helpers.DialogHelper.ShowInfo($"Service entry {row.ServiceEntryNumber} was closed successfully.", "Call Closed");
+            }
         }
         catch (Exception)
         {
             Helpers.DialogHelper.ShowError("Unable to close service entry. Please try again later.");
+        }
+    }
+
+    [RelayCommand]
+    private void Search()
+    {
+        var dialog = new Views.Dialogs.SearchDialog
+        {
+            Owner = System.Windows.Application.Current.MainWindow
+        };
+        if (dialog.ShowDialog() == true)
+        {
+            SelectedStatusFilter = "All";
+            SearchBy = dialog.SearchBy;
+            SearchText = dialog.SearchText;
         }
     }
 

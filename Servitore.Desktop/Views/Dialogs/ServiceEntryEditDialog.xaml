@@ -150,7 +150,7 @@
                             <TextBox x:Name="SerialNumberBox"
                                      materialDesign:HintAssist.Hint="Serial Number (Optional)"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                                     TextChanged="Input_Changed"
+                                     TextChanged="SerialNumberBox_TextChanged"
                                      Margin="0,0,0,2" />
                         </StackPanel>
                     </materialDesign:Card>

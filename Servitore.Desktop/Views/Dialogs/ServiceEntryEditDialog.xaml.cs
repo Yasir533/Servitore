@@ -944,6 +944,51 @@ public partial class ServiceEntryEditDialog : Window
         }
     }
 
+    private async void SerialNumberBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        Input_Changed(sender, e);
+        if (!_isLoaded) return;
+
+        _debounceCts?.Cancel();
+        _debounceCts = new System.Threading.CancellationTokenSource();
+        var token = _debounceCts.Token;
+
+        try
+        {
+            await Task.Delay(350, token);
+            if (token.IsCancellationRequested) return;
+
+            var rawInput = SerialNumberBox.Text.Trim();
+            if (rawInput.Length >= 5)
+            {
+                var asset = await _apiService.GetAsync<AssetWithCustomerDto>($"api/assets/by-serial/{Uri.EscapeDataString(rawInput)}");
+                if (asset != null)
+                {
+                    ProductNameBox.Text = asset.ProductName;
+                    BrandBox.Text = asset.Brand;
+                    ModelBox.Text = asset.Model;
+
+                    if (asset.CustomerId > 0)
+                    {
+                        MobileBox.Text = asset.CustomerMobile ?? string.Empty;
+                        NameBox.Text = asset.CustomerName ?? string.Empty;
+                        CompanyBox.Text = asset.CustomerCompany ?? string.Empty;
+                        EmailBox.Text = asset.CustomerEmail ?? string.Empty;
+
+                        await LoadAssetsForCustomerAsync(asset.CustomerId);
+                        ExistingAssetsCombo.SelectedValue = asset.AssetId;
+                    }
+                }
+            }
+        }
+        catch (TaskCanceledException)
+        {
+        }
+        catch (Exception)
+        {
+        }
+    }
+
     private async Task LoadAssetsForCustomerAsync(int customerId)
     {
         try
@@ -1143,6 +1188,20 @@ public partial class ServiceEntryEditDialog : Window
         public string? Brand { get; set; }
         public string? Model { get; set; }
         public string? SerialNumber { get; set; }
+    }
+
+    public class AssetWithCustomerDto
+    {
+        public int AssetId { get; set; }
+        public string ProductName { get; set; } = string.Empty;
+        public string? Brand { get; set; }
+        public string? Model { get; set; }
+        public string? SerialNumber { get; set; }
+        public int CustomerId { get; set; }
+        public string? CustomerName { get; set; }
+        public string? CustomerMobile { get; set; }
+        public string? CustomerCompany { get; set; }
+        public string? CustomerEmail { get; set; }
     }
 
     public class CustomerLookupItem

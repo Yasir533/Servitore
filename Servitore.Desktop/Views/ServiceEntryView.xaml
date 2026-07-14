@@ -3,6 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
 
+    <UserControl.InputBindings>
+        <KeyBinding Key="F2" Command="{Binding SearchCommand}" />
+        <KeyBinding Key="F5" Command="{Binding LoadCommand}" />
+    </UserControl.InputBindings>
+
     <Grid Margin="24">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -52,6 +57,33 @@
                        FontSize="14" RowHeight="44"
                        materialDesign:DataGridAssist.CellPadding="16 10 16 10"
                        materialDesign:DataGridAssist.ColumnHeaderPadding="16 10 16 10">
+                <DataGrid.RowStyle>
+                    <Style TargetType="DataGridRow" BasedOn="{StaticResource MaterialDesignDataGridRow}">
+                        <Setter Property="ContextMenu">
+                            <Setter.Value>
+                                <ContextMenu>
+                                    <MenuItem Header="Update Service Call" 
+                                              Command="{Binding PlacementTarget.DataContext.ViewServiceEntryCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              InputGestureText="Ctrl+U" />
+                                    <MenuItem Header="Close Call" 
+                                              Command="{Binding PlacementTarget.DataContext.CloseServiceEntryCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                    <MenuItem Header="Delete Service Call" 
+                                              Command="{Binding PlacementTarget.DataContext.DeleteServiceEntryCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                    <Separator />
+                                    <MenuItem Header="Search" 
+                                              Command="{Binding PlacementTarget.DataContext.SearchCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              InputGestureText="F2" />
+                                    <MenuItem Header="Refresh" 
+                                              Command="{Binding PlacementTarget.DataContext.LoadCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              InputGestureText="F5" />
+                                </ContextMenu>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </DataGrid.RowStyle>
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Entry #"     Binding="{Binding ServiceEntryNumber}" Width="120" />
                     <DataGridTextColumn Header="Customer"    Binding="{Binding CustomerName}"       Width="180" />
