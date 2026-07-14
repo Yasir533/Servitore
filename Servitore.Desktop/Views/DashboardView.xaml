@@ -293,6 +293,15 @@
                     <!-- User Profile & Notifications -->
                     <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
                         
+                        <!-- Refresh Button -->
+                        <Button Style="{StaticResource MaterialDesignIconButton}"
+                                x:Name="RefreshBtn"
+                                Click="RefreshBtn_Click"
+                                ToolTip="Refresh Page Data"
+                                Margin="0,0,16,0">
+                            <materialDesign:PackIcon Kind="Refresh" Width="20" Height="20" />
+                        </Button>
+
                         <!-- Notification Button -->
                         <Button Style="{StaticResource MaterialDesignIconButton}"
                                 x:Name="NotificationBtn"

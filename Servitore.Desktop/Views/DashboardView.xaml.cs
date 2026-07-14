@@ -285,6 +285,56 @@ public partial class DashboardView : UserControl
         NotificationPopup.IsOpen = !NotificationPopup.IsOpen;
     }
 
+    private async void RefreshBtn_Click(object sender, RoutedEventArgs e)
+    {
+        if (_currentTag == "Dashboard")
+        {
+            try
+            {
+                await _viewModel.LoadCommand.ExecuteAsync(null);
+            }
+            catch (Exception ex)
+            {
+                Helpers.ClientLogger.Log("Failed to refresh dashboard", ex);
+            }
+            return;
+        }
+
+        if (ContentHost.Content is FrameworkElement element)
+        {
+            if (element.DataContext is ViewModels.ViewModelBase vm)
+            {
+                var prop = vm.GetType().GetProperty("LoadCommand");
+                if (prop != null)
+                {
+                    var command = prop.GetValue(vm) as System.Windows.Input.ICommand;
+                    if (command != null && command.CanExecute(null))
+                    {
+                        if (command is CommunityToolkit.Mvvm.Input.IAsyncRelayCommand asyncCommand)
+                        {
+                            try
+                            {
+                                await asyncCommand.ExecuteAsync(null);
+                            }
+                            catch (Exception ex)
+                            {
+                                Helpers.ClientLogger.Log("Failed to refresh via LoadCommand", ex);
+                            }
+                        }
+                        else
+                        {
+                            command.Execute(null);
+                        }
+                        return;
+                    }
+                }
+            }
+
+            // Fallback: reload view completely
+            NavButton_Click(new Button { Tag = _currentTag }, new RoutedEventArgs());
+        }
+    }
+
     private void GlobalSearchBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
     {
         if (e.Key == System.Windows.Input.Key.Enter)
