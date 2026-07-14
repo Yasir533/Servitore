@@ -1,0 +1,17 @@
+{% extends 'layouts/base.html' %}
+{% block title %}{{ 'Edit' if item else 'Add' }} Customer Type{% endblock %}
+{% block topbar_title %}{{ 'Edit' if item else 'Add' }} Customer Type{% endblock %}
+{% block content %}
+<div class="page-header"><div><div class="page-title">{{ 'Edit Customer Type' if item else 'Add Customer Type' }}</div></div><a href="{{ url_for('masters.customer_types') }}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Back</a></div>
+<div class="card" style="max-width:460px;">
+  <div class="card-header"><i class="bi bi-tag text-accent"></i><span class="card-header-title">Customer Type Details</span></div>
+  <div class="card-body">
+    <form method="POST" action="{{ url_for('masters.edit_customer_type', id=item.id) if item else url_for('masters.add_customer_type') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="form-group" style="margin-bottom:14px;"><label class="form-label">Name <span class="required">*</span></label><input type="text" name="name" class="form-control" value="{{ item.name if item else '' }}" required></div>
+      <div class="form-group" style="margin-bottom:20px;"><label class="form-label">Description</label><input type="text" name="description" class="form-control" value="{{ item.description if item else '' }}"></div>
+      <div style="display:flex;gap:10px;"><button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> {{ 'Update' if item else 'Add' }}</button><a href="{{ url_for('masters.customer_types') }}" class="btn btn-secondary">Cancel</a></div>
+    </form>
+  </div>
+</div>
+{% endblock %}

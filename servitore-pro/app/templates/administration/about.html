@@ -1,0 +1,33 @@
+{% extends 'layouts/base.html' %}
+{% block title %}About — Servitore Pro{% endblock %}
+{% block topbar_title %}About Servitore Pro{% endblock %}
+{% block content %}
+<div class="page-header"><div><div class="page-title">About Servitore Pro</div></div></div>
+<div class="card" style="max-width:560px;">
+  <div class="card-header"><i class="bi bi-info-circle text-accent"></i><span class="card-header-title">System Information</span></div>
+  <div class="card-body" style="font-size:13px;">
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div><span style="color:var(--text-muted);font-size:11px;text-transform:uppercase;">Application</span><div class="fw-600 font-outfit" style="font-size:18px;">Servitore Pro</div></div>
+      <div><span style="color:var(--text-muted);font-size:11px;text-transform:uppercase;">Company</span><div>Sai Services</div></div>
+      <div><span style="color:var(--text-muted);font-size:11px;text-transform:uppercase;">Version</span><div class="text-accent fw-600">2.0.0</div></div>
+      <div class="divider"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;text-align:center;">
+        <div style="background:var(--bg-panel);border-radius:var(--radius-sm);padding:14px;">
+          <div class="font-outfit fw-700" style="font-size:28px;color:var(--accent);">{{ user_count }}</div>
+          <div style="font-size:11px;color:var(--text-muted);">Total Users</div>
+        </div>
+        <div style="background:var(--bg-panel);border-radius:var(--radius-sm);padding:14px;">
+          <div class="font-outfit fw-700" style="font-size:28px;color:var(--accent);">{{ customer_count }}</div>
+          <div style="font-size:11px;color:var(--text-muted);">Customers</div>
+        </div>
+        <div style="background:var(--bg-panel);border-radius:var(--radius-sm);padding:14px;">
+          <div class="font-outfit fw-700" style="font-size:28px;color:var(--accent);">{{ call_count }}</div>
+          <div style="font-size:11px;color:var(--text-muted);">Total Service Calls</div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div style="font-size:12px;color:var(--text-muted);">Built with Flask · SQLite · Bootstrap Icons · Inter &amp; Outfit Fonts</div>
+    </div>
+  </div>
+</div>
+{% endblock %}

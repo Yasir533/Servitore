@@ -1,0 +1,42 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Transfer Requested Calls{% endblock %}
+{% block topbar_title %}Transfer Requested Calls{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="page-title">Transfer Requested Calls</div>
+    <div class="page-subtitle">Service calls pending transfer to another engineer or center</div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">
+    <i class="bi bi-arrow-left-right text-accent"></i>
+    <span class="card-header-title">Transfer Requested</span>
+    <span style="margin-left:8px;font-size:12px;color:var(--text-muted);">({{ calls|length }} records)</span>
+  </div>
+  <div class="table-responsive">
+    {% if calls %}
+    <table class="data-table">
+      <thead>
+        <tr><th>Call No</th><th>Customer</th><th>Problem</th><th>Current Engineer</th><th>Date</th><th>Action</th></tr>
+      </thead>
+      <tbody>
+        {% for call in calls %}
+        <tr>
+          <td><span class="fw-600 text-accent">{{ call.call_no }}</span></td>
+          <td>{{ call.customer.name if call.customer else '—' }}</td>
+          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ call.problem_description }}</td>
+          <td>{{ call.engineer.full_name if call.engineer else '—' }}</td>
+          <td style="color:var(--text-muted);font-size:12px;">{{ call.call_date.strftime('%d %b %Y') if call.call_date else '—' }}</td>
+          <td><a href="{{ url_for('service.update_call', id=call.id) }}" class="btn btn-sm btn-secondary"><i class="bi bi-pencil-square"></i> Update</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state"><i class="bi bi-check-circle-fill" style="color:var(--status-closed);"></i><h3>No transfer requests</h3><p>No calls pending transfer.</p></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,135 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Pending Calls{% endblock %}
+{% block topbar_title %}Pending Calls (Ctrl+P){% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="page-title">Pending Service Calls</div>
+    <div class="page-subtitle">All open, unresolved service calls</div>
+  </div>
+  <a href="{{ url_for('service.register') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Register New Call</a>
+</div>
+
+<!-- Filters -->
+<div class="filters-bar">
+  <form method="GET" style="display:contents;">
+    <div class="filter-group">
+      <div class="filter-label">Search</div>
+      <input type="text" name="q" class="filter-control" placeholder="Customer or Call No" value="{{ q }}">
+    </div>
+    <div class="filter-group">
+      <div class="filter-label">Status</div>
+      <select name="status" class="filter-control">
+        <option value="">All Open</option>
+        {% for s in statuses %}
+        {% if s != 'Closed' %}
+        <option value="{{ s }}" {% if status_filter == s %}selected{% endif %}>{{ s }}</option>
+        {% endif %}
+        {% endfor %}
+      </select>
+    </div>
+    <div class="filter-group">
+      <div class="filter-label">Area</div>
+      <select name="area" class="filter-control">
+        <option value="">All Areas</option>
+        {% for a in areas %}
+        <option value="{{ a.id }}" {% if area_filter == a.id|string %}selected{% endif %}>{{ a.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="filter-group">
+      <div class="filter-label">Engineer</div>
+      <select name="engineer" class="filter-control">
+        <option value="">All Engineers</option>
+        {% for eng in engineers %}
+        <option value="{{ eng.id }}" {% if engineer_filter == eng.id|string %}selected{% endif %}>{{ eng.full_name or eng.username }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="filter-group" style="justify-content:flex-end; padding-bottom:2px;">
+      <div style="display:flex; gap:8px; align-items:center; margin-top:auto;">
+        <label class="form-check" style="margin:0;">
+          <input type="checkbox" name="priority" value="1" class="form-check-input" {% if priority_only %}checked{% endif %}>
+          <span style="font-size:12px; color:var(--status-priority); font-weight:600;">Priority</span>
+        </label>
+        <label class="form-check" style="margin:0;">
+          <input type="checkbox" name="deadline" value="1" class="form-check-input" {% if deadline_only %}checked{% endif %}>
+          <span style="font-size:12px; color:var(--status-deadline); font-weight:600;">Deadline</span>
+        </label>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary btn-sm" style="align-self:flex-end;"><i class="bi bi-funnel"></i> Filter</button>
+    <a href="{{ url_for('service.pending_calls') }}" class="btn btn-secondary btn-sm" style="align-self:flex-end;">Clear</a>
+  </form>
+</div>
+
+<!-- Calls Table -->
+<div class="card">
+  <div class="card-header">
+    <i class="bi bi-clock text-accent"></i>
+    <span class="card-header-title">Open Calls</span>
+    <span style="margin-left:8px; font-size:12px; color:var(--text-muted);">({{ calls|length }} records)</span>
+  </div>
+  <div class="table-responsive">
+    {% if calls %}
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th data-sort>Call No</th>
+          <th data-sort>Customer</th>
+          <th>Problem</th>
+          <th data-sort>Status</th>
+          <th>Engineer</th>
+          <th>Area</th>
+          <th data-sort>Date</th>
+          <th>Flags</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for call in calls %}
+        <tr style="{% if call.is_deadline %}background:rgba(220,38,38,0.05);{% elif call.is_priority %}background:rgba(239,68,68,0.04);{% endif %}">
+          <td>
+            <span class="fw-600 text-accent" style="font-family:'Outfit',sans-serif;">{{ call.call_no }}</span>
+          </td>
+          <td>
+            <div class="fw-600" style="font-size:13px;">{{ call.customer.name if call.customer else '—' }}</div>
+            {% if call.customer and call.customer.mobile %}
+            <div style="font-size:11px; color:var(--text-muted);">{{ call.customer.mobile }}</div>
+            {% endif %}
+          </td>
+          <td style="max-width:200px;">
+            <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:12.5px;">{{ call.problem_description }}</div>
+            {% if call.item_name %}<div style="font-size:11px; color:var(--text-muted);">{{ call.item_name }}</div>{% endif %}
+          </td>
+          <td>
+            {% set s = call.status %}
+            <span class="badge badge-{% if s == 'Pending' %}pending{% elif s == 'In Progress' %}progress{% elif s == 'Transfer Requested' %}transfer{% elif s == 'Unassigned' %}unassigned{% elif 'Customer' in s %}progress{% elif 'Spare' in s %}transfer{% elif 'Technical' in s %}progress{% else %}standby{% endif %}">{{ s }}</span>
+          </td>
+          <td style="font-size:12.5px;">{{ call.engineer.full_name if call.engineer else '<span style="color:var(--text-muted);">Unassigned</span>' }}</td>
+          <td style="font-size:12px; color:var(--text-muted);">{{ call.area.name if call.area else '—' }}</td>
+          <td style="font-size:12px; color:var(--text-muted); white-space:nowrap;">{{ call.call_date.strftime('%d %b %Y') if call.call_date else '—' }}</td>
+          <td>
+            {% if call.is_priority %}<span class="badge badge-priority" title="Priority"><i class="bi bi-exclamation-triangle"></i></span>{% endif %}
+            {% if call.is_deadline %}<span class="badge badge-deadline" title="Deadline" style="margin-left:4px;"><i class="bi bi-alarm"></i></span>{% endif %}
+          </td>
+          <td>
+            <a href="{{ url_for('service.update_call', id=call.id) }}" class="btn btn-sm btn-secondary" title="Update Call">
+              <i class="bi bi-pencil-square"></i>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+      <i class="bi bi-check-circle-fill" style="color:var(--status-closed);"></i>
+      <h3>No pending calls</h3>
+      <p>All service calls are resolved, or no calls match your filters.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

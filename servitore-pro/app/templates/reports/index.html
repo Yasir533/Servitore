@@ -1,0 +1,43 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Reports{% endblock %}
+{% block topbar_title %}Reports{% endblock %}
+{% block content %}
+<div class="page-header"><div><div class="page-title">Reports</div><div class="page-subtitle">Business analytics and service performance reports</div></div></div>
+<div class="stat-grid" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr));">
+  <a href="{{ url_for('reports.service_bills') }}" class="stat-card" style="--stat-color:#10b981;text-decoration:none;">
+    <div class="stat-card-label">Service Bills</div>
+    <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-top:8px;">Bill Ledger</div>
+    <i class="bi bi-receipt stat-card-icon"></i>
+  </a>
+  <a href="{{ url_for('reports.display_calls') }}" class="stat-card" style="--stat-color:#3b82f6;text-decoration:none;">
+    <div class="stat-card-label">Display Service Calls <kbd style="font-size:9px;opacity:0.5;padding:1px 4px;border:1px solid rgba(255,255,255,0.2);border-radius:3px;">F6</kbd></div>
+    <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-top:8px;">All Calls Report</div>
+    <i class="bi bi-telephone-inbound stat-card-icon"></i>
+  </a>
+  <a href="{{ url_for('reports.asp_reports') }}" class="stat-card" style="--stat-color:#8b5cf6;text-decoration:none;">
+    <div class="stat-card-label">ASP Reports</div>
+    <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-top:8px;">Company Wise</div>
+    <i class="bi bi-building-check stat-card-icon"></i>
+  </a>
+  <a href="{{ url_for('reports.area_reports') }}" class="stat-card" style="--stat-color:#f59e0b;text-decoration:none;">
+    <div class="stat-card-label">Area Related Reports</div>
+    <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-top:8px;">6 Area Sub-reports</div>
+    <i class="bi bi-geo-alt stat-card-icon"></i>
+  </a>
+  <a href="{{ url_for('reports.engineer_reports') }}" class="stat-card" style="--stat-color:#06b6d4;text-decoration:none;">
+    <div class="stat-card-label">Engineer Wise <kbd style="font-size:9px;opacity:0.5;padding:1px 4px;border:1px solid rgba(255,255,255,0.2);border-radius:3px;">F8</kbd></div>
+    <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-top:8px;">Revenue / Pending</div>
+    <i class="bi bi-person-badge stat-card-icon"></i>
+  </a>
+  <a href="{{ url_for('reports.warranty_reports') }}" class="stat-card" style="--stat-color:#ef4444;text-decoration:none;">
+    <div class="stat-card-label">Warranty Reports</div>
+    <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-top:8px;">Expenditure / Expiry</div>
+    <i class="bi bi-shield-exclamation stat-card-icon"></i>
+  </a>
+  <a href="{{ url_for('reports.standby_reports') }}" class="stat-card" style="--stat-color:#6b7280;text-decoration:none;">
+    <div class="stat-card-label">StandBy Reports</div>
+    <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-top:8px;">Standby Calls</div>
+    <i class="bi bi-pause-circle stat-card-icon"></i>
+  </a>
+</div>
+{% endblock %}

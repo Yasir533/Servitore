@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Servitore Pro{% endblock %} — Sai Services</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <!-- Brand -->
+    <div class="sidebar-brand">
+      <div class="brand-icon">S</div>
+      <div class="brand-text">
+        Servitore Pro
+        <small>Sai Services</small>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav style="flex:1; padding: 8px 0; overflow-y: auto;">
+
+      <!-- Dashboard -->
+      <div class="nav-section">
+        <a href="{{ url_for('dashboard.index') }}" class="nav-link {% if request.blueprint == 'dashboard' %}active{% endif %}">
+          <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+      </div>
+
+      <div class="divider" style="margin: 4px 16px;"></div>
+
+      <!-- Masters -->
+      <div class="nav-section">
+        <div class="nav-section-label">Masters</div>
+        <div class="nav-item">
+          <a class="nav-link" data-bs-toggle="collapse" href="#mastersMenu" role="button"
+             aria-expanded="{% if request.blueprint == 'masters' %}true{% else %}false{% endif %}">
+            <i class="bi bi-database"></i>
+            <span>Masters</span>
+            <i class="bi bi-chevron-down nav-arrow"></i>
+          </a>
+          <div class="collapse {% if request.blueprint == 'masters' %}show{% endif %}" id="mastersMenu">
+            <ul class="nav-submenu">
+              <li><a href="{{ url_for('masters.customer_types') }}" class="nav-link {% if request.path.startswith('/masters/customer-type') %}active{% endif %}"><i class="bi bi-tag"></i> Customer Types</a></li>
+              <li><a href="{{ url_for('masters.customers') }}" class="nav-link {% if request.path.startswith('/masters/customer') and 'type' not in request.path %}active{% endif %}"><i class="bi bi-people"></i> Customers</a></li>
+              <li><a href="{{ url_for('masters.asps') }}" class="nav-link {% if request.path.startswith('/masters/asp') %}active{% endif %}"><i class="bi bi-building"></i> Auth. Service Providers</a></li>
+              <li><a href="{{ url_for('masters.taxes') }}" class="nav-link {% if request.path.startswith('/masters/tax') %}active{% endif %}"><i class="bi bi-percent"></i> Tax Master</a></li>
+              <li><a href="{{ url_for('masters.service_categories') }}" class="nav-link {% if request.path.startswith('/masters/service-cat') %}active{% endif %}"><i class="bi bi-collection"></i> Service Categories</a></li>
+              <li><a href="{{ url_for('masters.item_categories') }}" class="nav-link {% if request.path.startswith('/masters/item-cat') %}active{% endif %}"><i class="bi bi-grid"></i> Item Categories</a></li>
+              <li><a href="{{ url_for('masters.manufacturers') }}" class="nav-link {% if request.path.startswith('/masters/manufacturer') %}active{% endif %}"><i class="bi bi-gear"></i> Manufacturers</a></li>
+              <li><a href="{{ url_for('masters.items') }}" class="nav-link {% if request.path.startswith('/masters/item') and 'cat' not in request.path %}active{% endif %}"><i class="bi bi-box"></i> Items</a></li>
+              <li><a href="{{ url_for('masters.areas') }}" class="nav-link {% if request.path.startswith('/masters/area') %}active{% endif %}"><i class="bi bi-map"></i> Area Master</a></li>
+              <li><a href="{{ url_for('masters.service_centers') }}" class="nav-link {% if request.path.startswith('/masters/service-center') %}active{% endif %}"><i class="bi bi-shop"></i> Service Centers</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider" style="margin: 4px 16px;"></div>
+
+      <!-- Maintenance Contract -->
+      <div class="nav-section">
+        <div class="nav-section-label">Operations</div>
+        <div class="nav-item">
+          <a class="nav-link" data-bs-toggle="collapse" href="#maintenanceMenu" role="button"
+             aria-expanded="{% if request.blueprint == 'maintenance' %}true{% else %}false{% endif %}">
+            <i class="bi bi-file-earmark-check"></i>
+            <span>Maintenance</span>
+            <i class="bi bi-chevron-down nav-arrow"></i>
+          </a>
+          <div class="collapse {% if request.blueprint == 'maintenance' %}show{% endif %}" id="maintenanceMenu">
+            <ul class="nav-submenu">
+              <li><a href="{{ url_for('maintenance.new_contract') }}" class="nav-link {% if request.path == '/maintenance/new' %}active{% endif %}"><i class="bi bi-plus-circle"></i> New Contract</a></li>
+              <li><a href="{{ url_for('maintenance.list_contracts') }}" class="nav-link {% if request.path == '/maintenance/' %}active{% endif %}"><i class="bi bi-list-ul"></i> Display Contracts</a></li>
+              <li><a href="{{ url_for('maintenance.pm_calls_pending') }}" class="nav-link {% if request.path == '/maintenance/pm-calls-pending' %}active{% endif %}"><i class="bi bi-clock-history"></i> PM Calls Pending</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Warranty -->
+        <div class="nav-item">
+          <a class="nav-link" data-bs-toggle="collapse" href="#warrantyMenu" role="button"
+             aria-expanded="{% if request.blueprint == 'warranty' %}true{% else %}false{% endif %}">
+            <i class="bi bi-shield-check"></i>
+            <span>Warranty</span>
+            <i class="bi bi-chevron-down nav-arrow"></i>
+          </a>
+          <div class="collapse {% if request.blueprint == 'warranty' %}show{% endif %}" id="warrantyMenu">
+            <ul class="nav-submenu">
+              <li><a href="{{ url_for('warranty.add_warranty') }}" class="nav-link {% if request.path == '/warranty/add' %}active{% endif %}"><i class="bi bi-plus-circle"></i> Add Warranty Info</a></li>
+              <li><a href="{{ url_for('warranty.list_warranties') }}" class="nav-link {% if request.path == '/warranty/' %}active{% endif %}"><i class="bi bi-list-ul"></i> View Warranty Info</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Service -->
+        <div class="nav-item">
+          <a class="nav-link" data-bs-toggle="collapse" href="#serviceMenu" role="button"
+             aria-expanded="{% if request.blueprint == 'service' %}true{% else %}false{% endif %}">
+            <i class="bi bi-tools"></i>
+            <span>Service</span>
+            <i class="bi bi-chevron-down nav-arrow"></i>
+          </a>
+          <div class="collapse {% if request.blueprint == 'service' %}show{% endif %}" id="serviceMenu">
+            <ul class="nav-submenu">
+              <li><a href="{{ url_for('service.register') }}" class="nav-link {% if request.path == '/service/register' %}active{% endif %}"><i class="bi bi-plus-circle"></i> Service Call Register <kbd style="font-size:9px; opacity:0.5; padding:1px 4px; border:1px solid rgba(255,255,255,0.2); border-radius:3px; margin-left:2px;">F3</kbd></a></li>
+              <li><a href="{{ url_for('service.pending_calls') }}" class="nav-link {% if '/service/pending' in request.path or request.path == '/service/' %}active{% endif %}"><i class="bi bi-clock"></i> Pending Calls <kbd style="font-size:9px; opacity:0.5; padding:1px 4px; border:1px solid rgba(255,255,255,0.2); border-radius:3px; margin-left:2px;">Ctrl+P</kbd></a></li>
+              <li><a href="{{ url_for('service.transfer_requested') }}" class="nav-link {% if request.path == '/service/transfer-requested' %}active{% endif %}"><i class="bi bi-arrow-left-right"></i> Transfer Requested</a></li>
+              <li><a href="{{ url_for('service.all_calls') }}" class="nav-link {% if request.path == '/service/all' %}active{% endif %}"><i class="bi bi-list-columns"></i> All Calls <kbd style="font-size:9px; opacity:0.5; padding:1px 4px; border:1px solid rgba(255,255,255,0.2); border-radius:3px; margin-left:2px;">F6</kbd></a></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Delivery Challan -->
+        <div class="nav-item">
+          <a class="nav-link" data-bs-toggle="collapse" href="#challanMenu" role="button"
+             aria-expanded="{% if request.blueprint == 'challan' %}true{% else %}false{% endif %}">
+            <i class="bi bi-truck"></i>
+            <span>Delivery Challan</span>
+            <i class="bi bi-chevron-down nav-arrow"></i>
+          </a>
+          <div class="collapse {% if request.blueprint == 'challan' %}show{% endif %}" id="challanMenu">
+            <ul class="nav-submenu">
+              <li><a href="{{ url_for('challan.add_challan') }}" class="nav-link {% if request.path == '/challan/add' %}active{% endif %}"><i class="bi bi-plus-circle"></i> Add Delivery Challan</a></li>
+              <li><a href="{{ url_for('challan.list_challans') }}" class="nav-link {% if request.path == '/challan/' %}active{% endif %}"><i class="bi bi-list-ul"></i> View Delivery Challans</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider" style="margin: 4px 16px;"></div>
+
+      <!-- Reports -->
+      <div class="nav-section">
+        <div class="nav-section-label">Reports</div>
+        <div class="nav-item">
+          <a class="nav-link" data-bs-toggle="collapse" href="#reportsMenu" role="button"
+             aria-expanded="{% if request.blueprint == 'reports' %}true{% else %}false{% endif %}">
+            <i class="bi bi-bar-chart"></i>
+            <span>Reports</span>
+            <i class="bi bi-chevron-down nav-arrow"></i>
+          </a>
+          <div class="collapse {% if request.blueprint == 'reports' %}show{% endif %}" id="reportsMenu">
+            <ul class="nav-submenu">
+              <li><a href="{{ url_for('reports.service_bills') }}" class="nav-link {% if request.path == '/reports/service-bills' %}active{% endif %}"><i class="bi bi-receipt"></i> Service Bills</a></li>
+              <li><a href="{{ url_for('reports.display_calls') }}" class="nav-link {% if request.path == '/reports/display-calls' %}active{% endif %}"><i class="bi bi-telephone-inbound"></i> Display Service Calls <kbd style="font-size:9px; opacity:0.5; padding:1px 4px; border:1px solid rgba(255,255,255,0.2); border-radius:3px;">F6</kbd></a></li>
+              <li><a href="{{ url_for('reports.asp_reports') }}" class="nav-link {% if request.path == '/reports/asp-reports' %}active{% endif %}"><i class="bi bi-building-check"></i> ASP Reports</a></li>
+              <li><a href="{{ url_for('reports.area_reports') }}" class="nav-link {% if request.path == '/reports/area-reports' %}active{% endif %}"><i class="bi bi-geo-alt"></i> Area Related Reports</a></li>
+              <li><a href="{{ url_for('reports.engineer_reports') }}" class="nav-link {% if request.path == '/reports/engineer-reports' %}active{% endif %}"><i class="bi bi-person-badge"></i> Engineer Wise <kbd style="font-size:9px; opacity:0.5; padding:1px 4px; border:1px solid rgba(255,255,255,0.2); border-radius:3px;">F8</kbd></a></li>
+              <li><a href="{{ url_for('reports.warranty_reports') }}" class="nav-link {% if request.path == '/reports/warranty-reports' %}active{% endif %}"><i class="bi bi-shield-exclamation"></i> Warranty Reports</a></li>
+              <li><a href="{{ url_for('reports.standby_reports') }}" class="nav-link {% if request.path == '/reports/standby-reports' %}active{% endif %}"><i class="bi bi-pause-circle"></i> StandBy Reports</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider" style="margin: 4px 16px;"></div>
+
+      <!-- Administration -->
+      {% if current_user.is_authenticated and current_user.role == 'Admin' %}
+      <div class="nav-section">
+        <div class="nav-section-label">Administration</div>
+        <a href="{{ url_for('administration.list_users') }}" class="nav-link {% if request.blueprint == 'administration' and 'user' in request.path %}active{% endif %}">
+          <i class="bi bi-people-fill"></i> Users
+        </a>
+        <a href="{{ url_for('administration.settings') }}" class="nav-link {% if request.path == '/administration/settings' %}active{% endif %}">
+          <i class="bi bi-sliders"></i> Settings
+        </a>
+        <a href="{{ url_for('administration.about') }}" class="nav-link {% if request.path == '/administration/about' %}active{% endif %}">
+          <i class="bi bi-info-circle"></i> About
+        </a>
+      </div>
+      {% endif %}
+
+    </nav>
+
+    <!-- Sidebar Footer: User info -->
+    <div class="sidebar-footer">
+      {% if current_user.is_authenticated %}
+      <div class="sidebar-user">
+        <div class="user-avatar">{{ (current_user.full_name or current_user.username)[0]|upper }}</div>
+        <div class="user-info">
+          <div class="user-name">{{ current_user.full_name or current_user.username }}</div>
+          <div class="user-role">{{ current_user.role }}</div>
+        </div>
+      </div>
+      <div style="display:flex; gap:6px; margin-top:8px;">
+        <a href="{{ url_for('auth.change_password') }}" class="btn btn-secondary btn-sm" style="flex:1; justify-content:center; font-size:11px;"><i class="bi bi-key"></i> Password</a>
+        <a href="{{ url_for('auth.logout') }}" class="btn btn-danger btn-sm" style="flex:1; justify-content:center; font-size:11px;"><i class="bi bi-box-arrow-right"></i> Logout</a>
+      </div>
+      {% endif %}
+    </div>
+  </aside>
+
+  <!-- Sidebar overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- Main Wrapper -->
+  <div class="main-wrapper">
+
+    <!-- Top Bar -->
+    <header class="topbar">
+      <button class="mobile-toggle" id="mobile-toggle"><i class="bi bi-list"></i></button>
+      <div>
+        <div class="topbar-title font-outfit">{% block topbar_title %}Servitore Pro{% endblock %}</div>
+      </div>
+      <div class="topbar-actions">
+        <!-- Quick shortcuts -->
+        <button onclick="window.location.reload();" class="topbar-btn" title="Refresh Page">
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+        <a href="{{ url_for('service.register') }}" class="topbar-btn primary" title="Service Call Register (F3)">
+          <i class="bi bi-plus-lg"></i> New Call
+        </a>
+        <a href="{{ url_for('service.pending_calls') }}" class="topbar-btn" title="Pending Calls (Ctrl+P)">
+          <i class="bi bi-clock"></i>
+          <span class="d-none d-sm-inline">Pending</span>
+        </a>
+        {% if current_user.is_authenticated %}
+        <span style="font-size:12px; color:var(--text-muted);" id="header-greeting" data-name="{{ current_user.full_name or current_user.username }}"></span>
+        {% endif %}
+      </div>
+    </header>
+
+    <!-- Content Area -->
+    <main class="content-area">
+      <!-- Flash messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-messages">
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">
+                <i class="bi bi-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-triangle{% elif category == 'warning' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+                {{ message }}
+                <button class="alert-close" type="button">&times;</button>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+
+<!-- Bootstrap collapse JS (for sidebar sub-menus) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+<!-- Keyboard shortcuts -->
+<script>
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'F3') { e.preventDefault(); window.location = '{{ url_for("service.register") }}'; }
+    if (e.ctrlKey && e.key === 'p') { e.preventDefault(); window.location = '{{ url_for("service.pending_calls") }}'; }
+    if (e.key === 'F6') { e.preventDefault(); window.location = '{{ url_for("service.all_calls") }}'; }
+    if (e.key === 'F8') { e.preventDefault(); window.location = '{{ url_for("reports.engineer_reports") }}'; }
+});
+</script>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,23 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Administration{% endblock %}
+{% block topbar_title %}Administration Panel{% endblock %}
+{% block content %}
+<div class="page-header"><div><div class="page-title">Administration Panel</div><div class="page-subtitle">System management and configuration</div></div></div>
+<div class="stat-grid" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr));">
+  <a href="{{ url_for('administration.list_users') }}" class="stat-card" style="--stat-color:#f59e0b;text-decoration:none;">
+    <div class="stat-card-label">Users</div>
+    <div class="stat-card-value">{{ users|length }}</div>
+    <i class="bi bi-people-fill stat-card-icon"></i>
+  </a>
+  <a href="{{ url_for('administration.settings') }}" class="stat-card" style="--stat-color:#3b82f6;text-decoration:none;">
+    <div class="stat-card-label">Settings</div>
+    <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-top:8px;">System Config</div>
+    <i class="bi bi-sliders stat-card-icon"></i>
+  </a>
+  <a href="{{ url_for('administration.about') }}" class="stat-card" style="--stat-color:#10b981;text-decoration:none;">
+    <div class="stat-card-label">About</div>
+    <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-top:8px;">v2.0.0</div>
+    <i class="bi bi-info-circle stat-card-icon"></i>
+  </a>
+</div>
+{% endblock %}

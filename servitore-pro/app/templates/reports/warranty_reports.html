@@ -1,0 +1,42 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Warranty Reports{% endblock %}
+{% block topbar_title %}Warranty Reports{% endblock %}
+{% block content %}
+<div class="page-header"><div><div class="page-title">Warranty Reports</div></div></div>
+<div class="filters-bar no-print">
+  <form method="GET" style="display:contents;">
+    <div class="filter-group"><div class="filter-label">Report Type</div>
+      <select name="type" class="filter-control">
+        <option value="expenditure" {% if report_type=='expenditure' %}selected{% endif %}>Expenditure Report</option>
+        <option value="near_expiry" {% if report_type=='near_expiry' %}selected{% endif %}>Near Expiry (Next 30 Days)</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary btn-sm" style="align-self:flex-end;"><i class="bi bi-funnel"></i> Apply</button>
+  </form>
+</div>
+<div class="card">
+  <div class="card-header"><i class="bi bi-shield-exclamation text-accent"></i><span class="card-header-title">Warranties</span></div>
+  <div class="table-responsive">
+    {% if warranties %}
+    <table class="data-table">
+      <thead><tr><th>Warranty No</th><th>Customer</th><th>Item</th><th>Purchase Date</th><th>Expiry Date</th><th>Days Left</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for w in warranties %}
+        <tr>
+          <td class="fw-600 text-accent">{{ w.warranty_no }}</td>
+          <td class="fw-600">{{ w.customer.name if w.customer else '—' }}</td>
+          <td style="font-size:12.5px;">{{ w.item_name or '—' }}</td>
+          <td style="font-size:12px;color:var(--text-muted);">{{ w.purchase_date.strftime('%d %b %Y') }}</td>
+          <td style="font-size:12px;{% if w.is_expired %}color:var(--status-deadline);{% elif w.days_to_expiry <= 30 %}color:var(--status-pending);{% endif %}font-weight:600;">{{ w.expiry_date.strftime('%d %b %Y') }}</td>
+          <td><span class="badge badge-{% if w.is_expired %}expired{% elif w.days_to_expiry <= 30 %}priority{% else %}closed{% endif %}">{{ w.days_to_expiry }} days</span></td>
+          <td><span class="badge badge-{{ 'active' if w.status == 'Active' else 'expired' }}">{{ w.status }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state"><i class="bi bi-shield-x"></i><h3>No warranties found</h3></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

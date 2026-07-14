@@ -1,0 +1,50 @@
+{% extends 'layouts/base.html' %}
+{% block title %}View Contract — {{ contract.contract_no }}{% endblock %}
+{% block topbar_title %}Contract: {{ contract.contract_no }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="page-title">{{ contract.contract_no }}</div>
+    <div class="page-subtitle">{{ contract.customer.name if contract.customer else '' }} &nbsp;|&nbsp; {{ contract.start_date.strftime('%d %b %Y') }} – {{ contract.end_date.strftime('%d %b %Y') }}</div>
+  </div>
+  <a href="{{ url_for('maintenance.list_contracts') }}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Back</a>
+</div>
+<div class="row">
+  <div class="col-auto" style="min-width:260px;max-width:300px;">
+    <div class="card">
+      <div class="card-header"><i class="bi bi-info-circle text-accent"></i><span class="card-header-title">Contract Info</span></div>
+      <div class="card-body" style="font-size:13px;display:flex;flex-direction:column;gap:12px;">
+        <div><span style="color:var(--text-muted);font-size:11px;">Customer</span><div class="fw-600">{{ contract.customer.name if contract.customer else '—' }}</div></div>
+        <div><span style="color:var(--text-muted);font-size:11px;">Period</span><div>{{ contract.start_date.strftime('%d %b %Y') }} → {{ contract.end_date.strftime('%d %b %Y') }}</div></div>
+        <div><span style="color:var(--text-muted);font-size:11px;">Amount</span><div class="fw-600" style="color:var(--status-closed);">₹{{ '%.2f'|format(contract.amount) }}</div></div>
+        <div><span style="color:var(--text-muted);font-size:11px;">PM Frequency</span><div>Every {{ contract.pm_frequency_months }} month(s)</div></div>
+        <div><span style="color:var(--text-muted);font-size:11px;">Status</span><div><span class="badge badge-{{ 'active' if contract.status == 'Active' and not contract.is_expired else 'expired' }}">{{ contract.status }}</span></div></div>
+        {% if contract.description %}<div><span style="color:var(--text-muted);font-size:11px;">Description</span><div style="color:var(--text-secondary);">{{ contract.description }}</div></div>{% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card">
+      <div class="card-header"><i class="bi bi-calendar-check text-accent"></i><span class="card-header-title">PM Call Schedule</span></div>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead><tr><th>Scheduled Date</th><th>Status</th><th>Engineer</th><th>Completed Date</th><th>Notes</th></tr></thead>
+          <tbody>
+            {% for pm in contract.pm_calls|sort(attribute='scheduled_date') %}
+            <tr>
+              <td style="{% if pm.status == 'Pending' %}color:var(--status-deadline);{% endif %}white-space:nowrap;">{{ pm.scheduled_date.strftime('%d %b %Y') }}</td>
+              <td><span class="badge badge-{{ 'closed' if pm.status == 'Completed' else 'pending' }}">{{ pm.status }}</span></td>
+              <td style="font-size:12.5px;">{{ pm.engineer.full_name if pm.engineer else '—' }}</td>
+              <td style="font-size:12px;color:var(--text-muted);">{{ pm.completed_date.strftime('%d %b %Y') if pm.completed_date else '—' }}</td>
+              <td style="font-size:12px;color:var(--text-secondary);">{{ pm.notes or '—' }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:24px;">No PM calls scheduled.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

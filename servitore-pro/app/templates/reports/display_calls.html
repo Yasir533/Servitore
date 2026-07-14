@@ -1,0 +1,47 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Display Service Calls{% endblock %}
+{% block topbar_title %}Display Service Calls{% endblock %}
+{% block content %}
+<div class="page-header"><div><div class="page-title">Display Service Calls</div><div class="page-subtitle">Call register for selected date range and status</div></div><button onclick="window.print()" class="btn btn-secondary no-print"><i class="bi bi-printer"></i> Print</button></div>
+<div class="filters-bar no-print">
+  <form method="GET" style="display:contents;">
+    <div class="filter-group"><div class="filter-label">From</div><input type="date" name="date_from" class="filter-control" value="{{ date_from }}"></div>
+    <div class="filter-group"><div class="filter-label">To</div><input type="date" name="date_to" class="filter-control" value="{{ date_to }}"></div>
+    <div class="filter-group"><div class="filter-label">Status</div>
+      <select name="status" class="filter-control">
+        <option value="">All</option>
+        <option value="Pending" {% if status_filter=='Pending' %}selected{% endif %}>Pending</option>
+        <option value="In Progress" {% if status_filter=='In Progress' %}selected{% endif %}>In Progress</option>
+        <option value="Closed" {% if status_filter=='Closed' %}selected{% endif %}>Closed</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary btn-sm" style="align-self:flex-end;"><i class="bi bi-funnel"></i> Apply</button>
+    <a href="{{ url_for('reports.display_calls') }}" class="btn btn-secondary btn-sm" style="align-self:flex-end;">Reset</a>
+  </form>
+</div>
+<div class="card">
+  <div class="card-header"><i class="bi bi-telephone-inbound text-accent"></i><span class="card-header-title">Calls</span><span style="margin-left:8px;font-size:12px;color:var(--text-muted);">({{ calls|length }})</span></div>
+  <div class="table-responsive">
+    {% if calls %}
+    <table class="data-table">
+      <thead><tr><th>Call No</th><th>Customer</th><th>Problem</th><th>Status</th><th>Engineer</th><th>Date</th><th>Total (₹)</th></tr></thead>
+      <tbody>
+        {% for c in calls %}
+        <tr>
+          <td class="fw-600 text-accent">{{ c.call_no }}</td>
+          <td class="fw-600">{{ c.customer.name if c.customer else '—' }}</td>
+          <td style="font-size:12.5px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ c.problem_description }}</td>
+          <td><span class="badge badge-{{ 'closed' if c.status == 'Closed' else 'pending' if c.status == 'Pending' else 'progress' }}">{{ c.status }}</span></td>
+          <td style="font-size:12.5px;">{{ c.engineer.full_name if c.engineer else '—' }}</td>
+          <td style="font-size:12px;color:var(--text-muted);white-space:nowrap;">{{ c.call_date.strftime('%d %b %Y') if c.call_date else '—' }}</td>
+          <td style="color:var(--status-closed);font-weight:600;">{{ '₹%.2f'|format(c.total_amount) if c.total_amount else '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state"><i class="bi bi-telephone-x"></i><h3>No calls found</h3></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

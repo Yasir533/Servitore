@@ -1,0 +1,61 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Warranty Records{% endblock %}
+{% block topbar_title %}View Warranty Info{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><div class="page-title">Warranty Records</div><div class="page-subtitle">All product warranties — track active, expired, and near-expiry</div></div>
+  <a href="{{ url_for('warranty.add_warranty') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Add Warranty</a>
+</div>
+<div class="filters-bar">
+  <form method="GET" style="display:contents;">
+    <div class="filter-group"><div class="filter-label">Search</div><input type="text" name="q" class="filter-control" placeholder="Customer or Warranty No" value="{{ q }}"></div>
+    <div class="filter-group"><div class="filter-label">Status</div>
+      <select name="status" class="filter-control">
+        <option value="">All</option>
+        <option value="Active" {% if status_filter == 'Active' %}selected{% endif %}>Active</option>
+        <option value="Expired" {% if status_filter == 'Expired' %}selected{% endif %}>Expired</option>
+        <option value="Claimed" {% if status_filter == 'Claimed' %}selected{% endif %}>Claimed</option>
+      </select>
+    </div>
+    <div class="filter-group" style="justify-content:flex-end;padding-bottom:2px;">
+      <label class="form-check" style="margin:auto 0 0;">
+        <input type="checkbox" name="near_expiry" value="1" class="form-check-input" {% if near_expiry %}checked{% endif %}>
+        <span style="font-size:12px;color:var(--status-pending);font-weight:600;"><i class="bi bi-exclamation-circle"></i> Near Expiry (30 days)</span>
+      </label>
+    </div>
+    <button type="submit" class="btn btn-primary btn-sm" style="align-self:flex-end;"><i class="bi bi-funnel"></i> Filter</button>
+    <a href="{{ url_for('warranty.list_warranties') }}" class="btn btn-secondary btn-sm" style="align-self:flex-end;">Clear</a>
+  </form>
+</div>
+<div class="card">
+  <div class="card-header"><i class="bi bi-shield-check text-accent"></i><span class="card-header-title">Warranties</span><span style="margin-left:8px;font-size:12px;color:var(--text-muted);">({{ warranties|length }} records)</span></div>
+  <div class="table-responsive">
+    {% if warranties %}
+    <table class="data-table">
+      <thead><tr><th>Warranty No</th><th>Customer</th><th>Item</th><th>Serial No</th><th>Purchase Date</th><th>Expiry Date</th><th>Days Left</th><th>Status</th><th>Action</th></tr></thead>
+      <tbody>
+        {% for w in warranties %}
+        <tr>
+          <td><span class="fw-600 text-accent">{{ w.warranty_no }}</span></td>
+          <td class="fw-600">{{ w.customer.name if w.customer else '—' }}</td>
+          <td style="font-size:12.5px;">{{ w.item_name or (w.item.name if w.item else '—') }}</td>
+          <td style="font-size:12px;color:var(--text-muted);">{{ w.serial_no or '—' }}</td>
+          <td style="font-size:12px;color:var(--text-muted);white-space:nowrap;">{{ w.purchase_date.strftime('%d %b %Y') }}</td>
+          <td style="white-space:nowrap;{% if w.is_expired %}color:var(--status-deadline);{% elif w.days_to_expiry <= 30 %}color:var(--status-pending);{% else %}color:var(--status-closed);{% endif %}font-weight:600;">{{ w.expiry_date.strftime('%d %b %Y') }}</td>
+          <td>
+            {% if w.is_expired %}<span class="badge badge-expired">Expired</span>
+            {% elif w.days_to_expiry <= 30 %}<span class="badge badge-priority">{{ w.days_to_expiry }} days</span>
+            {% else %}<span class="badge badge-closed">{{ w.days_to_expiry }} days</span>{% endif %}
+          </td>
+          <td><span class="badge badge-{{ 'active' if w.status == 'Active' else 'expired' if w.status == 'Expired' else 'standby' }}">{{ w.status }}</span></td>
+          <td><a href="{{ url_for('warranty.edit_warranty', id=w.id) }}" class="btn btn-sm btn-secondary"><i class="bi bi-pencil-square"></i></a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state"><i class="bi bi-shield-x"></i><h3>No warranties found</h3><p>No warranty records match your criteria.</p></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

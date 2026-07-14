@@ -1,0 +1,28 @@
+{% extends 'layouts/base.html' %}
+{% block title %}{{ 'Edit' if item else 'Add' }} Customer{% endblock %}
+{% block topbar_title %}{{ 'Edit' if item else 'Add' }} Customer{% endblock %}
+{% block content %}
+<div class="page-header"><div><div class="page-title">{{ 'Edit' if item else 'Add' }} Customer</div></div><a href="{{ url_for('masters.customers') }}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Back</a></div>
+<div class="card">
+  <div class="card-header"><i class="bi bi-person-plus text-accent"></i><span class="card-header-title">Customer Details</span></div>
+  <div class="card-body">
+    <form method="POST" action="{{ url_for('masters.edit_customer', id=item.id) if item else url_for('masters.add_customer') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="form-grid">
+        <div class="form-group full"><label class="form-label">Customer Name <span class="required">*</span></label><input type="text" name="name" class="form-control" value="{{ item.name if item else '' }}" required></div>
+        <div class="form-group"><label class="form-label">Customer Type</label><select name="type_id" class="form-control"><option value="">-- None --</option>{% for t in types %}<option value="{{ t.id }}" {% if item and item.type_id == t.id %}selected{% endif %}>{{ t.name }}</option>{% endfor %}</select></div>
+        <div class="form-group"><label class="form-label">Area</label><select name="area_id" class="form-control"><option value="">-- None --</option>{% for a in areas %}<option value="{{ a.id }}" {% if item and item.area_id == a.id %}selected{% endif %}>{{ a.name }}</option>{% endfor %}</select></div>
+        <div class="form-group"><label class="form-label">Phone</label><input type="text" name="phone" class="form-control" value="{{ item.phone if item else '' }}"></div>
+        <div class="form-group"><label class="form-label">Mobile</label><input type="text" name="mobile" class="form-control" value="{{ item.mobile if item else '' }}"></div>
+        <div class="form-group"><label class="form-label">Email</label><input type="email" name="email" class="form-control" value="{{ item.email if item else '' }}"></div>
+        <div class="form-group"><label class="form-label">City</label><input type="text" name="city" class="form-control" value="{{ item.city if item else '' }}"></div>
+        <div class="form-group"><label class="form-label">Pincode</label><input type="text" name="pincode" class="form-control" value="{{ item.pincode if item else '' }}"></div>
+        <div class="form-group"><label class="form-label">GST Number</label><input type="text" name="gst_number" class="form-control" value="{{ item.gst_number if item else '' }}"></div>
+        <div class="form-group full"><label class="form-label">Address</label><textarea name="address" class="form-control" rows="2">{{ item.address if item else '' }}</textarea></div>
+        {% if item %}<div class="form-group" style="padding-top:20px;"><label class="form-check"><input type="checkbox" name="is_active" class="form-check-input" {% if item.is_active %}checked{% endif %}><span class="form-check-label">Account Active</span></label></div>{% endif %}
+      </div>
+      <div style="display:flex;gap:10px;margin-top:16px;"><button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> {{ 'Update' if item else 'Add Customer' }}</button><a href="{{ url_for('masters.customers') }}" class="btn btn-secondary">Cancel</a></div>
+    </form>
+  </div>
+</div>
+{% endblock %}

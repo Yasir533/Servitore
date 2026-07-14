@@ -1,0 +1,27 @@
+{%  extends 'layouts/base.html' %}
+{% block title %}Manufacturers{% endblock %}
+{% block topbar_title %}Masters — Manufacturers{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><div class="page-title">Manufacturers</div></div>
+  <a href="{{ url_for('masters.add_manufacturer') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Add</a>
+</div>
+<div class="card">
+  <div class="card-header"><i class="bi-gear text-accent"></i><span class="card-header-title">Manufacturers</span></div>
+  <div class="table-responsive">
+    {%  if items %}
+    <table class="data-table"><thead><tr><th>Name</th><th>Contact</th><th>Phone</th><th>Email</th><th>Action</th></tr></thead>
+    <tbody>{%  for it in items %}<tr>
+      <td style="font-size:12.5px;">{{ it.name if it.name else '—' }}</td>
+          <td style="font-size:12.5px;">{{ it.contact if it.contact else '—' }}</td>
+          <td style="font-size:12.5px;">{{ it.phone if it.phone else '—' }}</td>
+          <td style="font-size:12.5px;">{{ it.email if it.email else '—' }}</td>
+          
+      <td><a href="{{ url_for('masters.edit_manufacturer', id=it.id) }}" class="btn btn-sm btn-secondary"><i class="bi bi-pencil-square"></i></a></td>
+    </tr>{%  endfor %}</tbody></table>
+    {%  else %}
+    <div class="empty-state"><i class="bi-gear"></i><h3>No manufacturers found</h3></div>
+    {%  endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Service Bills — Bill Ledger{% endblock %}
+{% block topbar_title %}Service Bills{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><div class="page-title">Service Bills — Bill Ledger</div><div class="page-subtitle">Closed calls with billing amounts for the selected period</div></div>
+  <button onclick="window.print()" class="btn btn-secondary no-print"><i class="bi bi-printer"></i> Print</button>
+</div>
+<div class="filters-bar no-print">
+  <form method="GET" style="display:contents;">
+    <div class="filter-group"><div class="filter-label">From Date</div><input type="date" name="date_from" class="filter-control" value="{{ date_from }}"></div>
+    <div class="filter-group"><div class="filter-label">To Date</div><input type="date" name="date_to" class="filter-control" value="{{ date_to }}"></div>
+    <button type="submit" class="btn btn-primary btn-sm" style="align-self:flex-end;"><i class="bi bi-funnel"></i> Apply</button>
+  </form>
+</div>
+<div class="card">
+  <div class="card-header"><i class="bi bi-receipt text-accent"></i><span class="card-header-title">Bill Ledger</span><span style="margin-left:8px;font-size:12px;color:var(--text-muted);">({{ calls|length }} bills)</span>
+    <div class="card-header-actions"><span class="fw-600 text-accent" style="font-size:14px;">Total: ₹{{ '%.2f'|format(total) }}</span></div>
+  </div>
+  <div class="table-responsive">
+    {% if calls %}
+    <table class="data-table">
+      <thead><tr><th>Call No</th><th>Customer</th><th>Item</th><th>Engineer</th><th>Close Date</th><th>Labour (₹)</th><th>Spare (₹)</th><th>Total (₹)</th></tr></thead>
+      <tbody>
+        {% for c in calls %}
+        <tr>
+          <td class="fw-600 text-accent">{{ c.call_no }}</td>
+          <td class="fw-600">{{ c.customer.name if c.customer else '—' }}</td>
+          <td style="font-size:12.5px;">{{ c.item_name or (c.item.name if c.item else '—') }}</td>
+          <td style="font-size:12.5px;">{{ c.engineer.full_name if c.engineer else '—' }}</td>
+          <td style="font-size:12px;color:var(--text-muted);white-space:nowrap;">{{ c.closed_date.strftime('%d %b %Y') if c.closed_date else '—' }}</td>
+          <td style="color:var(--text-secondary);">{{ '%.2f'|format(c.labour_charge) }}</td>
+          <td style="color:var(--text-secondary);">{{ '%.2f'|format(c.spare_charge) }}</td>
+          <td class="fw-600" style="color:var(--status-closed);">{{ '%.2f'|format(c.total_amount) }}</td>
+        </tr>
+        {% endfor %}
+        <tr style="background:rgba(245,158,11,0.08);border-top:2px solid var(--border-accent);">
+          <td colspan="5" class="fw-600 text-accent">TOTAL</td>
+          <td class="fw-600">{{ '%.2f'|format(calls|sum(attribute='labour_charge')) }}</td>
+          <td class="fw-600">{{ '%.2f'|format(calls|sum(attribute='spare_charge')) }}</td>
+          <td class="fw-600 text-accent" style="font-size:14px;">₹{{ '%.2f'|format(total) }}</td>
+        </tr>
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state"><i class="bi bi-receipt"></i><h3>No bills for selected period</h3><p>No closed service calls with billing in this date range.</p></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

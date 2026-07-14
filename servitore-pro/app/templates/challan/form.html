@@ -1,0 +1,48 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Add Delivery Challan{% endblock %}
+{% block topbar_title %}Add Delivery Challan{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><div class="page-title">Add Delivery Challan</div><div class="page-subtitle">Record items dispatched to a customer</div></div>
+  <a href="{{ url_for('challan.list_challans') }}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Back</a>
+</div>
+<div class="card">
+  <div class="card-header"><i class="bi bi-truck text-accent"></i><span class="card-header-title">Challan Details</span></div>
+  <div class="card-body">
+    <form method="POST" action="{{ url_for('challan.add_challan') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="form-section">
+        <div class="form-section-title"><i class="bi bi-person me-2"></i>Customer & Dispatch Info</div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">Customer <span class="required">*</span></label>
+            <select name="customer_id" class="form-control" required>
+              <option value="">-- Select --</option>
+              {% for c in customers %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">Dispatch Date</label><input type="date" name="dispatch_date" class="form-control" value="{{ today }}"></div>
+          <div class="form-group"><label class="form-label">Expected Return Date</label><input type="date" name="expected_return_date" class="form-control"></div>
+          <div class="form-group full"><label class="form-label">Notes</label><textarea name="notes" class="form-control" rows="2" placeholder="Purpose of dispatch..."></textarea></div>
+        </div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-title"><i class="bi bi-box me-2"></i>Items Dispatched</div>
+        <div id="challan-lines">
+          <div class="challan-line" style="display:grid;grid-template-columns:2fr 1.5fr 1fr 1.5fr auto;gap:10px;margin-bottom:10px;align-items:end;">
+            <div class="form-group" style="margin:0;"><label class="form-label">Item Name <span class="required">*</span></label><input type="text" name="item_name[]" class="form-control" placeholder="Item description" required></div>
+            <div class="form-group" style="margin:0;"><label class="form-label">Serial No</label><input type="text" name="serial_no[]" class="form-control" placeholder="Serial number"></div>
+            <div class="form-group" style="margin:0;"><label class="form-label">Qty</label><input type="number" name="quantity[]" class="form-control" value="1" min="1"></div>
+            <div class="form-group" style="margin:0;"><label class="form-label">Condition</label><input type="text" name="condition[]" class="form-control" placeholder="Good/Damaged..."></div>
+            <div style="margin-bottom:2px;"><button type="button" class="remove-line btn btn-danger btn-icon btn-sm" title="Remove"><i class="bi bi-trash"></i></button></div>
+          </div>
+        </div>
+        <button type="button" id="add-challan-line" class="btn btn-secondary btn-sm" style="margin-top:4px;"><i class="bi bi-plus-circle"></i> Add Another Item</button>
+      </div>
+      <div style="display:flex;gap:10px;padding-top:8px;">
+        <button type="submit" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Create Challan</button>
+        <a href="{{ url_for('challan.list_challans') }}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

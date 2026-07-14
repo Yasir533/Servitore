@@ -1,0 +1,35 @@
+{% extends 'layouts/base.html' %}
+{% block title %}ASP Reports{% endblock %}
+{% block topbar_title %}ASP Reports — Company Wise{% endblock %}
+{% block content %}
+<div class="page-header"><div><div class="page-title">ASP Reports</div><div class="page-subtitle">Company (ASP) wise call summary and revenue</div></div><button onclick="window.print()" class="btn btn-secondary no-print"><i class="bi bi-printer"></i> Print</button></div>
+<div class="filters-bar no-print">
+  <form method="GET" style="display:contents;">
+    <div class="filter-group"><div class="filter-label">From</div><input type="date" name="date_from" class="filter-control" value="{{ date_from }}"></div>
+    <div class="filter-group"><div class="filter-label">To</div><input type="date" name="date_to" class="filter-control" value="{{ date_to }}"></div>
+    <button type="submit" class="btn btn-primary btn-sm" style="align-self:flex-end;"><i class="bi bi-funnel"></i> Apply</button>
+  </form>
+</div>
+<div class="card">
+  <div class="card-header"><i class="bi bi-building-check text-accent"></i><span class="card-header-title">ASP Summary</span></div>
+  <div class="table-responsive">
+    {% if asp_data %}
+    <table class="data-table">
+      <thead><tr><th>ASP Name</th><th>Total Calls</th><th>Closed</th><th>Revenue (₹)</th></tr></thead>
+      <tbody>
+        {% for d in asp_data %}
+        <tr>
+          <td class="fw-600">{{ d.asp.name }}</td>
+          <td>{{ d.total }}</td>
+          <td style="color:var(--status-closed);font-weight:600;">{{ d.closed }}</td>
+          <td style="color:var(--status-closed);font-weight:600;">₹{{ '%.2f'|format(d.revenue) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state"><i class="bi bi-building"></i><h3>No ASP data</h3><p>No service calls linked to ASPs in this period.</p></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

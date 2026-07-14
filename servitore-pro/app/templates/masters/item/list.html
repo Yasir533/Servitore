@@ -1,0 +1,41 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Items{% endblock %}
+{% block topbar_title %}Masters — Items{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><div class="page-title">Items</div><div class="page-subtitle">Products and equipment catalogue</div></div>
+  <a href="{{ url_for('masters.add_item') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Add Item</a>
+</div>
+<div class="filters-bar">
+  <form method="GET" style="display:contents;">
+    <div class="filter-group"><div class="filter-label">Search</div><input type="text" name="q" class="filter-control" placeholder="Item name" value="{{ q }}"></div>
+    <button type="submit" class="btn btn-primary btn-sm" style="align-self:flex-end;"><i class="bi bi-search"></i></button>
+    <a href="{{ url_for('masters.items') }}" class="btn btn-secondary btn-sm" style="align-self:flex-end;">Clear</a>
+  </form>
+</div>
+<div class="card">
+  <div class="card-header"><i class="bi bi-box text-accent"></i><span class="card-header-title">Items</span><span style="margin-left:8px;font-size:12px;color:var(--text-muted);">({{ items|length }})</span></div>
+  <div class="table-responsive">
+    {% if items %}
+    <table class="data-table">
+      <thead><tr><th>Name</th><th>Model No</th><th>Category</th><th>Manufacturer</th><th>Unit Price</th><th>Status</th><th>Action</th></tr></thead>
+      <tbody>
+        {% for it in items %}
+        <tr>
+          <td class="fw-600">{{ it.name }}</td>
+          <td style="font-size:12.5px;color:var(--text-muted);">{{ it.model_no or '—' }}</td>
+          <td style="font-size:12.5px;">{{ it.category.name if it.category else '—' }}</td>
+          <td style="font-size:12.5px;">{{ it.manufacturer.name if it.manufacturer else '—' }}</td>
+          <td style="font-size:12.5px;color:var(--status-closed);">{{ '₹%.2f'|format(it.unit_price) if it.unit_price else '—' }}</td>
+          <td><span class="badge badge-{{ 'active' if it.is_active else 'expired' }}">{{ 'Active' if it.is_active else 'Inactive' }}</span></td>
+          <td><a href="{{ url_for('masters.edit_item', id=it.id) }}" class="btn btn-sm btn-secondary"><i class="bi bi-pencil-square"></i></a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state"><i class="bi bi-box"></i><h3>No items found</h3></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

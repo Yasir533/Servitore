@@ -1,0 +1,158 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Register Service Call{% endblock %}
+{% block topbar_title %}Service Call Register (F3){% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="page-title">Service Call Register</div>
+    <div class="page-subtitle">Register a new service call for a customer</div>
+  </div>
+  <a href="{{ url_for('service.pending_calls') }}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Back to Pending</a>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <i class="bi bi-telephone-plus text-accent"></i>
+    <span class="card-header-title">New Service Call</span>
+  </div>
+  <div class="card-body">
+    <form method="POST" action="{{ url_for('service.register') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+      <!-- Customer & Call Info -->
+      <div class="form-section">
+        <div class="form-section-title"><i class="bi bi-person me-2"></i>Customer & Call Information</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Customer <span class="required">*</span></label>
+            <select name="customer_id" class="form-control" required>
+              <option value="">-- Select Customer --</option>
+              {% for c in customers %}
+              <option value="{{ c.id }}">{{ c.name }}{% if c.mobile %} ({{ c.mobile }}){% endif %}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Call Date</label>
+            <input type="date" name="call_date" class="form-control" value="{{ today }}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Service Category</label>
+            <select name="service_category_id" class="form-control">
+              <option value="">-- Select --</option>
+              {% for sc in categories %}
+              <option value="{{ sc.id }}">{{ sc.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Area</label>
+            <select name="area_id" class="form-control">
+              <option value="">-- Select --</option>
+              {% for a in areas %}
+              <option value="{{ a.id }}">{{ a.name }}{% if a.city %}, {{ a.city }}{% endif %}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Assign Engineer</label>
+            <select name="engineer_id" class="form-control">
+              <option value="">-- Unassigned --</option>
+              {% for eng in engineers %}
+              <option value="{{ eng.id }}">{{ eng.full_name or eng.username }} ({{ eng.role }})</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">ASP (Authorised Service Provider)</label>
+            <select name="asp_id" class="form-control">
+              <option value="">-- None --</option>
+              {% for asp in asps %}
+              <option value="{{ asp.id }}">{{ asp.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Item Details -->
+      <div class="form-section">
+        <div class="form-section-title"><i class="bi bi-box me-2"></i>Item / Product Details</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Item (from Master)</label>
+            <select name="item_id" class="form-control">
+              <option value="">-- Select Item --</option>
+              {% for it in items %}
+              <option value="{{ it.id }}">{{ it.name }}{% if it.model_no %} ({{ it.model_no }}){% endif %}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Item Name (free text)</label>
+            <input type="text" name="item_name" class="form-control" placeholder="Enter item name if not in master">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Serial / Model Number</label>
+            <input type="text" name="serial_no" class="form-control" placeholder="e.g. SRL-123456">
+          </div>
+        </div>
+      </div>
+
+      <!-- Problem Description -->
+      <div class="form-section">
+        <div class="form-section-title"><i class="bi bi-chat-left-text me-2"></i>Problem Description</div>
+        <div class="form-group full">
+          <label class="form-label">Describe the Problem <span class="required">*</span></label>
+          <textarea name="problem_description" class="form-control" rows="3" required placeholder="Describe the fault / problem reported by the customer..."></textarea>
+        </div>
+        <div class="form-group full" style="margin-top:10px;">
+          <label class="form-label">Remarks / Notes</label>
+          <textarea name="remarks" class="form-control" rows="2" placeholder="Internal notes..."></textarea>
+        </div>
+      </div>
+
+      <!-- Scheduling & Flags -->
+      <div class="form-section">
+        <div class="form-section-title"><i class="bi bi-calendar me-2"></i>Scheduling & Flags</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Schedule Date</label>
+            <input type="date" name="schedule_date" class="form-control">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Deadline Date</label>
+            <input type="date" name="deadline_date" class="form-control">
+          </div>
+          <div class="form-group" style="justify-content:flex-end; padding-top:20px;">
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <label class="form-check">
+                <input type="checkbox" name="is_priority" class="form-check-input">
+                <span class="form-check-label" style="color:var(--status-priority);font-weight:600;"><i class="bi bi-exclamation-triangle"></i> Priority Call</span>
+              </label>
+              <label class="form-check">
+                <input type="checkbox" name="is_deadline" class="form-check-input">
+                <span class="form-check-label" style="color:var(--status-deadline);font-weight:600;"><i class="bi bi-alarm"></i> Deadline Call</span>
+              </label>
+              <label class="form-check">
+                <input type="checkbox" name="spare_required" class="form-check-input">
+                <span class="form-check-label"><i class="bi bi-box"></i> Spare Required</span>
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Spare Details</label>
+            <input type="text" name="spare_details" class="form-control" placeholder="Spare part name/model if required">
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; padding-top:8px;">
+        <button type="submit" class="btn btn-primary" style="min-width:140px;"><i class="bi bi-plus-circle"></i> Register Call</button>
+        <a href="{{ url_for('service.pending_calls') }}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

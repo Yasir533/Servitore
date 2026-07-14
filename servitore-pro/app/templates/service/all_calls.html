@@ -1,0 +1,75 @@
+{% extends 'layouts/base.html' %}
+{% block title %}All Service Calls{% endblock %}
+{% block topbar_title %}Display Service Calls (F6){% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="page-title">Display Service Calls</div>
+    <div class="page-subtitle">All service calls with filters</div>
+  </div>
+  <a href="{{ url_for('service.register') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Register New</a>
+</div>
+
+<div class="filters-bar">
+  <form method="GET" style="display:contents;">
+    <div class="filter-group">
+      <div class="filter-label">Search</div>
+      <input type="text" name="q" class="filter-control" placeholder="Customer or Call No" value="{{ q }}">
+    </div>
+    <div class="filter-group">
+      <div class="filter-label">Status</div>
+      <select name="status" class="filter-control">
+        <option value="">All</option>
+        {% for s in statuses %}<option value="{{ s }}" {% if status_filter == s %}selected{% endif %}>{{ s }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="filter-group">
+      <div class="filter-label">From Date</div>
+      <input type="date" name="date_from" class="filter-control" value="{{ date_from }}">
+    </div>
+    <div class="filter-group">
+      <div class="filter-label">To Date</div>
+      <input type="date" name="date_to" class="filter-control" value="{{ date_to }}">
+    </div>
+    <button type="submit" class="btn btn-primary btn-sm" style="align-self:flex-end;"><i class="bi bi-funnel"></i> Filter</button>
+    <a href="{{ url_for('service.all_calls') }}" class="btn btn-secondary btn-sm" style="align-self:flex-end;">Clear</a>
+  </form>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <i class="bi bi-list-columns text-accent"></i>
+    <span class="card-header-title">Service Calls</span>
+    <span style="margin-left:8px;font-size:12px;color:var(--text-muted);">({{ calls|length }} records)</span>
+    <div class="card-header-actions">
+      <button onclick="window.print()" class="btn btn-secondary btn-sm no-print"><i class="bi bi-printer"></i> Print</button>
+    </div>
+  </div>
+  <div class="table-responsive">
+    {% if calls %}
+    <table class="data-table">
+      <thead>
+        <tr><th data-sort>Call No</th><th data-sort>Customer</th><th>Problem</th><th data-sort>Status</th><th>Engineer</th><th data-sort>Date</th><th>Amount (₹)</th><th class="no-print">Action</th></tr>
+      </thead>
+      <tbody>
+        {% for call in calls %}
+        <tr>
+          <td><span class="fw-600 text-accent">{{ call.call_no }}</span>{% if call.is_priority %}<span class="badge badge-priority" style="margin-left:4px;font-size:9px;">P</span>{% endif %}</td>
+          <td class="fw-600">{{ call.customer.name if call.customer else '—' }}</td>
+          <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12.5px;">{{ call.problem_description }}</td>
+          <td><span class="badge badge-{% if call.status == 'Closed' %}closed{% elif call.status == 'Pending' %}pending{% elif call.status == 'In Progress' %}progress{% elif call.status == 'Transfer Requested' %}transfer{% else %}unassigned{% endif %}">{{ call.status }}</span></td>
+          <td style="font-size:12.5px;">{{ call.engineer.full_name if call.engineer else '—' }}</td>
+          <td style="font-size:12px;color:var(--text-muted);white-space:nowrap;">{{ call.call_date.strftime('%d %b %Y') if call.call_date else '—' }}</td>
+          <td style="font-size:12.5px;{% if call.total_amount > 0 %}color:var(--status-closed);font-weight:600;{% else %}color:var(--text-muted);{% endif %}">{{ '₹%.2f'|format(call.total_amount) if call.total_amount > 0 else '—' }}</td>
+          <td class="no-print"><a href="{{ url_for('service.update_call', id=call.id) }}" class="btn btn-sm btn-secondary"><i class="bi bi-pencil-square"></i></a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state"><i class="bi bi-telephone-x"></i><h3>No calls found</h3><p>No service calls match your criteria.</p></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

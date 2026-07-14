@@ -1,0 +1,52 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Maintenance Contracts{% endblock %}
+{% block topbar_title %}Maintenance Contracts{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><div class="page-title">Maintenance Contracts</div><div class="page-subtitle">All active and historical maintenance agreements</div></div>
+  <a href="{{ url_for('maintenance.new_contract') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> New Contract</a>
+</div>
+<div class="filters-bar">
+  <form method="GET" style="display:contents;">
+    <div class="filter-group"><div class="filter-label">Customer</div><input type="text" name="q" class="filter-control" placeholder="Search customer" value="{{ q }}"></div>
+    <div class="filter-group"><div class="filter-label">Status</div>
+      <select name="status" class="filter-control">
+        <option value="">All</option>
+        <option value="Active" {% if status_filter == 'Active' %}selected{% endif %}>Active</option>
+        <option value="Expired" {% if status_filter == 'Expired' %}selected{% endif %}>Expired</option>
+        <option value="Cancelled" {% if status_filter == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary btn-sm" style="align-self:flex-end;"><i class="bi bi-funnel"></i> Filter</button>
+    <a href="{{ url_for('maintenance.list_contracts') }}" class="btn btn-secondary btn-sm" style="align-self:flex-end;">Clear</a>
+  </form>
+</div>
+<div class="card">
+  <div class="card-header"><i class="bi bi-file-earmark-check text-accent"></i><span class="card-header-title">Contracts</span><span style="margin-left:8px;font-size:12px;color:var(--text-muted);">({{ contracts|length }} records)</span>
+    <div class="card-header-actions"><a href="{{ url_for('maintenance.pm_calls_pending') }}" class="btn btn-secondary btn-sm"><i class="bi bi-clock-history"></i> PM Calls Pending</a></div>
+  </div>
+  <div class="table-responsive">
+    {% if contracts %}
+    <table class="data-table">
+      <thead><tr><th>Contract No</th><th>Customer</th><th>Period</th><th>PM Freq</th><th>Amount (₹)</th><th>Status</th><th>PM Calls</th><th>Action</th></tr></thead>
+      <tbody>
+        {% for c in contracts %}
+        <tr>
+          <td><span class="fw-600 text-accent">{{ c.contract_no }}</span></td>
+          <td class="fw-600">{{ c.customer.name if c.customer else '—' }}</td>
+          <td style="font-size:12px;color:var(--text-muted);white-space:nowrap;">{{ c.start_date.strftime('%d %b %y') }} → {{ c.end_date.strftime('%d %b %y') }}</td>
+          <td style="font-size:12px;">Every {{ c.pm_frequency_months }} months</td>
+          <td style="color:var(--status-closed);font-weight:600;">₹{{ '%.2f'|format(c.amount) }}</td>
+          <td><span class="badge badge-{% if c.status == 'Active' and not c.is_expired %}active{% elif c.is_expired %}expired{% else %}standby{% endif %}">{{ c.status }}{% if c.is_expired %} (Expired){% endif %}</span></td>
+          <td style="font-size:12px;">{{ c.pm_calls|selectattr('status','eq','Pending')|list|length }} pending / {{ c.pm_calls|length }} total</td>
+          <td><a href="{{ url_for('maintenance.view_contract', id=c.id) }}" class="btn btn-sm btn-secondary"><i class="bi bi-eye"></i></a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state"><i class="bi bi-file-earmark-x"></i><h3>No contracts found</h3><p>No maintenance contracts match your criteria.</p></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

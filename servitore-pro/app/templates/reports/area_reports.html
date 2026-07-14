@@ -1,0 +1,44 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Area Related Reports{% endblock %}
+{% block topbar_title %}Area Related Reports{% endblock %}
+{% block content %}
+<div class="page-header"><div><div class="page-title">Area Related Reports</div></div><button onclick="window.print()" class="btn btn-secondary no-print"><i class="bi bi-printer"></i> Print</button></div>
+<div class="filters-bar no-print">
+  <form method="GET" style="display:contents;">
+    <div class="filter-group"><div class="filter-label">Report Type</div>
+      <select name="type" class="filter-control">
+        <option value="area_wise" {% if report_type=='area_wise' %}selected{% endif %}>Area Wise</option>
+        <option value="bills_not_raised" {% if report_type=='bills_not_raised' %}selected{% endif %}>Area Wise — Calls Closed Bills Not Raised</option>
+        <option value="payment_pending" {% if report_type=='payment_pending' %}selected{% endif %}>Area Wise — Payment Pending</option>
+      </select>
+    </div>
+    <div class="filter-group"><div class="filter-label">From</div><input type="date" name="date_from" class="filter-control" value="{{ date_from }}"></div>
+    <div class="filter-group"><div class="filter-label">To</div><input type="date" name="date_to" class="filter-control" value="{{ date_to }}"></div>
+    <button type="submit" class="btn btn-primary btn-sm" style="align-self:flex-end;"><i class="bi bi-funnel"></i> Apply</button>
+  </form>
+</div>
+<div class="card">
+  <div class="card-header"><i class="bi bi-geo-alt text-accent"></i><span class="card-header-title">Area Wise Summary</span></div>
+  <div class="table-responsive">
+    {% if data %}
+    <table class="data-table">
+      <thead><tr><th>Area</th><th>Total Calls</th><th>Closed</th><th>Pending</th><th>Revenue (₹)</th><th>Bills Not Raised</th></tr></thead>
+      <tbody>
+        {% for d in data %}
+        <tr>
+          <td class="fw-600">{{ d.area.name }}{% if d.area.city %}<div style="font-size:11px;color:var(--text-muted);">{{ d.area.city }}</div>{% endif %}</td>
+          <td>{{ d.total }}</td>
+          <td style="color:var(--status-closed);font-weight:600;">{{ d.closed }}</td>
+          <td style="color:var(--status-pending);font-weight:600;">{{ d.pending }}</td>
+          <td style="color:var(--status-closed);font-weight:600;">₹{{ '%.2f'|format(d.revenue) }}</td>
+          <td style="color:{% if d.bills_not_raised > 0 %}var(--status-deadline){% else %}var(--text-muted){% endif %};">{{ d.bills_not_raised }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state"><i class="bi bi-geo-alt"></i><h3>No data</h3><p>No area data for the selected period.</p></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

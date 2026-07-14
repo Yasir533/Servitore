@@ -1,0 +1,41 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Engineer Wise Reports{% endblock %}
+{% block topbar_title %}Engineer Wise Reports (F8){% endblock %}
+{% block content %}
+<div class="page-header"><div><div class="page-title">Engineer Wise Reports</div><div class="page-subtitle">Revenue / Expenditure and Pending Calls per engineer</div></div><button onclick="window.print()" class="btn btn-secondary no-print"><i class="bi bi-printer"></i> Print</button></div>
+<div class="filters-bar no-print">
+  <form method="GET" style="display:contents;">
+    <div class="filter-group"><div class="filter-label">From</div><input type="date" name="date_from" class="filter-control" value="{{ date_from }}"></div>
+    <div class="filter-group"><div class="filter-label">To</div><input type="date" name="date_to" class="filter-control" value="{{ date_to }}"></div>
+    <button type="submit" class="btn btn-primary btn-sm" style="align-self:flex-end;"><i class="bi bi-funnel"></i> Apply</button>
+  </form>
+</div>
+<div class="card">
+  <div class="card-header"><i class="bi bi-person-badge text-accent"></i><span class="card-header-title">Engineer Performance</span></div>
+  <div class="table-responsive">
+    {% if data %}
+    <table class="data-table">
+      <thead><tr><th>Engineer</th><th>Role</th><th>Total Calls</th><th>Pending</th><th>Closed</th><th>Revenue (₹)</th><th>Spare Expense (₹)</th><th>Net (₹)</th></tr></thead>
+      <tbody>
+        {% for d in data %}
+        <tr>
+          <td class="fw-600">{{ d.engineer.full_name or d.engineer.username }}</td>
+          <td><span class="badge badge-{{ d.engineer.role|lower }}">{{ d.engineer.role }}</span></td>
+          <td>{{ d.total }}</td>
+          <td style="color:var(--status-pending);font-weight:600;">{{ d.pending }}</td>
+          <td style="color:var(--status-closed);font-weight:600;">{{ d.closed }}</td>
+          <td style="color:var(--status-closed);font-weight:600;">₹{{ '%.2f'|format(d.revenue) }}</td>
+          <td style="color:var(--status-priority);">₹{{ '%.2f'|format(d.expense) }}</td>
+          <td class="fw-600 text-accent">₹{{ '%.2f'|format(d.revenue - d.expense) }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:32px;">No data</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state"><i class="bi bi-person-x"></i><h3>No engineer data</h3></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

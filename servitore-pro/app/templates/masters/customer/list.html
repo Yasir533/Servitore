@@ -1,0 +1,41 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Customers{% endblock %}
+{% block topbar_title %}Masters — Customers{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><div class="page-title">Customers</div><div class="page-subtitle">All registered customers</div></div>
+  <a href="{{ url_for('masters.add_customer') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Add Customer</a>
+</div>
+<div class="filters-bar">
+  <form method="GET" style="display:contents;">
+    <div class="filter-group"><div class="filter-label">Search</div><input type="text" name="q" class="filter-control" placeholder="Customer name" value="{{ q }}"></div>
+    <button type="submit" class="btn btn-primary btn-sm" style="align-self:flex-end;"><i class="bi bi-search"></i> Search</button>
+    <a href="{{ url_for('masters.customers') }}" class="btn btn-secondary btn-sm" style="align-self:flex-end;">Clear</a>
+  </form>
+</div>
+<div class="card">
+  <div class="card-header"><i class="bi bi-people text-accent"></i><span class="card-header-title">Customers</span><span style="margin-left:8px;font-size:12px;color:var(--text-muted);">({{ items|length }})</span></div>
+  <div class="table-responsive">
+    {% if items %}
+    <table class="data-table">
+      <thead><tr><th>Name</th><th>Type</th><th>Phone/Mobile</th><th>City</th><th>GST No</th><th>Status</th><th>Action</th></tr></thead>
+      <tbody>
+        {% for it in items %}
+        <tr>
+          <td><div class="fw-600">{{ it.name }}</div>{% if it.email %}<div style="font-size:11px;color:var(--text-muted);">{{ it.email }}</div>{% endif %}</td>
+          <td style="font-size:12.5px;">{{ it.customer_type.name if it.customer_type else '—' }}</td>
+          <td style="font-size:12.5px;">{{ it.phone or it.mobile or '—' }}</td>
+          <td style="font-size:12.5px;">{{ it.city or '—' }}</td>
+          <td style="font-size:12px;color:var(--text-muted);">{{ it.gst_number or '—' }}</td>
+          <td><span class="badge badge-{{ 'active' if it.is_active else 'expired' }}">{{ 'Active' if it.is_active else 'Inactive' }}</span></td>
+          <td><a href="{{ url_for('masters.edit_customer', id=it.id) }}" class="btn btn-sm btn-secondary"><i class="bi bi-pencil-square"></i></a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state"><i class="bi bi-people"></i><h3>No customers found</h3><p>Add your first customer to get started.</p></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

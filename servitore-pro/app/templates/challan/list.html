@@ -1,0 +1,59 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Delivery Challans{% endblock %}
+{% block topbar_title %}Delivery Challans{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><div class="page-title">Delivery Challans</div><div class="page-subtitle">Track items dispatched and received back</div></div>
+  <a href="{{ url_for('challan.add_challan') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Add Challan</a>
+</div>
+<div class="filters-bar">
+  <form method="GET" style="display:contents;">
+    <div class="filter-group"><div class="filter-label">Search</div><input type="text" name="q" class="filter-control" placeholder="Customer or Challan No" value="{{ q }}"></div>
+    <div class="filter-group"><div class="filter-label">Status</div>
+      <select name="received" class="filter-control">
+        <option value="">All</option>
+        <option value="pending" {% if received_filter == 'pending' %}selected{% endif %}>Items Not Received</option>
+        <option value="received" {% if received_filter == 'received' %}selected{% endif %}>Received</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary btn-sm" style="align-self:flex-end;"><i class="bi bi-funnel"></i> Filter</button>
+    <a href="{{ url_for('challan.list_challans') }}" class="btn btn-secondary btn-sm" style="align-self:flex-end;">Clear</a>
+  </form>
+</div>
+<div class="card">
+  <div class="card-header"><i class="bi bi-truck text-accent"></i><span class="card-header-title">Challans</span><span style="margin-left:8px;font-size:12px;color:var(--text-muted);">({{ challans|length }} records)</span></div>
+  <div class="table-responsive">
+    {% if challans %}
+    <table class="data-table">
+      <thead><tr><th>Challan No</th><th>Customer</th><th>Dispatch Date</th><th>Expected Return</th><th>Items</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for ch in challans %}
+        <tr>
+          <td><span class="fw-600 text-accent">{{ ch.challan_no }}</span></td>
+          <td class="fw-600">{{ ch.customer.name if ch.customer else '—' }}</td>
+          <td style="font-size:12px;color:var(--text-muted);white-space:nowrap;">{{ ch.dispatch_date.strftime('%d %b %Y') }}</td>
+          <td style="font-size:12px;white-space:nowrap;{% if not ch.is_received and ch.expected_return_date %}color:var(--status-pending);{% else %}color:var(--text-muted);{% endif %}">{{ ch.expected_return_date.strftime('%d %b %Y') if ch.expected_return_date else '—' }}</td>
+          <td style="font-size:12px;">{{ ch.items|length }} item(s)</td>
+          <td>
+            {% if ch.is_received %}<span class="badge badge-closed"><i class="bi bi-check-circle"></i> Received</span>
+            {% else %}<span class="badge badge-pending"><i class="bi bi-clock"></i> Pending</span>{% endif %}
+          </td>
+          <td style="display:flex;gap:6px;align-items:center;">
+            <a href="{{ url_for('challan.print_challan', id=ch.id) }}" class="btn btn-sm btn-secondary" target="_blank"><i class="bi bi-printer"></i></a>
+            {% if not ch.is_received %}
+            <form method="POST" action="{{ url_for('challan.mark_received', id=ch.id) }}" style="display:inline;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-sm btn-success" title="Mark as Received"><i class="bi bi-check-lg"></i> Received</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state"><i class="bi bi-truck"></i><h3>No challans found</h3><p>No delivery challans match your criteria.</p></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

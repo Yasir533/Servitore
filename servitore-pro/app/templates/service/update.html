@@ -1,0 +1,100 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Update Service Call — {{ call.call_no }}{% endblock %}
+{% block topbar_title %}Update Call: {{ call.call_no }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="page-title">{{ call.call_no }}</div>
+    <div class="page-subtitle">
+      {{ call.customer.name if call.customer else '—' }} &nbsp;|&nbsp;
+      Registered: {{ call.call_date.strftime('%d %b %Y') if call.call_date else '—' }}
+      {% if call.is_priority %}<span class="badge badge-priority" style="margin-left:8px;"><i class="bi bi-exclamation-triangle"></i> Priority</span>{% endif %}
+      {% if call.is_deadline %}<span class="badge badge-deadline" style="margin-left:4px;"><i class="bi bi-alarm"></i> Deadline</span>{% endif %}
+    </div>
+  </div>
+  <a href="{{ url_for('service.pending_calls') }}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Back</a>
+</div>
+
+<div class="row">
+  <!-- Call Info Summary -->
+  <div class="col-auto" style="min-width:280px; max-width:300px;">
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-header"><i class="bi bi-info-circle text-accent"></i><span class="card-header-title">Call Details</span></div>
+      <div class="card-body" style="font-size:13px;">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div><span style="color:var(--text-muted);font-size:11px;">Customer</span><div class="fw-600">{{ call.customer.name if call.customer else '—' }}</div></div>
+          <div><span style="color:var(--text-muted);font-size:11px;">Item</span><div>{{ call.item_name or (call.item.name if call.item else '—') }}</div></div>
+          {% if call.serial_no %}<div><span style="color:var(--text-muted);font-size:11px;">Serial No</span><div>{{ call.serial_no }}</div></div>{% endif %}
+          <div><span style="color:var(--text-muted);font-size:11px;">Problem</span><div style="color:var(--text-secondary);">{{ call.problem_description }}</div></div>
+          {% if call.area %}<div><span style="color:var(--text-muted);font-size:11px;">Area</span><div>{{ call.area.name }}</div></div>{% endif %}
+          {% if call.spare_required %}<div><span style="color:var(--text-muted);font-size:11px;">Spare</span><div style="color:var(--status-pending);">Required — {{ call.spare_details or 'Details TBD' }}</div></div>{% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Update Form -->
+  <div class="col">
+    <div class="card">
+      <div class="card-header"><i class="bi bi-pencil text-accent"></i><span class="card-header-title">Update Status & Resolution</span></div>
+      <div class="card-body">
+        <form method="POST" action="{{ url_for('service.update_call', id=call.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="form-grid" style="margin-bottom:20px;">
+            <div class="form-group">
+              <label class="form-label">Status <span class="required">*</span></label>
+              <select name="status" class="form-control" required>
+                {% for s in statuses %}
+                <option value="{{ s }}" {% if call.status == s %}selected{% endif %}>{{ s }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Assign Engineer</label>
+              <select name="engineer_id" class="form-control">
+                <option value="">-- Unassigned --</option>
+                {% for eng in engineers %}
+                <option value="{{ eng.id }}" {% if call.engineer_id == eng.id %}selected{% endif %}>{{ eng.full_name or eng.username }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Labour Charge (₹)</label>
+              <input type="number" name="labour_charge" class="form-control" value="{{ call.labour_charge }}" step="0.01">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Spare Charge (₹)</label>
+              <input type="number" name="spare_charge" class="form-control" value="{{ call.spare_charge }}" step="0.01">
+            </div>
+            <div class="form-group" style="justify-content:flex-end; padding-top:20px;">
+              <div style="display:flex; gap:12px;">
+                <label class="form-check">
+                  <input type="checkbox" name="is_priority" class="form-check-input" {% if call.is_priority %}checked{% endif %}>
+                  <span class="form-check-label" style="color:var(--status-priority);font-weight:600;">Priority</span>
+                </label>
+                <label class="form-check">
+                  <input type="checkbox" name="is_deadline" class="form-check-input" {% if call.is_deadline %}checked{% endif %}>
+                  <span class="form-check-label" style="color:var(--status-deadline);font-weight:600;">Deadline</span>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="form-group full" style="margin-bottom:14px;">
+            <label class="form-label">Resolution / Work Done</label>
+            <textarea name="resolution" class="form-control" rows="3" placeholder="Describe what was done to resolve the issue...">{{ call.resolution or '' }}</textarea>
+          </div>
+          <div class="form-group full" style="margin-bottom:20px;">
+            <label class="form-label">Remarks</label>
+            <textarea name="remarks" class="form-control" rows="2" placeholder="Additional notes...">{{ call.remarks or '' }}</textarea>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Save Update</button>
+            <a href="{{ url_for('service.pending_calls') }}" class="btn btn-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

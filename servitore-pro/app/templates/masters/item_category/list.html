@@ -1,0 +1,25 @@
+{%  extends 'layouts/base.html' %}
+{% block title %}Item Categorys{% endblock %}
+{% block topbar_title %}Masters — Item Categorys{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><div class="page-title">Item Categorys</div></div>
+  <a href="{{ url_for('masters.add_item_category') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Add</a>
+</div>
+<div class="card">
+  <div class="card-header"><i class="bi-grid text-accent"></i><span class="card-header-title">Item Categorys</span></div>
+  <div class="table-responsive">
+    {%  if items %}
+    <table class="data-table"><thead><tr><th>Name</th><th>Description</th><th>Action</th></tr></thead>
+    <tbody>{%  for it in items %}<tr>
+      <td style="font-size:12.5px;">{{ it.name if it.name else '—' }}</td>
+          <td style="font-size:12.5px;">{{ it.description if it.description else '—' }}</td>
+          
+      <td><a href="{{ url_for('masters.edit_item_category', id=it.id) }}" class="btn btn-sm btn-secondary"><i class="bi bi-pencil-square"></i></a></td>
+    </tr>{%  endfor %}</tbody></table>
+    {%  else %}
+    <div class="empty-state"><i class="bi-grid"></i><h3>No item categorys found</h3></div>
+    {%  endif %}
+  </div>
+</div>
+{% endblock %}

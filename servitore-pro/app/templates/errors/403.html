@@ -1,0 +1,12 @@
+{% extends 'layouts/base.html' %}
+{% block title %}403 — Access Forbidden{% endblock %}
+{% block content %}
+<div style="display:flex;align-items:center;justify-content:center;min-height:60vh;">
+  <div style="text-align:center;">
+    <div style="font-family:'Outfit',sans-serif;font-size:80px;font-weight:800;color:#ef4444;line-height:1;opacity:0.4;">403</div>
+    <h2 style="font-size:20px;font-weight:600;color:var(--text-primary);margin:12px 0 8px;">Access Forbidden</h2>
+    <p style="color:var(--text-muted);margin-bottom:24px;">You don't have permission to access this page.</p>
+    <a href="{{ url_for('dashboard.index') }}" class="btn btn-primary"><i class="bi bi-house"></i> Go to Dashboard</a>
+  </div>
+</div>
+{% endblock %}

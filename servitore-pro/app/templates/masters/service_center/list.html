@@ -1,0 +1,26 @@
+{%  extends 'layouts/base.html' %}
+{% block title %}Service Centers{% endblock %}
+{% block topbar_title %}Masters — Service Centers{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><div class="page-title">Service Centers</div></div>
+  <a href="{{ url_for('masters.add_service_center') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Add</a>
+</div>
+<div class="card">
+  <div class="card-header"><i class="bi-shop text-accent"></i><span class="card-header-title">Service Centers</span></div>
+  <div class="table-responsive">
+    {%  if items %}
+    <table class="data-table"><thead><tr><th>Name</th><th>Contact</th><th>Phone</th><th>Action</th></tr></thead>
+    <tbody>{%  for it in items %}<tr>
+      <td style="font-size:12.5px;">{{ it.name if it.name else '—' }}</td>
+          <td style="font-size:12.5px;">{{ it.contact_person if it.contact_person else '—' }}</td>
+          <td style="font-size:12.5px;">{{ it.phone if it.phone else '—' }}</td>
+          
+      <td><a href="{{ url_for('masters.edit_service_center', id=it.id) }}" class="btn btn-sm btn-secondary"><i class="bi bi-pencil-square"></i></a></td>
+    </tr>{%  endfor %}</tbody></table>
+    {%  else %}
+    <div class="empty-state"><i class="bi-shop"></i><h3>No service centers found</h3></div>
+    {%  endif %}
+  </div>
+</div>
+{% endblock %}

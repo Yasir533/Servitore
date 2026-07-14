@@ -1,0 +1,36 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Customer Types{% endblock %}
+{% block topbar_title %}Masters — Customer Types{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><div class="page-title">Customer Types</div><div class="page-subtitle">Manage customer type categories</div></div>
+  <a href="{{ url_for('masters.add_customer_type') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Add</a>
+</div>
+<div class="card">
+  <div class="card-header"><i class="bi bi-tag text-accent"></i><span class="card-header-title">Customer Types</span></div>
+  <div class="table-responsive">
+    {% if items %}
+    <table class="data-table">
+      <thead><tr><th>#</th><th>Name</th><th>Description</th><th>Created</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for it in items %}<tr>
+          <td style="color:var(--text-muted);">{{ loop.index }}</td>
+          <td class="fw-600">{{ it.name }}</td>
+          <td style="color:var(--text-secondary);font-size:12.5px;">{{ it.description or '—' }}</td>
+          <td style="font-size:12px;color:var(--text-muted);">{{ it.created_at.strftime('%d %b %Y') }}</td>
+          <td style="display:flex;gap:6px;">
+            <a href="{{ url_for('masters.edit_customer_type', id=it.id) }}" class="btn btn-sm btn-secondary"><i class="bi bi-pencil-square"></i></a>
+            <form method="POST" action="{{ url_for('masters.delete_customer_type', id=it.id) }}" style="display:inline;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-sm btn-danger" data-confirm="Delete '{{ it.name }}'?"><i class="bi bi-trash"></i></button>
+            </form>
+          </td>
+        </tr>{% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state"><i class="bi bi-tag"></i><h3>No customer types</h3><p>Add your first customer type to get started.</p></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,194 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block topbar_title %}Dashboard — Quick View{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="page-title">Quick View</div>
+    <div class="page-subtitle">Live service operations overview — auto-refreshes every 60 seconds</div>
+  </div>
+  <div class="d-flex gap-8">
+    <a href="{{ url_for('service.register') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Register Call</a>
+    <a href="{{ url_for('service.pending_calls') }}" class="btn btn-secondary"><i class="bi bi-clock"></i> View Pending</a>
+  </div>
+</div>
+
+<!-- ── Quick View Stat Cards ─────────────────────────────────────────────── -->
+<div class="stat-grid">
+  <div class="stat-card" style="--stat-color:#f59e0b;" onclick="window.location='{{ url_for('service.pending_calls', status='Pending') }}'">
+    <div class="stat-card-label">Pending Calls</div>
+    <div class="stat-card-value alert-amber" id="qv-pending">{{ stats.pending }}</div>
+    <i class="bi bi-clock stat-card-icon"></i>
+  </div>
+  <div class="stat-card" style="--stat-color:#dc2626;" onclick="window.location='{{ url_for('service.pending_calls', deadline='1') }}'">
+    <div class="stat-card-label">Dead Line Calls</div>
+    <div class="stat-card-value alert-red" id="qv-deadline">{{ stats.deadline }}</div>
+    <i class="bi bi-alarm stat-card-icon"></i>
+  </div>
+  <div class="stat-card" style="--stat-color:#ef4444;" onclick="window.location='{{ url_for('service.pending_calls', priority='1') }}'">
+    <div class="stat-card-label">Priority Calls</div>
+    <div class="stat-card-value alert-red" id="qv-priority">{{ stats.priority }}</div>
+    <i class="bi bi-exclamation-triangle stat-card-icon"></i>
+  </div>
+  <div class="stat-card" style="--stat-color:#10b981;">
+    <div class="stat-card-label">Registered Today</div>
+    <div class="stat-card-value" id="qv-registered_today">{{ stats.registered_today }}</div>
+    <i class="bi bi-calendar-plus stat-card-icon"></i>
+  </div>
+  <div class="stat-card" style="--stat-color:#10b981;" onclick="window.location='{{ url_for('service.all_calls') }}'">
+    <div class="stat-card-label">Closed Today</div>
+    <div class="stat-card-value alert-green" id="qv-closed_today">{{ stats.closed_today }}</div>
+    <i class="bi bi-check-circle stat-card-icon"></i>
+  </div>
+  <div class="stat-card" style="--stat-color:#3b82f6;" onclick="window.location='{{ url_for('service.pending_calls', status='Pending - Customer') }}'">
+    <div class="stat-card-label">Pending for Customer</div>
+    <div class="stat-card-value" id="qv-pend_customer">{{ stats.pend_customer }}</div>
+    <i class="bi bi-person-exclamation stat-card-icon"></i>
+  </div>
+  <div class="stat-card" style="--stat-color:#8b5cf6;" onclick="window.location='{{ url_for('service.pending_calls', status='Pending - Spare') }}'">
+    <div class="stat-card-label">Pending for Spare</div>
+    <div class="stat-card-value" id="qv-pend_spare">{{ stats.pend_spare }}</div>
+    <i class="bi bi-box stat-card-icon"></i>
+  </div>
+  <div class="stat-card" style="--stat-color:#06b6d4;" onclick="window.location='{{ url_for('service.pending_calls', status='Pending - Technical') }}'">
+    <div class="stat-card-label">Pending for Technical</div>
+    <div class="stat-card-value" id="qv-pend_technical">{{ stats.pend_technical }}</div>
+    <i class="bi bi-cpu stat-card-icon"></i>
+  </div>
+  <div class="stat-card" style="--stat-color:#6b7280;" onclick="window.location='{{ url_for('service.pending_calls', status='Pending - Others') }}'">
+    <div class="stat-card-label">Pending for Others</div>
+    <div class="stat-card-value" id="qv-pend_other">{{ stats.pend_other }}</div>
+    <i class="bi bi-question-circle stat-card-icon"></i>
+  </div>
+  <div class="stat-card" style="--stat-color:#94a3b8;" onclick="window.location='{{ url_for('service.pending_calls', status='Unassigned') }}'">
+    <div class="stat-card-label">Unassigned Calls</div>
+    <div class="stat-card-value" id="qv-unassigned">{{ stats.unassigned }}</div>
+    <i class="bi bi-person-x stat-card-icon"></i>
+  </div>
+  <div class="stat-card" style="--stat-color:#8b5cf6;" onclick="window.location='{{ url_for('service.transfer_requested') }}'">
+    <div class="stat-card-label">Transfer Requested</div>
+    <div class="stat-card-value" id="qv-transfer">{{ stats.transfer }}</div>
+    <i class="bi bi-arrow-left-right stat-card-icon"></i>
+  </div>
+  <div class="stat-card" style="--stat-color:#f59e0b;" onclick="window.location='{{ url_for('challan.list_challans', received='pending') }}'">
+    <div class="stat-card-label">Challan — Items Not Received</div>
+    <div class="stat-card-value" id="qv-challan_pending">{{ stats.challan_pending }}</div>
+    <i class="bi bi-truck stat-card-icon"></i>
+  </div>
+  <div class="stat-card" style="--stat-color:#6b7280;" onclick="window.location='{{ url_for('service.pending_calls', status='StandBy') }}'">
+    <div class="stat-card-label">StandBy</div>
+    <div class="stat-card-value" id="qv-standby">{{ stats.standby }}</div>
+    <i class="bi bi-pause-circle stat-card-icon"></i>
+  </div>
+  <div class="stat-card" style="--stat-color:#10b981;" onclick="window.location='{{ url_for('maintenance.pm_calls_pending') }}'">
+    <div class="stat-card-label">PM Calls Pending</div>
+    <div class="stat-card-value alert-amber" id="qv-pm_pending">{{ stats.pm_pending }}</div>
+    <i class="bi bi-calendar-check stat-card-icon"></i>
+  </div>
+</div>
+
+<!-- ── Recent Service Calls ──────────────────────────────────────────────── -->
+<div class="row" style="gap:20px;">
+  <div class="col">
+    <div class="card">
+      <div class="card-header">
+        <i class="bi bi-clock-history text-accent"></i>
+        <span class="card-header-title">Recent Service Calls</span>
+        <div class="card-header-actions">
+          <a href="{{ url_for('service.all_calls') }}" class="btn btn-secondary btn-sm">View All</a>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Call No</th>
+              <th>Customer</th>
+              <th>Problem</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Engineer</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for call in recent_calls %}
+            <tr onclick="window.location='{{ url_for('service.update_call', id=call.id) }}'" style="cursor:pointer;">
+              <td><span class="fw-600 text-accent">{{ call.call_no }}</span>
+                {% if call.is_priority %}<span class="badge badge-priority ms-1" style="margin-left:4px;">P</span>{% endif %}
+                {% if call.is_deadline %}<span class="badge badge-deadline ms-1" style="margin-left:4px;">DL</span>{% endif %}
+              </td>
+              <td>{{ call.customer.name if call.customer else '—' }}</td>
+              <td style="max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ call.problem_description }}</td>
+              <td>
+                {% set s = call.status %}
+                <span class="badge badge-{% if s == 'Closed' %}closed{% elif s == 'Pending' %}pending{% elif s == 'In Progress' %}progress{% elif s == 'Transfer Requested' %}transfer{% elif s == 'Unassigned' %}unassigned{% elif 'Priority' in call.status or call.is_priority %}priority{% else %}pending{% endif %}">{{ s }}</span>
+              </td>
+              <td style="color:var(--text-muted);">{{ call.call_date.strftime('%d %b %Y') if call.call_date else '—' }}</td>
+              <td style="color:var(--text-secondary);">{{ call.engineer.full_name if call.engineer else '<span style="color:var(--text-muted);">Unassigned</span>' }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:32px;">No service calls yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PM Calls Due -->
+  <div class="col-auto" style="min-width:280px; max-width:320px;">
+    <div class="card">
+      <div class="card-header">
+        <i class="bi bi-calendar-event text-accent"></i>
+        <span class="card-header-title">PM Calls Due</span>
+        <div class="card-header-actions">
+          <a href="{{ url_for('maintenance.pm_calls_pending') }}" class="btn btn-secondary btn-sm">All</a>
+        </div>
+      </div>
+      <div class="card-body" style="padding:0;">
+        {% for pm in pm_calls %}
+        <div style="padding:12px 16px; border-bottom:1px solid var(--border);">
+          <div class="fw-600" style="font-size:12.5px;">{{ pm.contract.customer.name if pm.contract and pm.contract.customer else '—' }}</div>
+          <div style="font-size:11.5px; color:var(--text-muted);">{{ pm.contract.contract_no if pm.contract else '' }}</div>
+          <div style="font-size:11px; color:var(--status-deadline); margin-top:3px;"><i class="bi bi-calendar"></i> Due: {{ pm.scheduled_date.strftime('%d %b %Y') }}</div>
+        </div>
+        {% else %}
+        <div style="padding:32px 16px; text-align:center; color:var(--text-muted); font-size:12.5px;"><i class="bi bi-check-circle" style="display:block;font-size:24px;margin-bottom:8px;"></i>No PM calls due</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Schedule Widget -->
+    <div class="card" style="margin-top:16px;">
+      <div class="card-header">
+        <i class="bi bi-clock text-accent"></i>
+        <span class="card-header-title">Schedule Date &amp; Time</span>
+      </div>
+      <div class="card-body" style="text-align:center;">
+        <div id="live-date" class="font-outfit fw-700" style="font-size:28px; color:var(--text-primary);"></div>
+        <div id="live-time" class="font-outfit fw-600" style="font-size:20px; color:var(--accent); margin-top:4px;"></div>
+        <div id="live-day" style="font-size:12px; color:var(--text-muted); margin-top:4px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function updateClock() {
+    const now = new Date();
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    document.getElementById('live-date').textContent =
+        String(now.getDate()).padStart(2,'0') + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
+    document.getElementById('live-time').textContent =
+        String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0') + ':' + String(now.getSeconds()).padStart(2,'0');
+    document.getElementById('live-day').textContent = days[now.getDay()];
+}
+updateClock();
+setInterval(updateClock, 1000);
+</script>
+{% endblock %}
