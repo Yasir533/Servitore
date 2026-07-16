@@ -61,9 +61,21 @@ public class ApiService
         Helpers.ClientLogger.Log($"[DIAGNOSTIC] ApiService initialized with API URL: {baseUrl}");
         BaseUrl = baseUrl;
         IdleTimeoutMinutes = idleTimeout;
+        
+        Uri parsedUri;
+        try
+        {
+            parsedUri = new Uri(baseUrl);
+        }
+        catch (UriFormatException)
+        {
+            // Fallback to local loopback to prevent startup crashes when placeholder is active
+            parsedUri = new Uri("http://127.0.0.1:5001");
+        }
+
         _httpClient = new HttpClient
         {
-            BaseAddress = new Uri(baseUrl),
+            BaseAddress = parsedUri,
             Timeout = TimeSpan.FromSeconds(30)
         };
     }

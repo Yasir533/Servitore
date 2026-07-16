@@ -1,24 +1,39 @@
 ## .NET
 bin/
 obj/
-*.user
-*.suo
-.vs/
-
-## Build results
 [Dd]ebug/
 [Rr]elease/
 x64/
 x86/
-
-## NuGet
-*.nupkg
-**/packages/*
-
-## Rider / VS Code
+*.user
+*.suo
+.vs/
 .idea/
 .vscode/
 
-## Secrets - never commit real connection strings, JWT keys, or API keys
-appsettings.Production.json
+## NuGet Packages
+*.nupkg
+**/packages/*
+
+## Databases and Backups
+*.mdf
+*.ldf
+*.bak
+*.backup
+*.db
+*.sqlite
+
+## Secrets and Local Environment settings
 *.pfx
+appsettings.Production.json
+appsettings.local.json
+databaseSettings.local.json
+ApiSettings.local.json
+.env
+.env.*
+
+## Logs and diagnostics
+*.log
+api.log
+desktop.log
+

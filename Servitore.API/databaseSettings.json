@@ -1,8 +1,8 @@
 {
   "DatabaseSettings": {
-    "Server": "(localdb)\\MSSQLLocalDB",
+    "Server": "YOUR_SQL_SERVER",
     "Database": "ServitoreDB",
-    "Username": "",
-    "Password": ""
+    "Username": "YOUR_USERNAME",
+    "Password": "YOUR_PASSWORD"
   }
 }

@@ -4,7 +4,7 @@ public static class AppConstants
 {
     // API base URL (no trailing slash, no /api — endpoints include "api/..." prefix)
     public const string ApiBaseUrlSetting = "BaseUrl";
-    public const string DefaultApiBaseUrl = "http://localhost:5001";
+    public const string DefaultApiBaseUrl = "http://YOUR-API-SERVER-IP:5001";
 
     // SignalR
     public const string NotificationHubUrl = "/hubs/collaboration";
