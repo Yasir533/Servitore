@@ -76,7 +76,7 @@ public partial class CustomerViewModel : ViewModelBase, IDisposable
         catch (Exception ex)
         {
             Helpers.ClientLogger.Log("Failed to load customer data", ex);
-            Helpers.ToastHelper.ShowToast("Unable to load customers. Please try again.");
+            Helpers.ToastHelper.ShowToast(Helpers.ExceptionHelper.GetUserFriendlyMessage(ex));
         }
         finally
         {
@@ -159,9 +159,9 @@ public partial class CustomerViewModel : ViewModelBase, IDisposable
                     Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
                 });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Helpers.DialogHelper.ShowError("Unable to delete customer. Please try again later.");
+                Helpers.DialogHelper.ShowError(Helpers.ExceptionHelper.GetUserFriendlyMessage(ex));
             }
             finally
             {

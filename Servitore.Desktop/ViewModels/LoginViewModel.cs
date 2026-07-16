@@ -45,9 +45,9 @@ public partial class LoginViewModel : ViewModelBase
                 ErrorMessage = result?.Message ?? "Login failed. Please try again.";
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            ErrorMessage = "Unable to connect to the server. Please ensure the server is running.";
+            ErrorMessage = Helpers.ExceptionHelper.GetUserFriendlyMessage(ex);
         }
         finally
         {

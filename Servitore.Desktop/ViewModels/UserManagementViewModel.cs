@@ -57,7 +57,7 @@ public partial class UserManagementViewModel : ViewModelBase
         catch (Exception ex)
         {
             Helpers.ClientLogger.Log("Failed to load user data", ex);
-            Helpers.ToastHelper.ShowToast("Unable to load users. Please try again.");
+            Helpers.ToastHelper.ShowToast(Helpers.ExceptionHelper.GetUserFriendlyMessage(ex));
         }
         finally
         {
@@ -99,9 +99,9 @@ public partial class UserManagementViewModel : ViewModelBase
                 await _apiService.PostAsync<object, object>("api/users", dto);
                 await LoadAsync();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Helpers.DialogHelper.ShowError("Unable to save changes. Please try again later.");
+                Helpers.DialogHelper.ShowError(Helpers.ExceptionHelper.GetUserFriendlyMessage(ex));
             }
             finally
             {
@@ -158,9 +158,9 @@ public partial class UserManagementViewModel : ViewModelBase
                 await _apiService.PutAsync($"api/users/{row.Id}", dto);
                 await LoadAsync();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Helpers.DialogHelper.ShowError("Unable to save changes. Please try again later.");
+                Helpers.DialogHelper.ShowError(Helpers.ExceptionHelper.GetUserFriendlyMessage(ex));
             }
             finally
             {
@@ -179,9 +179,9 @@ public partial class UserManagementViewModel : ViewModelBase
             row.IsActive = !row.IsActive;
             UsersView.Refresh();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            Helpers.DialogHelper.ShowError("Unable to toggle user active status. Please try again later.");
+            Helpers.DialogHelper.ShowError(Helpers.ExceptionHelper.GetUserFriendlyMessage(ex));
         }
     }
 

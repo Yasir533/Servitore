@@ -69,7 +69,7 @@ public partial class RecentlyDeletedViewModel : ViewModelBase, IDisposable
         catch (Exception ex)
         {
             ClientLogger.Log("Failed to load recently deleted items", ex);
-            ToastHelper.ShowToast("Unable to load recently deleted items. Please try again.");
+            ToastHelper.ShowToast(Helpers.ExceptionHelper.GetUserFriendlyMessage(ex));
         }
         finally
         {
@@ -94,7 +94,7 @@ public partial class RecentlyDeletedViewModel : ViewModelBase, IDisposable
             catch (Exception ex)
             {
                 ClientLogger.Log($"Failed to restore {item.Type} ID: {item.Id}", ex);
-                DialogHelper.ShowError($"Failed to restore record: {ex.Message}");
+                DialogHelper.ShowError(Helpers.ExceptionHelper.GetUserFriendlyMessage(ex));
             }
             finally
             {
@@ -123,7 +123,7 @@ public partial class RecentlyDeletedViewModel : ViewModelBase, IDisposable
             catch (Exception ex)
             {
                 ClientLogger.Log($"Failed to permanently delete {item.Type} ID: {item.Id}", ex);
-                DialogHelper.ShowError($"Failed to permanently delete record: {ex.Message}");
+                DialogHelper.ShowError(Helpers.ExceptionHelper.GetUserFriendlyMessage(ex));
             }
             finally
             {

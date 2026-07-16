@@ -26,54 +26,97 @@ public partial class LoginWindow : Window
     }
 
     private bool _isServerOnline = false;
+    private bool _isDatabaseOnline = false;
+
+    private enum StatusState
+    {
+        Connecting,
+        Connected,
+        Disconnected,
+        ServerOffline,
+        DatabaseOffline
+    }
 
     private async System.Threading.Tasks.Task RunConnectionCheckInBackgroundAsync()
     {
-        UpdateStatusLight(false, "Connecting to server...");
+        UpdateStatusLight(StatusState.Connecting, "Connecting to server...");
         Helpers.ClientLogger.Log($"[DIAGNOSTIC] Starting background connection check. API base URL: {App.ApiService.BaseUrl}");
 
-        int maxRetries = 60; // 30 seconds
+        int maxRetries = 60; // 60 seconds
         for (int i = 0; i < maxRetries; i++)
         {
             try
             {
                 var pingResult = await App.ApiService.GetAsync<PingResponse>("api/auth/ping");
-                if (pingResult is { Status: "Healthy" })
+                if (pingResult is not null)
                 {
-                    _isServerOnline = true;
-                    UpdateStatusLight(true, "Server Online");
-                    Helpers.ClientLogger.Log("[DIAGNOSTIC] Background connection check: Server is ONLINE.");
-                    return;
+                    if (pingResult.Server == "Online" && pingResult.Database == "Online")
+                    {
+                        _isServerOnline = true;
+                        _isDatabaseOnline = true;
+                        UpdateStatusLight(StatusState.Connected, "Connected");
+                        Helpers.ClientLogger.Log("[DIAGNOSTIC] Background connection check: Connected.");
+                        return;
+                    }
+                    else if (pingResult.Server == "Online")
+                    {
+                        _isServerOnline = true;
+                        _isDatabaseOnline = false;
+                        UpdateStatusLight(StatusState.DatabaseOffline, "Database Offline");
+                        Helpers.ClientLogger.Log("[DIAGNOSTIC] Background connection check: Database is offline.");
+                    }
                 }
+            }
+            catch (System.Net.Http.HttpRequestException ex)
+            {
+                _isServerOnline = false;
+                _isDatabaseOnline = false;
+                UpdateStatusLight(StatusState.ServerOffline, "Server Offline");
+                Helpers.ClientLogger.Log($"[DIAGNOSTIC] Startup connection check attempt {i + 1} failed. Server offline. {ex.Message}");
             }
             catch (System.Exception ex)
             {
-                Helpers.ClientLogger.Log($"[DIAGNOSTIC] Startup connection check attempt {i + 1} failed. Endpoint: {App.ApiService.BaseUrl}api/auth/ping", ex);
+                _isServerOnline = false;
+                _isDatabaseOnline = false;
+                UpdateStatusLight(StatusState.Disconnected, "Disconnected");
+                Helpers.ClientLogger.Log($"[DIAGNOSTIC] Startup connection check attempt {i + 1} failed. {ex.Message}");
             }
             
             await System.Threading.Tasks.Task.Delay(1000);
         }
 
-        UpdateStatusLight(false, "Server Offline. Check API connection.", isFailed: true);
-        Helpers.ClientLogger.Log("[DIAGNOSTIC] Background connection check: Server is OFFLINE after 60 retries.");
+        if (!_isServerOnline)
+        {
+            UpdateStatusLight(StatusState.ServerOffline, "Server Offline. Check API connection.");
+        }
+        else if (!_isDatabaseOnline)
+        {
+            UpdateStatusLight(StatusState.DatabaseOffline, "Database Offline");
+        }
+        else
+        {
+            UpdateStatusLight(StatusState.Disconnected, "Disconnected");
+        }
     }
 
-    private void UpdateStatusLight(bool isOnline, string text, bool isFailed = false)
+    private void UpdateStatusLight(StatusState state, string text)
     {
         Dispatcher.Invoke(() =>
         {
             StatusText.Text = text;
-            if (isOnline)
+            switch (state)
             {
-                StatusLight.Fill = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(76, 175, 80)); // Green
-            }
-            else if (isFailed)
-            {
-                StatusLight.Fill = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(244, 67, 54)); // Red
-            }
-            else
-            {
-                StatusLight.Fill = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 179, 0)); // Amber
+                case StatusState.Connected:
+                    StatusLight.Fill = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(76, 175, 80)); // Green
+                    break;
+                case StatusState.Connecting:
+                case StatusState.Disconnected:
+                    StatusLight.Fill = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 179, 0)); // Amber
+                    break;
+                case StatusState.ServerOffline:
+                case StatusState.DatabaseOffline:
+                    StatusLight.Fill = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(244, 67, 54)); // Red
+                    break;
             }
         });
     }
@@ -81,25 +124,36 @@ public partial class LoginWindow : Window
     private class PingResponse
     {
         public string Status { get; set; } = string.Empty;
+        public string Server { get; set; } = string.Empty;
+        public string Database { get; set; } = string.Empty;
     }
 
     private async void LoginButton_Click(object sender, RoutedEventArgs e)
     {
-        if (!_isServerOnline)
+        if (!_isServerOnline || !_isDatabaseOnline)
         {
             try
             {
-                Helpers.ClientLogger.Log("[DIAGNOSTIC] LoginButton clicked, server not online yet. Pinging server...");
+                Helpers.ClientLogger.Log("[DIAGNOSTIC] LoginButton clicked, server or database not online yet. Pinging server...");
                 var pingResult = await App.ApiService.GetAsync<PingResponse>("api/auth/ping");
-                if (pingResult is { Status: "Healthy" })
+                if (pingResult is not null)
                 {
-                    _isServerOnline = true;
-                    UpdateStatusLight(true, "Server Online");
-                    Helpers.ClientLogger.Log("[DIAGNOSTIC] Ping during LoginButton click succeeded: Server is ONLINE.");
+                    _isServerOnline = pingResult.Server == "Online";
+                    _isDatabaseOnline = pingResult.Database == "Online";
+                    if (_isServerOnline && _isDatabaseOnline)
+                    {
+                        UpdateStatusLight(StatusState.Connected, "Connected");
+                    }
+                    else if (_isServerOnline)
+                    {
+                        UpdateStatusLight(StatusState.DatabaseOffline, "Database Offline");
+                    }
                 }
             }
             catch (Exception ex)
             {
+                _isServerOnline = false;
+                _isDatabaseOnline = false;
                 Helpers.ClientLogger.Log("[DIAGNOSTIC] Ping during LoginButton click failed.", ex);
             }
         }
@@ -107,6 +161,13 @@ public partial class LoginWindow : Window
         if (!_isServerOnline)
         {
             ErrorText.Text = "Cannot log in because the server is offline. Please check your connection.";
+            ErrorText.Visibility = Visibility.Visible;
+            return;
+        }
+
+        if (!_isDatabaseOnline)
+        {
+            ErrorText.Text = "Cannot log in because the database is unavailable. Please contact the administrator.";
             ErrorText.Visibility = Visibility.Visible;
             return;
         }

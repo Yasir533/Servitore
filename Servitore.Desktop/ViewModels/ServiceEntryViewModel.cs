@@ -116,7 +116,7 @@ public partial class ServiceEntryViewModel : ViewModelBase, IDisposable
         catch (Exception ex)
         {
             Helpers.ClientLogger.Log("Failed to load service entry data", ex);
-            Helpers.ToastHelper.ShowToast("Unable to load service entries. Please try again.");
+            Helpers.ToastHelper.ShowToast(Helpers.ExceptionHelper.GetUserFriendlyMessage(ex));
         }
         finally
         {
@@ -232,9 +232,9 @@ public partial class ServiceEntryViewModel : ViewModelBase, IDisposable
                 Helpers.DialogHelper.ShowInfo($"Service entry {row.ServiceEntryNumber} was closed successfully.", "Call Closed");
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            Helpers.DialogHelper.ShowError("Unable to close service entry. Please try again later.");
+            Helpers.DialogHelper.ShowError(Helpers.ExceptionHelper.GetUserFriendlyMessage(ex));
         }
     }
 
@@ -278,9 +278,9 @@ public partial class ServiceEntryViewModel : ViewModelBase, IDisposable
                     Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
                 });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Helpers.DialogHelper.ShowError("Unable to delete service entry. Please try again later.");
+                Helpers.DialogHelper.ShowError(Helpers.ExceptionHelper.GetUserFriendlyMessage(ex));
             }
             finally
             {

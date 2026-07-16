@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Servitore.API.DTOs;
 using Servitore.API.Services;
 using Servitore.Shared.Models;
+using Servitore.Database.Context;
 
 namespace Servitore.API.Controllers;
 
@@ -12,11 +13,13 @@ public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
     private readonly IActivityLogService _activityLogService;
+    private readonly AppDbContext _dbContext;
 
-    public AuthController(IAuthService authService, IActivityLogService activityLogService)
+    public AuthController(IAuthService authService, IActivityLogService activityLogService, AppDbContext dbContext)
     {
         _authService = authService;
         _activityLogService = activityLogService;
+        _dbContext = dbContext;
     }
 
     /// <summary>
@@ -24,9 +27,24 @@ public class AuthController : ControllerBase
     /// </summary>
     [HttpGet("ping")]
     [AllowAnonymous]
-    public IActionResult Ping()
+    public async Task<IActionResult> Ping()
     {
-        return Ok(new { Status = "Healthy" });
+        bool dbOnline = false;
+        try
+        {
+            dbOnline = await _dbContext.Database.CanConnectAsync();
+        }
+        catch
+        {
+            dbOnline = false;
+        }
+
+        return Ok(new
+        {
+            Status = dbOnline ? "Healthy" : "Degraded",
+            Server = "Online",
+            Database = dbOnline ? "Online" : "Offline"
+        });
     }
 
     /// <summary>

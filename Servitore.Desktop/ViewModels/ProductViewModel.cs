@@ -83,7 +83,7 @@ public partial class ProductViewModel : ViewModelBase, IDisposable
         catch (Exception ex)
         {
             Helpers.ClientLogger.Log("Failed to load product data", ex);
-            Helpers.ToastHelper.ShowToast("Unable to load products. Please try again.");
+            Helpers.ToastHelper.ShowToast(Helpers.ExceptionHelper.GetUserFriendlyMessage(ex));
         }
         finally
         {
@@ -190,9 +190,9 @@ public partial class ProductViewModel : ViewModelBase, IDisposable
                     Username = App.AuthenticationService.CurrentUser?.FullName ?? "Unknown"
                 });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Helpers.DialogHelper.ShowError("Unable to delete product. Please try again later.");
+                Helpers.DialogHelper.ShowError(Helpers.ExceptionHelper.GetUserFriendlyMessage(ex));
             }
             finally
             {

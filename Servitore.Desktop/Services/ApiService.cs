@@ -26,12 +26,12 @@ public class ApiService
         var idleTimeout = 10;
         try
         {
-            var configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "clientSettings.json");
+            var configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ApiSettings.json");
             if (File.Exists(configPath))
             {
                 var json = File.ReadAllText(configPath);
                 using var doc = JsonDocument.Parse(json);
-                if (doc.RootElement.TryGetProperty("ApiBaseUrl", out var prop))
+                if (doc.RootElement.TryGetProperty(AppConstants.ApiBaseUrlSetting, out var prop))
                 {
                     var val = prop.GetString();
                     if (!string.IsNullOrWhiteSpace(val))
@@ -49,7 +49,7 @@ public class ApiService
             }
             else
             {
-                var defaultJson = JsonSerializer.Serialize(new { ApiBaseUrl = AppConstants.DefaultApiBaseUrl, IdleTimeoutMinutes = 10 }, new JsonSerializerOptions { WriteIndented = true });
+                var defaultJson = JsonSerializer.Serialize(new { BaseUrl = AppConstants.DefaultApiBaseUrl, IdleTimeoutMinutes = 10 }, new JsonSerializerOptions { WriteIndented = true });
                 File.WriteAllText(configPath, defaultJson);
             }
         }
@@ -142,6 +142,10 @@ public class ApiService
         {
             var response = await _httpClient.PostAsJsonAsync(endpoint, body);
             Helpers.ClientLogger.Log($"[DIAGNOSTIC] POST Response code for {endpoint}: {(int)response.StatusCode} ({response.StatusCode})");
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized || response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                return await ReadContentSafeAsync<TResponse>(response.Content);
+            }
             response.EnsureSuccessStatusCode();
             return await ReadContentSafeAsync<TResponse>(response.Content);
         }

@@ -10,7 +10,7 @@ using Servitore.Database.Context;
 using Servitore.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.WebHost.UseUrls("http://0.0.0.0:5000");
+builder.WebHost.UseUrls("http://0.0.0.0:5001");
 
 // Load optional databaseSettings.json file
 builder.Configuration.AddJsonFile("databaseSettings.json", optional: true, reloadOnChange: true);
