@@ -34,4 +34,8 @@
     </None>
   </ItemGroup>
 
+  <Target Name="KillRunningAPI" BeforeTargets="PrepareForBuild">
+    <Exec Command="powershell -Command &quot;Get-Process -Name Servitore.API -ErrorAction SilentlyContinue | Stop-Process -Force&quot;" IgnoreExitCode="true" />
+  </Target>
+
 </Project>
