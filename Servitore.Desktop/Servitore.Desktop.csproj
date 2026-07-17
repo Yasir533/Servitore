@@ -5,7 +5,7 @@
     <TargetFramework>net8.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <!-- Avoid generating apphost.exe which can be locked by a running process during rebuilds -->
-    <UseAppHost>false</UseAppHost>
+    <UseAppHost>true</UseAppHost>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>Servitore.Desktop</RootNamespace>
@@ -40,6 +40,7 @@
   </ItemGroup>
 
   <Target Name="KillRunningDesktop" BeforeTargets="PrepareForBuild">
+    <Exec Command="powershell -Command &quot;Get-Process -Name Servitore.Desktop -ErrorAction SilentlyContinue | Stop-Process -Force&quot;" IgnoreExitCode="true" />
     <Exec Command="powershell -Command &quot;Get-CimInstance Win32_Process -Filter \&quot;Name = 'dotnet.exe' AND CommandLine LIKE '%Servitore.Desktop.dll%'\&quot; -ErrorAction SilentlyContinue | Remove-CimInstance&quot;" IgnoreExitCode="true" />
   </Target>
 
