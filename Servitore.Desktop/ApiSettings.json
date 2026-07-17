@@ -1,3 +1,8 @@
 {
+<<<<<<< HEAD
   "BaseUrl": "http://localhost:5001"
 } 
+=======
+  "BaseUrl": "http://192.168.1.104:5001"
+}
+>>>>>>> 5ecf323d12fe3b5a7fa0117f722827101cd60954

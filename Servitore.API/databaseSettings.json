@@ -1,8 +1,8 @@
 {
   "DatabaseSettings": {
-    "Server": "YOUR_SQL_SERVER",
+    "Server": "localhost",
     "Database": "ServitoreDB",
-    "Username": "YOUR_USERNAME",
-    "Password": "YOUR_PASSWORD"
+    "Username": "",
+    "Password": ""
   }
 }
