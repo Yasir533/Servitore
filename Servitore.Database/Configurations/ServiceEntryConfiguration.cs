@@ -12,6 +12,7 @@ public class ServiceEntryConfiguration : IEntityTypeConfiguration<ServiceEntry>
         builder.Property(e => e.ServiceEntryNumber).IsRequired().HasMaxLength(30);
         builder.HasIndex(e => e.ServiceEntryNumber).IsUnique();
         builder.Property(e => e.ProblemDescription).IsRequired().HasMaxLength(2000);
+        builder.Property(e => e.ApproximateCharges).HasColumnType("decimal(18,2)");
 
         builder.HasOne(e => e.Customer)
             .WithMany(c => c.ServiceEntries)

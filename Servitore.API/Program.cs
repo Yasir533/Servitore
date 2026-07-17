@@ -22,6 +22,7 @@ var dbSettings = builder.Configuration.GetSection("DatabaseSettings");
 if (dbSettings.Exists() && 
     !string.IsNullOrWhiteSpace(dbSettings["Server"]) && 
     dbSettings["Server"] != "PRODUCTION_DATABASE_SERVER" && 
+    dbSettings["Server"]?.Contains("YOUR_") != true && 
     !string.IsNullOrWhiteSpace(dbSettings["Database"]))
 {
     isCustomDbSettings = true;
@@ -126,7 +127,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddAuthorization();
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
