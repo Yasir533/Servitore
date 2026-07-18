@@ -16,6 +16,8 @@ public class DashboardSummary
     // Extended fields
     public List<DashboardServiceEntryDto> RecentServiceEntries { get; set; } = new();
     public Dictionary<string, int> ServiceEntryStatusCounts { get; set; } = new();
+    public Dictionary<string, int> CategoryCounts { get; set; } = new();
+    public List<MonthlyResolveMetricDto> MonthlyResolveRates { get; set; } = new();
     public List<ActivityLogDto> RecentActivities { get; set; } = new();
 
     // Quick View fields
@@ -32,6 +34,13 @@ public class DashboardSummary
     public int QuickViewUnassignedCalls { get; set; }
     public int QuickViewTransferRequested { get; set; }
     public int QuickViewDeliveryChallan { get; set; }
+}
+
+public class MonthlyResolveMetricDto
+{
+    public string MonthName { get; set; } = string.Empty;
+    public int Count { get; set; }
+    public double BarHeight { get; set; }
 }
 
 public class DashboardServiceEntryDto

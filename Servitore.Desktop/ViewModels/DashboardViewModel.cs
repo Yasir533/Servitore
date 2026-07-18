@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Servitore.Desktop.Services;
@@ -20,6 +21,28 @@ public partial class DashboardViewModel : ViewModelBase
 
     [ObservableProperty]
     private bool isLoading;
+
+    // Category Breakdown Percentages & Counts
+    [ObservableProperty]
+    private int _warrantyCount;
+    [ObservableProperty]
+    private int _oowCount;
+    [ObservableProperty]
+    private int _amcCount;
+
+    [ObservableProperty]
+    private double _warrantyPercentage;
+    [ObservableProperty]
+    private double _oowPercentage;
+    [ObservableProperty]
+    private double _amcPercentage;
+
+    [ObservableProperty]
+    private GridLength _warrantyColumnWidth = new GridLength(1, GridUnitType.Star);
+    [ObservableProperty]
+    private GridLength _oowColumnWidth = new GridLength(1, GridUnitType.Star);
+    [ObservableProperty]
+    private GridLength _amcColumnWidth = new GridLength(1, GridUnitType.Star);
 
     public bool HasNoNotifications =>
         Summary == null || Summary.RecentNotifications.Count == 0;
@@ -42,16 +65,66 @@ public partial class DashboardViewModel : ViewModelBase
         try
         {
             Summary = await _apiService.GetAsync<DashboardSummary>("api/dashboard/summary");
+            ComputeChartMetrics();
         }
         catch (Exception ex)
         {
             Helpers.ClientLogger.Log("Failed to load dashboard summary", ex);
             Helpers.ToastHelper.ShowToast("Failed to refresh dashboard summary.");
             Summary = new DashboardSummary();
+            ComputeChartMetrics();
         }
         finally
         {
             IsLoading = false;
+        }
+    }
+
+    private void ComputeChartMetrics()
+    {
+        if (Summary == null) return;
+
+        // 1. Scale Monthly Resolve Rates
+        int maxCount = 0;
+        foreach (var item in Summary.MonthlyResolveRates)
+        {
+            if (item.Count > maxCount) maxCount = item.Count;
+        }
+        foreach (var item in Summary.MonthlyResolveRates)
+        {
+            item.BarHeight = maxCount > 0 ? ((double)item.Count / maxCount) * 120.0 : 0.0;
+            if (item.Count > 0 && item.BarHeight < 6.0) item.BarHeight = 6.0;
+        }
+
+        // 2. Compute category counts & percentages
+        Summary.CategoryCounts.TryGetValue("Warranty", out var warranty);
+        Summary.CategoryCounts.TryGetValue("OOW", out var oow);
+        Summary.CategoryCounts.TryGetValue("AMC", out var amc);
+
+        WarrantyCount = warranty;
+        OowCount = oow;
+        AmcCount = amc;
+
+        int total = warranty + oow + amc;
+        if (total > 0)
+        {
+            WarrantyPercentage = Math.Round(((double)warranty / total) * 100, 1);
+            OowPercentage = Math.Round(((double)oow / total) * 100, 1);
+            AmcPercentage = Math.Round(((double)amc / total) * 100, 1);
+
+            WarrantyColumnWidth = new GridLength(warranty > 0 ? warranty : 0.0001, GridUnitType.Star);
+            OowColumnWidth = new GridLength(oow > 0 ? oow : 0.0001, GridUnitType.Star);
+            AmcColumnWidth = new GridLength(amc > 0 ? amc : 0.0001, GridUnitType.Star);
+        }
+        else
+        {
+            WarrantyPercentage = 0;
+            OowPercentage = 0;
+            AmcPercentage = 0;
+
+            WarrantyColumnWidth = new GridLength(1, GridUnitType.Star);
+            OowColumnWidth = new GridLength(1, GridUnitType.Star);
+            AmcColumnWidth = new GridLength(1, GridUnitType.Star);
         }
     }
 
