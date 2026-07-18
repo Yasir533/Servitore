@@ -41,7 +41,7 @@
 
   <Target Name="KillRunningDesktop" BeforeTargets="PrepareForBuild">
     <Exec Command="powershell -Command &quot;Get-Process -Name Servitore.Desktop -ErrorAction SilentlyContinue | Stop-Process -Force&quot;" IgnoreExitCode="true" />
-    <Exec Command="powershell -Command &quot;Get-CimInstance Win32_Process -Filter \&quot;Name = 'dotnet.exe' AND CommandLine LIKE '%Servitore.Desktop.dll%'\&quot; -ErrorAction SilentlyContinue | Remove-CimInstance&quot;" IgnoreExitCode="true" />
+    <Exec Command="powershell -Command &quot;Get-CimInstance Win32_Process -Filter \&quot;Name = 'dotnet.exe' AND CommandLine LIKE '%Servitore.Desktop.dll%' AND CommandLine NOT LIKE '%MSBuild%' AND CommandLine NOT LIKE '%csc%' AND CommandLine NOT LIKE '%VBCSCompiler%'\&quot; -ErrorAction SilentlyContinue | Remove-CimInstance&quot;" IgnoreExitCode="true" />
   </Target>
 
 </Project>
