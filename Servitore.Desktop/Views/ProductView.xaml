@@ -43,7 +43,11 @@
                       materialDesign:HintAssist.Hint="Scan barcode / QR"
                       Style="{StaticResource MaterialDesignOutlinedTextBox}"
                       Text="{Binding ScannedCode, UpdateSourceTrigger=PropertyChanged}"
-                      Margin="0,0,8,0" />
+                      Margin="0,0,8,0">
+                <TextBox.InputBindings>
+                    <KeyBinding Key="Return" Command="{Binding LookupByBarcodeCommand}" />
+                </TextBox.InputBindings>
+            </TextBox>
             <Button Grid.Column="2" Content="Lookup"
                     Style="{StaticResource MaterialDesignOutlinedButton}"
                     Command="{Binding LookupByBarcodeCommand}" />
