@@ -91,6 +91,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddServitoreServices();
 builder.Services.AddHostedService<StaleLockCleanupService>();
 builder.Services.AddHostedService<SoftDeleteCleanupService>();
+builder.Services.AddHostedService<DailyReportBackgroundService>();
 
 // SignalR for real-time multi-desktop sync
 builder.Services.AddSignalR();
