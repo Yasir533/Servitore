@@ -63,6 +63,10 @@ if (maskedConnectionString.Contains("Password="))
 Console.WriteLine($"[DIAGNOSTIC] API startup: Using database connection string from {(isCustomDbSettings ? "databaseSettings.json" : "appsettings.json ConnectionStrings:DefaultConnection")}: {maskedConnectionString}");
 
 var jwtKey = builder.Configuration["Jwt:Key"];
+Console.WriteLine("==================================");
+Console.WriteLine("JWT Key: " + jwtKey);
+Console.WriteLine("JWT Length: " + (jwtKey?.Length ?? 0));
+Console.WriteLine("==================================");
 if (string.IsNullOrWhiteSpace(jwtKey))
 {
     throw new InvalidOperationException("CRITICAL CONFIGURATION ERROR: Jwt:Key is missing or empty.");

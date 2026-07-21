@@ -1,3 +1,4 @@
 {
-  "BaseUrl": "http://192.168.1.104:5001"
+  "BaseUrl": "http://192.168.1.108:5001",
+  "IdleTimeoutMinutes": 10
 }
