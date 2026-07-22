@@ -41,13 +41,22 @@ public class AppDbContext : DbContext
             .HasOne(d => d.Asset)
             .WithMany(a => a.Documents)
             .HasForeignKey(d => d.AssetId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Cascade)
+            .IsRequired(false);
 
         modelBuilder.Entity<ServiceEntryAttachment>()
             .HasOne(a => a.ServiceEntry)
             .WithMany(e => e.Attachments)
             .HasForeignKey(a => a.ServiceEntryId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Cascade)
+            .IsRequired(false);
+
+        modelBuilder.Entity<ServiceEntryHistory>()
+            .HasOne(h => h.ServiceEntry)
+            .WithMany(e => e.History)
+            .HasForeignKey(h => h.ServiceEntryId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .IsRequired(false);
 
         // Seed default roles
         modelBuilder.Entity<Role>().HasData(

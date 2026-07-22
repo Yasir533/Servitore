@@ -76,7 +76,18 @@ public class UsersController : ControllerBase
     {
         var created = await _userService.CreateAsync(dto);
         await _activityLogService.LogActivityAsync($"Created User: {created.Username} (ID: {created.Id})", "Users", HttpContext);
-        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+        
+        var createdDto = new
+        {
+            created.Id,
+            created.Username,
+            created.FullName,
+            created.Email,
+            created.PhoneNumber,
+            RoleName = created.Role?.RoleName,
+            created.IsActive
+        };
+        return CreatedAtAction(nameof(GetById), new { id = created.Id }, createdDto);
     }
 
     [HttpPut("{id:int}")]

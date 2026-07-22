@@ -16,157 +16,234 @@
                           Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"
                           Margin="0,0,0,16" />
  
-             <!-- Redesigned Upgraded Dashboard Widgets -->
-            <Grid Margin="0,0,0,24">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1.2*" />
-                    <ColumnDefinition Width="2*" />
-                </Grid.ColumnDefinitions>
+            <!-- 4 Top Cards (Row 1) -->
+             <UniformGrid Rows="1" Columns="4" Margin="0,0,0,24">
+                 <!-- Total Customers -->
+                 <Border Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="8" Padding="16" Margin="0,0,8,0">
+                     <Grid>
+                         <Grid.ColumnDefinitions>
+                             <ColumnDefinition Width="*" />
+                             <ColumnDefinition Width="Auto" />
+                         </Grid.ColumnDefinitions>
+                         <StackPanel Grid.Column="0">
+                             <TextBlock Text="Customers" FontSize="13" Opacity="0.55" FontWeight="SemiBold" />
+                             <TextBlock Text="{Binding Summary.TotalCustomers, FallbackValue='0'}" FontSize="24" FontWeight="Bold" Margin="0,4,0,0" />
+                         </StackPanel>
+                         <materialDesign:PackIcon Grid.Column="1" Kind="AccountGroup" Width="36" Height="36" Foreground="#5C6BC0" VerticalAlignment="Center" />
+                     </Grid>
+                 </Border>
 
-                <!-- Left Side: Schedule Date & Time Widget -->
-                <Border Margin="0,0,12,0" CornerRadius="8" Padding="24" Height="280">
-                    <Border.Background>
-                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                            <GradientStop Color="#1E2A3A" Offset="0" />
-                            <GradientStop Color="#0D1520" Offset="1" />
-                        </LinearGradientBrush>
-                    </Border.Background>
-                    <Grid>
-                        <!-- Watermark background image of mechanical gears and headset -->
-                        <Image Source="pack://application:,,,/Assets/Images/dashboard_background.png" 
-                               Opacity="0.12" 
-                               Stretch="Uniform" 
-                               HorizontalAlignment="Right" 
-                               VerticalAlignment="Bottom" 
-                               Width="160" Height="160" />
+                 <!-- Total Products -->
+                 <Border Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="8" Padding="16" Margin="8,0,8,0">
+                     <Grid>
+                         <Grid.ColumnDefinitions>
+                             <ColumnDefinition Width="*" />
+                             <ColumnDefinition Width="Auto" />
+                         </Grid.ColumnDefinitions>
+                         <StackPanel Grid.Column="0">
+                             <TextBlock Text="Assets / Products" FontSize="13" Opacity="0.55" FontWeight="SemiBold" />
+                             <TextBlock Text="{Binding Summary.TotalProducts, FallbackValue='0'}" FontSize="24" FontWeight="Bold" Margin="0,4,0,0" />
+                         </StackPanel>
+                         <materialDesign:PackIcon Grid.Column="1" Kind="Laptop" Width="36" Height="36" Foreground="#26A69A" VerticalAlignment="Center" />
+                     </Grid>
+                 </Border>
 
-                        <DockPanel>
-                            <TextBlock Text="Schedule Date &amp; Time" DockPanel.Dock="Top" FontSize="18" FontWeight="SemiBold" Foreground="White" />
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-                                <materialDesign:PackIcon Kind="ClockOutline" Width="72" Height="72" Foreground="#3F51B5" VerticalAlignment="Center" Margin="0,0,16,0" />
-                                <TextBlock Text="{Binding Summary.QuickViewDeadlineCalls, FallbackValue='2'}" FontSize="84" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" />
-                            </StackPanel>
-                        </DockPanel>
-                    </Grid>
-                </Border>
+                 <!-- Open Service Entries -->
+                 <Border Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="8" Padding="16" Margin="8,0,8,0">
+                     <Grid>
+                         <Grid.ColumnDefinitions>
+                             <ColumnDefinition Width="*" />
+                             <ColumnDefinition Width="Auto" />
+                         </Grid.ColumnDefinitions>
+                         <StackPanel Grid.Column="0">
+                             <TextBlock Text="Active Workload" FontSize="13" Opacity="0.55" FontWeight="SemiBold" />
+                             <TextBlock Text="{Binding Summary.OpenServiceEntries, FallbackValue='0'}" FontSize="24" FontWeight="Bold" Margin="0,4,0,0" />
+                         </StackPanel>
+                         <materialDesign:PackIcon Grid.Column="1" Kind="TicketOutline" Width="36" Height="36" Foreground="#EF5350" VerticalAlignment="Center" />
+                     </Grid>
+                 </Border>
 
-                <!-- Right Side: Quick View Particulars Panel -->
-                <Border Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="8" Padding="20" Grid.Column="1" Margin="12,0,0,0">
-                    <DockPanel>
-                        <TextBlock Text="Quick View" DockPanel.Dock="Top" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,12" />
-                        <TextBlock Text="Particulars" DockPanel.Dock="Top" FontSize="12" Opacity="0.5" Margin="0,0,0,8" />
-                        <ScrollViewer VerticalScrollBarVisibility="Auto" Height="220">
-                            <UniformGrid Columns="2" VerticalAlignment="Top">
-                                <!-- Particular items -->
-                                <Border BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0,0,0,1" Margin="4,4,12,4" Padding="0,4">
-                                    <Grid>
-                                        <TextBlock Text="Service Calls" VerticalAlignment="Center" FontSize="13" />
-                                        <Border Background="#E8EAF6" CornerRadius="10" HorizontalAlignment="Right" Padding="8,2" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Summary.QuickViewServiceCalls, FallbackValue='0'}" FontSize="11.5" FontWeight="Bold" Foreground="#3F51B5" />
-                                        </Border>
-                                    </Grid>
-                                </Border>
-                                <Border BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0,0,0,1" Margin="4,4,4,4" Padding="0,4">
-                                    <Grid>
-                                        <TextBlock Text="Pending Calls" VerticalAlignment="Center" FontSize="13" />
-                                        <Border Background="#FFE0B2" CornerRadius="10" HorizontalAlignment="Right" Padding="8,2" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Summary.QuickViewPendingCalls, FallbackValue='0'}" FontSize="11.5" FontWeight="Bold" Foreground="#FB8C00" />
-                                        </Border>
-                                    </Grid>
-                                </Border>
-                                <Border BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0,0,0,1" Margin="4,4,12,4" Padding="0,4">
-                                    <Grid>
-                                        <TextBlock Text="Dead Line Calls" VerticalAlignment="Center" FontSize="13" />
-                                        <Border Background="#FFCDD2" CornerRadius="10" HorizontalAlignment="Right" Padding="8,2" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Summary.QuickViewDeadlineCalls, FallbackValue='0'}" FontSize="11.5" FontWeight="Bold" Foreground="#E53935" />
-                                        </Border>
-                                    </Grid>
-                                </Border>
-                                <Border BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0,0,0,1" Margin="4,4,4,4" Padding="0,4">
-                                    <Grid>
-                                        <TextBlock Text="Priority Calls" VerticalAlignment="Center" FontSize="13" />
-                                        <Border Background="#F8BBD0" CornerRadius="10" HorizontalAlignment="Right" Padding="8,2" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Summary.QuickViewPriorityCalls, FallbackValue='0'}" FontSize="11.5" FontWeight="Bold" Foreground="#D81B60" />
-                                        </Border>
-                                    </Grid>
-                                </Border>
-                                <Border BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0,0,0,1" Margin="4,4,12,4" Padding="0,4">
-                                    <Grid>
-                                        <TextBlock Text="Calls Registered/Closed Today" VerticalAlignment="Center" FontSize="13" />
-                                        <Border Background="#E0F2F1" CornerRadius="10" HorizontalAlignment="Right" Padding="8,2" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Summary.QuickViewRegisteredClosedToday, FallbackValue='0'}" FontSize="11.5" FontWeight="Bold" Foreground="#00897B" />
-                                        </Border>
-                                    </Grid>
-                                </Border>
-                                <Border BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0,0,0,1" Margin="4,4,4,4" Padding="0,4">
-                                    <Grid>
-                                        <TextBlock Text="Pending for Customer Response" VerticalAlignment="Center" FontSize="13" />
-                                        <Border Background="#ECEFF1" CornerRadius="10" HorizontalAlignment="Right" Padding="8,2" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Summary.QuickViewPendingCustomerResponse, FallbackValue='0'}" FontSize="11.5" FontWeight="Bold" Foreground="#546E7A" />
-                                        </Border>
-                                    </Grid>
-                                </Border>
-                                <Border BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0,0,0,1" Margin="4,4,12,4" Padding="0,4">
-                                    <Grid>
-                                        <TextBlock Text="Pending for Spare" VerticalAlignment="Center" FontSize="13" />
-                                        <Border Background="#D7CCC8" CornerRadius="10" HorizontalAlignment="Right" Padding="8,2" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Summary.QuickViewPendingSpare, FallbackValue='0'}" FontSize="11.5" FontWeight="Bold" Foreground="#6D4C41" />
-                                        </Border>
-                                    </Grid>
-                                </Border>
-                                <Border BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0,0,0,1" Margin="4,4,4,4" Padding="0,4">
-                                    <Grid>
-                                        <TextBlock Text="Pending for Technical Support" VerticalAlignment="Center" FontSize="13" />
-                                        <Border Background="#E1BEE7" CornerRadius="10" HorizontalAlignment="Right" Padding="8,2" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Summary.QuickViewPendingTechnicalSupport, FallbackValue='0'}" FontSize="11.5" FontWeight="Bold" Foreground="#8E24AA" />
-                                        </Border>
-                                    </Grid>
-                                </Border>
-                                <Border BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0,0,0,1" Margin="4,4,12,4" Padding="0,4">
-                                    <Grid>
-                                        <TextBlock Text="Pending for Others Reason" VerticalAlignment="Center" FontSize="13" />
-                                        <Border Background="#F5F5F5" CornerRadius="10" HorizontalAlignment="Right" Padding="8,2" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Summary.QuickViewPendingOthers, FallbackValue='0'}" FontSize="11.5" FontWeight="Bold" Foreground="#616161" />
-                                        </Border>
-                                    </Grid>
-                                </Border>
-                                <Border BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0,0,0,1" Margin="4,4,4,4" Padding="0,4">
-                                    <Grid>
-                                        <TextBlock Text="Item not Delivered" VerticalAlignment="Center" FontSize="13" />
-                                        <Border Background="#FFECB3" CornerRadius="10" HorizontalAlignment="Right" Padding="8,2" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Summary.QuickViewItemNotDelivered, FallbackValue='0'}" FontSize="11.5" FontWeight="Bold" Foreground="#FFB300" />
-                                        </Border>
-                                    </Grid>
-                                </Border>
-                                <Border BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0,0,0,1" Margin="4,4,12,4" Padding="0,4">
-                                    <Grid>
-                                        <TextBlock Text="Unassigned Calls" VerticalAlignment="Center" FontSize="13" />
-                                        <Border Background="#CFD8DC" CornerRadius="10" HorizontalAlignment="Right" Padding="8,2" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Summary.QuickViewUnassignedCalls, FallbackValue='0'}" FontSize="11.5" FontWeight="Bold" Foreground="#37474F" />
-                                        </Border>
-                                    </Grid>
-                                </Border>
-                                <Border BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0,0,0,1" Margin="4,4,4,4" Padding="0,4">
-                                    <Grid>
-                                        <TextBlock Text="Transfer Requested" VerticalAlignment="Center" FontSize="13" />
-                                        <Border Background="#E0F7FA" CornerRadius="10" HorizontalAlignment="Right" Padding="8,2" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Summary.QuickViewTransferRequested, FallbackValue='0'}" FontSize="11.5" FontWeight="Bold" Foreground="#00838F" />
-                                        </Border>
-                                    </Grid>
-                                </Border>
-                                <Border BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0,0,0,1" Margin="4,4,12,4" Padding="0,4">
-                                    <Grid>
-                                        <TextBlock Text="Delivery Challan" VerticalAlignment="Center" FontSize="13" />
-                                        <Border Background="#DCEDC8" CornerRadius="10" HorizontalAlignment="Right" Padding="8,2" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Summary.QuickViewDeliveryChallan, FallbackValue='0'}" FontSize="11.5" FontWeight="Bold" Foreground="#558B2F" />
-                                        </Border>
-                                    </Grid>
-                                </Border>
-                            </UniformGrid>
-                        </ScrollViewer>
-                    </DockPanel>
-                </Border>
-            </Grid>
+                 <!-- Resolved Today -->
+                 <Border Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="8" Padding="16" Margin="8,0,0,0">
+                     <Grid>
+                         <Grid.ColumnDefinitions>
+                             <ColumnDefinition Width="*" />
+                             <ColumnDefinition Width="Auto" />
+                         </Grid.ColumnDefinitions>
+                         <StackPanel Grid.Column="0">
+                             <TextBlock Text="Resolved Today" FontSize="13" Opacity="0.55" FontWeight="SemiBold" />
+                             <TextBlock Text="{Binding Summary.ServiceEntriesResolvedToday, FallbackValue='0'}" FontSize="24" FontWeight="Bold" Margin="0,4,0,0" />
+                         </StackPanel>
+                         <materialDesign:PackIcon Grid.Column="1" Kind="CheckCircleOutline" Width="36" Height="36" Foreground="#4CAF50" VerticalAlignment="Center" />
+                     </Grid>
+                 </Border>
+             </UniformGrid>
+
+             <!-- Charts & Quick View (Row 2) -->
+             <Grid Margin="0,0,0,24">
+                 <Grid.ColumnDefinitions>
+                     <ColumnDefinition Width="1.6*" />
+                     <ColumnDefinition Width="1.1*" />
+                 </Grid.ColumnDefinitions>
+
+                 <!-- Left Side: Performance & Trends -->
+                 <Border Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="8" Padding="20" Margin="0,0,12,0">
+                     <DockPanel>
+                         <TextBlock Text="Performance &amp; Trends" DockPanel.Dock="Top" FontSize="17" FontWeight="SemiBold" Margin="0,0,0,16" />
+                         
+                         <Grid>
+                             <Grid.RowDefinitions>
+                                 <RowDefinition Height="Auto" />
+                                 <RowDefinition Height="24" />
+                                 <RowDefinition Height="Auto" />
+                             </Grid.RowDefinitions>
+
+                             <!-- Monthly Resolved Bar Chart -->
+                             <StackPanel Grid.Row="0">
+                                 <TextBlock Text="Resolved Tickets Trend (Last 6 Months)" FontSize="13.5" FontWeight="SemiBold" Margin="0,0,0,12" />
+                                 <ItemsControl ItemsSource="{Binding Summary.MonthlyResolveRates}">
+                                     <ItemsControl.ItemsPanel>
+                                         <ItemsPanelTemplate>
+                                             <UniformGrid Rows="1" Columns="6" />
+                                         </ItemsPanelTemplate>
+                                     </ItemsControl.ItemsPanel>
+                                     <ItemsControl.ItemTemplate>
+                                         <DataTemplate>
+                                             <Grid VerticalAlignment="Bottom" Height="140">
+                                                 <Grid.RowDefinitions>
+                                                     <RowDefinition Height="*" />
+                                                     <RowDefinition Height="Auto" />
+                                                     <RowDefinition Height="Auto" />
+                                                 </Grid.RowDefinitions>
+                                                 <TextBlock Grid.Row="0" Text="{Binding Count}" FontSize="11" FontWeight="SemiBold" 
+                                                            HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,4" />
+                                                 <Border Grid.Row="1" Background="#EF5350" Width="16" CornerRadius="3,3,0,0"
+                                                         Height="{Binding BarHeight}" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
+                                                 <TextBlock Grid.Row="2" Text="{Binding MonthName}" FontSize="9.5" Opacity="0.55" 
+                                                            HorizontalAlignment="Center" Margin="0,4,0,0" />
+                                             </Grid>
+                                         </DataTemplate>
+                                     </ItemsControl.ItemTemplate>
+                                 </ItemsControl>
+                             </StackPanel>
+
+                             <!-- Category Breakdown segmented bar -->
+                             <StackPanel Grid.Row="2">
+                                 <TextBlock Text="Ticket Categories Breakdown" FontSize="13.5" FontWeight="SemiBold" Margin="0,0,0,10" />
+                                 <Grid Height="12" Margin="0,0,0,12">
+                                     <Grid.ColumnDefinitions>
+                                         <ColumnDefinition Width="{Binding WarrantyColumnWidth}" />
+                                         <ColumnDefinition Width="{Binding OowColumnWidth}" />
+                                         <ColumnDefinition Width="{Binding AmcColumnWidth}" />
+                                     </Grid.ColumnDefinitions>
+                                     <Border Grid.Column="0" Background="#4CAF50" CornerRadius="3,0,0,3" ToolTip="Warranty" />
+                                     <Border Grid.Column="1" Background="#2196F3" ToolTip="Out of Warranty" />
+                                     <Border Grid.Column="2" Background="#FF9800" CornerRadius="0,3,3,0" ToolTip="AMC" />
+                                 </Grid>
+                                 
+                                 <UniformGrid Rows="1" Columns="3">
+                                     <StackPanel>
+                                         <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
+                                             <Ellipse Width="6" Height="6" Fill="#4CAF50" Margin="0,0,6,0" VerticalAlignment="Center" />
+                                             <TextBlock Text="Warranty" FontSize="11.5" FontWeight="SemiBold" />
+                                         </StackPanel>
+                                         <TextBlock FontSize="11" Opacity="0.7">
+                                             <Run Text="{Binding WarrantyCount}" FontWeight="Bold" />
+                                             <Run Text=" (" />
+                                             <Run Text="{Binding WarrantyPercentage}" />
+                                             <Run Text="%)" />
+                                         </TextBlock>
+                                     </StackPanel>
+                                     <StackPanel>
+                                         <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
+                                             <Ellipse Width="6" Height="6" Fill="#2196F3" Margin="0,0,6,0" VerticalAlignment="Center" />
+                                             <TextBlock Text="OOW" FontSize="11.5" FontWeight="SemiBold" />
+                                         </StackPanel>
+                                         <TextBlock FontSize="11" Opacity="0.7">
+                                             <Run Text="{Binding OowCount}" FontWeight="Bold" />
+                                             <Run Text=" (" />
+                                             <Run Text="{Binding OowPercentage}" />
+                                             <Run Text="%)" />
+                                         </TextBlock>
+                                     </StackPanel>
+                                     <StackPanel>
+                                         <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
+                                             <Ellipse Width="6" Height="6" Fill="#FF9800" Margin="0,0,6,0" VerticalAlignment="Center" />
+                                             <TextBlock Text="AMC" FontSize="11.5" FontWeight="SemiBold" />
+                                         </StackPanel>
+                                         <TextBlock FontSize="11" Opacity="0.7">
+                                             <Run Text="{Binding AmcCount}" FontWeight="Bold" />
+                                             <Run Text=" (" />
+                                             <Run Text="{Binding AmcPercentage}" />
+                                             <Run Text="%)" />
+                                         </TextBlock>
+                                     </StackPanel>
+                                 </UniformGrid>
+                             </StackPanel>
+                         </Grid>
+                     </DockPanel>
+                 </Border>
+
+                 <!-- Right Side: Status Details (Decluttered) -->
+                 <Border Background="{DynamicResource MaterialDesignCardBackground}" CornerRadius="8" Padding="20" Grid.Column="1" Margin="12,0,0,0">
+                     <DockPanel>
+                         <TextBlock Text="Status Breakdown" DockPanel.Dock="Top" FontSize="17" FontWeight="SemiBold" Margin="0,0,0,12" />
+                         <ScrollViewer VerticalScrollBarVisibility="Auto" Height="290">
+                             <StackPanel>
+                                 <!-- Service Calls -->
+                                 <Border BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0,0,0,1" Padding="0,8">
+                                     <Grid>
+                                         <TextBlock Text="Total Calls" FontSize="13" VerticalAlignment="Center" />
+                                         <TextBlock Text="{Binding Summary.QuickViewServiceCalls, FallbackValue='0'}" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                     </Grid>
+                                 </Border>
+                                 <!-- Pending Calls -->
+                                 <Border BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0,0,0,1" Padding="0,8">
+                                     <Grid>
+                                         <TextBlock Text="Pending Calls" FontSize="13" VerticalAlignment="Center" />
+                                         <TextBlock Text="{Binding Summary.QuickViewPendingCalls, FallbackValue='0'}" FontSize="13" FontWeight="Bold" Foreground="#FB8C00" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                     </Grid>
+                                 </Border>
+                                 <!-- Urgent/High Calls -->
+                                 <Border BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0,0,0,1" Padding="0,8">
+                                     <Grid>
+                                         <TextBlock Text="Urgent / Priority Calls" FontSize="13" VerticalAlignment="Center" />
+                                         <TextBlock Text="{Binding Summary.QuickViewPriorityCalls, FallbackValue='0'}" FontSize="13" FontWeight="Bold" Foreground="#D81B60" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                     </Grid>
+                                 </Border>
+                                 <!-- Pending for Spare -->
+                                 <Border BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0,0,0,1" Padding="0,8">
+                                     <Grid>
+                                         <TextBlock Text="Pending for Spare Parts" FontSize="13" VerticalAlignment="Center" />
+                                         <TextBlock Text="{Binding Summary.QuickViewPendingSpare, FallbackValue='0'}" FontSize="13" FontWeight="Bold" Foreground="#6D4C41" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                     </Grid>
+                                 </Border>
+                                 <!-- Pending Customer Response -->
+                                 <Border BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0,0,0,1" Padding="0,8">
+                                     <Grid>
+                                         <TextBlock Text="Pending Cust. Response" FontSize="13" VerticalAlignment="Center" />
+                                         <TextBlock Text="{Binding Summary.QuickViewPendingCustomerResponse, FallbackValue='0'}" FontSize="13" FontWeight="Bold" Foreground="#546E7A" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                     </Grid>
+                                 </Border>
+                                 <!-- Pending Technical Support -->
+                                 <Border BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0,0,0,1" Padding="0,8">
+                                     <Grid>
+                                         <TextBlock Text="Pending Tech. Support" FontSize="13" VerticalAlignment="Center" />
+                                         <TextBlock Text="{Binding Summary.QuickViewPendingTechnicalSupport, FallbackValue='0'}" FontSize="13" FontWeight="Bold" Foreground="#8E24AA" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                     </Grid>
+                                 </Border>
+                                 <!-- Unassigned Calls -->
+                                 <Border BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="0,0,0,1" Padding="0,8">
+                                     <Grid>
+                                         <TextBlock Text="Unassigned Calls" FontSize="13" VerticalAlignment="Center" />
+                                         <TextBlock Text="{Binding Summary.QuickViewUnassignedCalls, FallbackValue='0'}" FontSize="13" FontWeight="Bold" Foreground="#37474F" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                     </Grid>
+                                 </Border>
+                             </StackPanel>
+                         </ScrollViewer>
+                     </DockPanel>
+                 </Border>
+             </Grid>
  
              <!-- Row of Quick Actions -->
              <StackPanel Margin="0,0,0,24">

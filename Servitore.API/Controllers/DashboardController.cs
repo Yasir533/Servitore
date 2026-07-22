@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Servitore.Database.Context;
 using Servitore.Shared.Enums;
+using Servitore.Shared.Models;
 
 namespace Servitore.API.Controllers;
 
@@ -134,6 +135,46 @@ public class DashboardController : ControllerBase
         var quickViewDeliveryChallan = await _context.ServiceEntries
             .CountAsync(t => !t.IsDeleted && t.Status == ServiceEntryStatus.Delivered);
 
+        // 2b. Ticket Categories (CallType)
+        var allCategoryCounts = await _context.ServiceEntries
+            .Where(t => !t.IsDeleted && t.CallType != null && t.CallType != "")
+            .GroupBy(t => t.CallType)
+            .Select(g => new { CallType = g.Key, Count = g.Count() })
+            .ToListAsync();
+
+        var categoryCounts = new Dictionary<string, int>();
+        foreach (var item in allCategoryCounts)
+        {
+            categoryCounts[item.CallType!] = item.Count;
+        }
+        if (!categoryCounts.ContainsKey("Warranty")) categoryCounts["Warranty"] = 0;
+        if (!categoryCounts.ContainsKey("OOW")) categoryCounts["OOW"] = 0;
+        if (!categoryCounts.ContainsKey("AMC")) categoryCounts["AMC"] = 0;
+
+        // 2c. Monthly Resolve Rates (Last 6 Months)
+        var monthlyResolveRates = new List<MonthlyResolveMetricDto>();
+        for (int i = 5; i >= 0; i--)
+        {
+            var targetMonth = DateTime.UtcNow.AddMonths(-i);
+            var year = targetMonth.Year;
+            var month = targetMonth.Month;
+            
+            var startOfMonth = new DateTime(year, month, 1, 0, 0, 0, DateTimeKind.Utc);
+            var endOfMonth = startOfMonth.AddMonths(1);
+
+            var resolvedCount = await _context.ServiceEntries
+                .CountAsync(t => !t.IsDeleted &&
+                                 (t.Status == ServiceEntryStatus.Completed || t.Status == ServiceEntryStatus.Delivered) &&
+                                 t.ModifiedDate >= startOfMonth &&
+                                 t.ModifiedDate < endOfMonth);
+
+            monthlyResolveRates.Add(new MonthlyResolveMetricDto
+            {
+                MonthName = targetMonth.ToString("MMM yyyy"),
+                Count = resolvedCount
+            });
+        }
+
         var summary = new Servitore.Shared.Models.DashboardSummary
         {
             TotalCustomers = totalCustomers,
@@ -145,6 +186,8 @@ public class DashboardController : ControllerBase
             RecentNotifications = recentNotifications,
             RecentServiceEntries = recentEntries,
             ServiceEntryStatusCounts = entryStatusCounts,
+            CategoryCounts = categoryCounts,
+            MonthlyResolveRates = monthlyResolveRates,
             RecentActivities = recentActivities,
 
             QuickViewServiceCalls = quickViewServiceCalls,

@@ -24,13 +24,41 @@ public class ReportsController : ControllerBase
     }
 
     [HttpGet("tickets/{format}")]
-    public async Task<IActionResult> ExportTickets(string format)
+    public async Task<IActionResult> ExportTickets(
+        string format,
+        [FromQuery] DateTime? startDate = null,
+        [FromQuery] DateTime? endDate = null,
+        [FromQuery] Servitore.Shared.Enums.ServiceEntryStatus? status = null,
+        [FromQuery] Servitore.Shared.Enums.ServiceEntryPriority? priority = null)
     {
-        var tickets = await _context.ServiceEntries
+        var query = _context.ServiceEntries
             .AsNoTracking()
             .Include(t => t.Customer)
             .Include(t => t.Asset)
             .Include(t => t.AssignedToUser)
+            .AsQueryable();
+
+        if (startDate.HasValue)
+        {
+            query = query.Where(t => t.CreatedDate >= startDate.Value.Date);
+        }
+
+        if (endDate.HasValue)
+        {
+            query = query.Where(t => t.CreatedDate <= endDate.Value.Date.AddDays(1).AddTicks(-1));
+        }
+
+        if (status.HasValue)
+        {
+            query = query.Where(t => t.Status == status.Value);
+        }
+
+        if (priority.HasValue)
+        {
+            query = query.Where(t => t.Priority == priority.Value);
+        }
+
+        var tickets = await query
             .OrderByDescending(t => t.CreatedDate)
             .ToListAsync();
 

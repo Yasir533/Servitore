@@ -23,9 +23,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICustomerService, CustomerService>();
         services.AddScoped<IServiceEntryService, ServiceEntryService>();
         services.AddScoped<INotificationService, NotificationService>();
-        services.AddScoped<IBarcodeService, BarcodeService>();
+        services.AddScoped<IBarcodeService, BarcodeService>();                        
         services.AddScoped<IEmailService, EmailService>();
-        services.AddScoped<IActivityLogService, ActivityLogService>();
+        services.AddScoped<IActivityLogService, ActivityLogService>();     
         services.AddHttpClient<IWhatsAppService, WhatsAppService>();
 
         // Reports Exporter

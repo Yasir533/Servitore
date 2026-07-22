@@ -42,7 +42,9 @@ public partial class LoginViewModel : ViewModelBase
             }
             else
             {
-                ErrorMessage = result?.Message ?? "Login failed. Please try again.";
+                ErrorMessage = !string.IsNullOrWhiteSpace(result?.Message) 
+                    ? result.Message 
+                    : "Login failed. Please try again.";
             }
         }
         catch (Exception ex)
