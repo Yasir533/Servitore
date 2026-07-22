@@ -1,6 +1,6 @@
 {
   "DatabaseSettings": {
-    "Server": "localhost",
+    "Server": "PRODUCTION_DATABASE_SERVER",
     "Database": "ServitoreDB",
     "Username": "",
     "Password": ""

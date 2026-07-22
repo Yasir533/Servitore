@@ -5,10 +5,6 @@
       {
         "Path": "Servitore.Desktop\\Servitore.Desktop.csproj",
         "Action": "Start"
-      },
-      {
-        "Path": "Servitore.API\\Servitore.API.csproj",
-        "Action": "Start"
       }
     ]
   }

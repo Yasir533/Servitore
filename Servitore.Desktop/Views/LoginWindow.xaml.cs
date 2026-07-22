@@ -11,6 +11,7 @@ public partial class LoginWindow : Window
     public LoginWindow()
     {
         InitializeComponent();
+        Title = $"Servitore - Login ({App.ApiService.BaseUrl})";
 
         _viewModel = new LoginViewModel(App.AuthenticationService);
         _viewModel.LoginSucceeded += OnLoginSucceeded;
@@ -215,7 +216,7 @@ public partial class LoginWindow : Window
         var username = App.AuthenticationService.CurrentUser?.Username ?? "admin";
         var mainWindow = new Window
         {
-            Title = $"Servitore - Sai services - {username}",
+            Title = $"Servitore - Sai services - {username} ({App.ApiService.BaseUrl})",
             Content = dashboard,
             WindowState = WindowState.Maximized,
             Icon = new System.Windows.Media.Imaging.BitmapImage(new Uri("pack://application:,,,/Assets/Icons/logo.ico", UriKind.Absolute))

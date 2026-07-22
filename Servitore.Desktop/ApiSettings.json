@@ -1,9 +1,0 @@
-{
-<<<<<<< HEAD
-  "BaseUrl": "http://192.168.1.108:5001",
-  "IdleTimeoutMinutes": 10
-}
-=======
-  "BaseUrl": "http://localhost:5001"
-}
->>>>>>> 757042272a6df570f1c79a3faad51ce26ae04ca4
